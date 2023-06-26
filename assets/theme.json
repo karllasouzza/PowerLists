@@ -1,0 +1,362 @@
+{
+  "seed": "#6750A4",
+  "description": "TYPE: CUSTOM",
+  "coreColors": {
+    "primary": "#6750A4"
+  },
+  "schemes": {
+    "light": {
+      "primary": "#6750A4",
+      "onPrimary": "#FFFFFF",
+      "primaryContainer": "#DCE1FF",
+      "onPrimaryContainer": "#001550",
+      "primaryFixed": "#DCE1FF",
+      "onPrimaryFixed": "#001550",
+      "primaryFixedDim": "#B6C4FF",
+      "onPrimaryFixedVariant": "#294190",
+      "secondary": "#595D72",
+      "onSecondary": "#FFFFFF",
+      "secondaryContainer": "#DEE1F9",
+      "onSecondaryContainer": "#161B2C",
+      "secondaryFixed": "#DEE1F9",
+      "onSecondaryFixed": "#161B2C",
+      "secondaryFixedDim": "#C2C5DD",
+      "onSecondaryFixedVariant": "#424659",
+      "tertiary": "#75546F",
+      "onTertiary": "#FFFFFF",
+      "tertiaryContainer": "#FFD7F5",
+      "onTertiaryContainer": "#2C122A",
+      "tertiaryFixed": "#FFD7F5",
+      "onTertiaryFixed": "#2C122A",
+      "tertiaryFixedDim": "#E3BADA",
+      "onTertiaryFixedVariant": "#5B3D57",
+      "error": "#BA1A1A",
+      "onError": "#FFFFFF",
+      "errorContainer": "#FFDAD6",
+      "onErrorContainer": "#410002",
+      "outline": "#767680",
+      "background": "#FEFBFF",
+      "onBackground": "#1B1B1F",
+      "surface": "#FBF8FD",
+      "onSurface": "#1B1B1F",
+      "surfaceVariant": "#E2E1EC",
+      "onSurfaceVariant": "#45464F",
+      "inverseSurface": "#303034",
+      "inverseOnSurface": "#F2F0F4",
+      "inversePrimary": "#B6C4FF",
+      "shadow": "#000000",
+      "surfaceTint": "#4359A9",
+      "outlineVariant": "#C6C5D0",
+      "scrim": "#000000",
+      "surfaceContainerHighest": "#E4E1E6",
+      "surfaceContainerHigh": "#EAE7EC",
+      "surfaceContainer": "#EFEDF1",
+      "surfaceContainerLow": "#F5F3F7",
+      "surfaceContainerLowest": "#FFFFFF",
+      "surfaceBright": "#FBF8FD",
+      "surfaceDim": "#DBD9DE"
+    },
+    "dark": {
+      "primary": "#B6C4FF",
+      "onPrimary": "#0A2978",
+      "primaryContainer": "#294190",
+      "onPrimaryContainer": "#DCE1FF",
+      "primaryFixed": "#DCE1FF",
+      "onPrimaryFixed": "#001550",
+      "primaryFixedDim": "#B6C4FF",
+      "onPrimaryFixedVariant": "#294190",
+      "secondary": "#C2C5DD",
+      "onSecondary": "#2B3042",
+      "secondaryContainer": "#424659",
+      "onSecondaryContainer": "#DEE1F9",
+      "secondaryFixed": "#DEE1F9",
+      "onSecondaryFixed": "#161B2C",
+      "secondaryFixedDim": "#C2C5DD",
+      "onSecondaryFixedVariant": "#424659",
+      "tertiary": "#E3BADA",
+      "onTertiary": "#43273F",
+      "tertiaryContainer": "#5B3D57",
+      "onTertiaryContainer": "#FFD7F5",
+      "tertiaryFixed": "#FFD7F5",
+      "onTertiaryFixed": "#2C122A",
+      "tertiaryFixedDim": "#E3BADA",
+      "onTertiaryFixedVariant": "#5B3D57",
+      "error": "#FFB4AB",
+      "onError": "#690005",
+      "errorContainer": "#93000A",
+      "onErrorContainer": "#FFDAD6",
+      "outline": "#90909A",
+      "background": "#1B1B1F",
+      "onBackground": "#E4E1E6",
+      "surface": "#131316",
+      "onSurface": "#C8C6CA",
+      "surfaceVariant": "#45464F",
+      "onSurfaceVariant": "#C6C5D0",
+      "inverseSurface": "#E4E1E6",
+      "inverseOnSurface": "#1B1B1F",
+      "inversePrimary": "#4359A9",
+      "shadow": "#000000",
+      "surfaceTint": "#B6C4FF",
+      "outlineVariant": "#45464F",
+      "scrim": "#000000",
+      "surfaceContainerHighest": "#36343B",
+      "surfaceContainerHigh": "#2B2930",
+      "surfaceContainer": "#211F26",
+      "surfaceContainerLow": "#1D1B20",
+      "surfaceContainerLowest": "#0F0D13",
+      "surfaceBright": "#3B383E",
+      "surfaceDim": "#141218"
+    }
+  },
+  "palettes": {
+    "primary": {
+      "0": "#000000",
+      "10": "#21005D",
+      "15": "#1D156C",
+      "20": "#381E72",
+      "30": "#4F378B",
+      "40": "#6750A4",
+      "50": "#7F67BE",
+      "60": "#9A82DB",
+      "70": "#B69DF8",
+      "80": "#D0BCFF",
+      "90": "#EADDFF",
+      "95": "#F6EDFF",
+      "99": "#FFFBFE",
+      "100": "#FFFFFF"
+    },
+    "secondary": {
+      "0": "#000000",
+      "10": "#1D192B",
+      "15": "#252436",
+      "20": "#332D41",
+      "30": "#4A4458",
+      "40": "#625B71",
+      "50": "#7A7289",
+      "60": "#958DA5",
+      "70": "#B0A7C0",
+      "80": "#CCC2DC",
+      "90": "#E8DEF8",
+      "95": "#F6EDFF",
+      "99": "#FFFBFE",
+      "100": "#FFFFFF"
+    },
+    "tertiary": {
+      "0": "#000000",
+      "10": "#31111D",
+      "15": "#3B1B2E",
+      "20": "#492532",
+      "30": "#633B48",
+      "40": "#7D5260",
+      "50": "#986977",
+      "60": "#B58392",
+      "70": "#D29DAC",
+      "80": "#EFB8C8",
+      "90": "#FFD8E4",
+      "95": "#FFECF1",
+      "99": "#FFFBFA",
+      "100": "#FFFFFF"
+    },
+    "error": {
+      "0": "#000000",
+      "10": "#410E0B",
+      "15": "#540003",
+      "20": "#601410",
+      "30": "#8C1D18",
+      "40": "#B3261E",
+      "50": "#DC362E",
+      "60": "#E46962",
+      "70": "#EC928E",
+      "80": "#F2B8B5",
+      "90": "#F9DEDC",
+      "95": "#FCEEEE",
+      "99": "#FFFBF9",
+      "100": "#FFFFFF"
+    },
+    "neutral": {
+      "0": "#000000",
+      "10": "#1D1B20",
+      "15": "#262529",
+      "20": "#322F35",
+      "30": "#48464C",
+      "40": "#605D64",
+      "50": "#79767D",
+      "60": "#938F96",
+      "70": "#AEA9B1",
+      "80": "#CAC5CD",
+      "90": "#E6E0E9",
+      "95": "#F5EFF7",
+      "99": "#FFFBFF",
+      "100": "#FFFFFF"
+    },
+    "neutralVariant": {
+      "0": "#000000",
+      "10": "#1D1A22",
+      "15": "#26252D",
+      "20": "#322F37",
+      "30": "#49454F",
+      "40": "#605D66",
+      "50": "#79747E",
+      "60": "#938F99",
+      "70": "#AEA9B4",
+      "80": "#CAC4D0",
+      "90": "#E7E0EC",
+      "95": "#F5EEFA",
+      "99": "#FFFBFE",
+      "100": "#FFFFFF"
+    }
+  },
+  "styles": {
+    "display": {
+      "large": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 57,
+        "lineHeight": 64,
+        "letterSpacing": -0.25
+      },
+      "medium": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 45,
+        "lineHeight": 52,
+        "letterSpacing": 0
+      },
+      "small": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 36,
+        "lineHeight": 44,
+        "letterSpacing": 0
+      }
+    },
+    "headline": {
+      "large": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 32,
+        "lineHeight": 40,
+        "letterSpacing": 0
+      },
+      "medium": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 28,
+        "lineHeight": 36,
+        "letterSpacing": 0
+      },
+      "small": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 24,
+        "lineHeight": 32,
+        "letterSpacing": 0
+      }
+    },
+    "body": {
+      "large": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 16,
+        "lineHeight": 24,
+        "letterSpacing": 0.5
+      },
+      "medium": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0.25
+      },
+      "small": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 12,
+        "lineHeight": 16,
+        "letterSpacing": 0.4000000059604645
+      }
+    },
+    "label": {
+      "large": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Medium",
+        "fontWeight": 500,
+        "fontSize": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0.10000000149011612
+      },
+      "medium": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Medium",
+        "fontWeight": 500,
+        "fontSize": 12,
+        "lineHeight": 16,
+        "letterSpacing": 0.5
+      },
+      "small": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Medium",
+        "fontWeight": 500,
+        "fontSize": 11,
+        "lineHeight": 16,
+        "letterSpacing": 0.5
+      }
+    },
+    "title": {
+      "large": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Regular",
+        "fontWeight": 400,
+        "fontSize": 22,
+        "lineHeight": 28,
+        "letterSpacing": 0
+      },
+      "medium": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Medium",
+        "fontWeight": 500,
+        "fontSize": 16,
+        "lineHeight": 24,
+        "letterSpacing": 0.15000000596046448
+      },
+      "small": {
+        "fontFamilyName": "Roboto",
+        "fontFamilyStyle": "Medium",
+        "fontWeight": 500,
+        "fontSize": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0.10000000149011612
+      }
+    }
+  },
+  "extendedColors": [
+    {
+      "harmonized": false,
+      "color": "#B943A8",
+      "name": "Custom Color 3",
+      "description": ""
+    },
+    {
+      "harmonized": true,
+      "color": "#8FF0A4",
+      "name": "Success",
+      "description": "harmonized"
+    },
+    {
+      "harmonized": false,
+      "color": "#F9F06B",
+      "name": "Alerts",
+      "description": ""
+    }
+  ],
+  "name": "material-theme"
+}
