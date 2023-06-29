@@ -1,6 +1,6 @@
 import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import Auth from "./pages/Auth";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -10,6 +10,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
 import theme from "./assets/theme.json";
+import Login from "./pages/Auth/Login";
 const MyTheme = {
   dark: false,
   colors: {
@@ -27,7 +28,15 @@ export default function App() {
   return (
     <NavigationContainer theme={MyTheme}>
       {!user ? (
-        <Stack.Navigator initialRouteName='Login'>
+        <Stack.Navigator initialRouteName='Auth'>
+          <Stack.Screen
+            name='Auth'
+            component={Auth}
+            options={{
+              headerShown: false,
+            }}
+          />
+
           <Stack.Screen
             name='Login'
             component={Login}

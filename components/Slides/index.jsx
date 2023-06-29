@@ -10,10 +10,9 @@ import {
 import FocusAwareStatusBar from "../FocusAwareStatusBar.jsx";
 import theme from "../../assets/theme.json";
 import * as NavigationBar from "expo-navigation-bar";
-import CheckBox from "../svgs/CheckBox.jsx";
-import SlideContext from "../../context/slidePage.js";
+import CheckBox from "../../assets/svgs/CheckBox.jsx";
 
-const Slides = () => {
+const Slides = ({ current_slide, nextSlide, prevSlide }) => {
   const slide_pages = [
     {
       styles: {
@@ -30,7 +29,7 @@ const Slides = () => {
     },
     {
       styles: {
-        background: theme.palettes.secondary[99],
+        background: theme.palettes.secondary[95],
         check_background: theme.schemes.light.secondary,
         check_color: theme.palettes.secondary[100],
       },
@@ -43,9 +42,9 @@ const Slides = () => {
     },
     {
       styles: {
-        background: theme.palettes.primary[99],
-        check_background: theme.schemes.light.primary,
-        check_color: theme.palettes.primary[100],
+        background: theme.palettes.error[95],
+        check_background: theme.palettes.error[70],
+        check_color: theme.palettes.error[100],
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_3.png"),
@@ -55,8 +54,6 @@ const Slides = () => {
       check: false,
     },
   ];
-
-  const { current_slide, nextSlide } = useContext(SlideContext);
 
   NavigationBar.setBackgroundColorAsync(
     slide_pages[current_slide].styles.background
@@ -86,8 +83,11 @@ const Slides = () => {
               check_background={slide.styles.check_background}
               background={slide.styles.check_background}
               checked={index < current_slide}
-              click={() => {
+              next={() => {
                 nextSlide();
+              }}
+              prev={() => {
+                prevSlide();
               }}
             />
           ))}

@@ -8,7 +8,9 @@
     "error": "#FF7900",
     "neutralVariant": "#958E98",
     "success": "#9CD4DC",
-    "fourtiary": "#8E42D8"
+    "fourtiary": "#8E42D8",
+    "white": "#FFFFFF",
+    "black": "#000000"
   },
   "schemes": {
     "light": {
@@ -415,20 +417,5 @@
         "letterSpacing": 0.10000000149011612
       }
     }
-  },
-  "extendedColors": [
-    {
-      "harmonized": false,
-      "color": "#9CD4DC",
-      "name": "Success",
-      "description": ""
-    },
-    {
-      "harmonized": false,
-      "color": "#8E42D8",
-      "name": "fourtiary",
-      "description": ""
-    }
-  ],
-  "name": "Tasks"
+  }
 }

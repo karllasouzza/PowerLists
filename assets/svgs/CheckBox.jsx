@@ -1,9 +1,15 @@
 import { Path, Svg } from "react-native-svg";
 
-export default function CheckBox({ background, check_color, checked, click }) {
+export default function CheckBox({
+  background,
+  check_color,
+  checked,
+  next,
+  prev,
+}) {
   const NotCheck = () => (
     <Svg
-      onPress={() => click()}
+      onPress={() => next()}
       width='84'
       height='84'
       viewBox='0 0 84 84'
@@ -19,6 +25,7 @@ export default function CheckBox({ background, check_color, checked, click }) {
 
   const Checked = () => (
     <Svg
+      onPress={() => prev()}
       width='84'
       height='84'
       viewBox='0 0 84 84'
@@ -35,8 +42,6 @@ export default function CheckBox({ background, check_color, checked, click }) {
       />
     </Svg>
   );
-
-  console.log(checked)
 
   return !checked ? NotCheck() : Checked();
 }

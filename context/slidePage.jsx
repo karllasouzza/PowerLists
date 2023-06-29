@@ -10,9 +10,21 @@ export const SlideProvider = ({ children }) => {
     setCurrentSlide(current_slide + 1);
   }
 
+  async function prevSlide() {
+    setCurrentSlide(current_slide - 1);
+  }
+
   return (
-    <SlideContext.Provider value={{ current_slide, nextSlide }}>
-      {current_slide < 3 ? <Slides /> : children}
+    <SlideContext.Provider value={{ current_slide, nextSlide, prevSlide }}>
+      {current_slide < 3 ? (
+        <Slides
+          current_slide={current_slide}
+          nextSlide={nextSlide}
+          prevSlide={prevSlide}
+        />
+      ) : (
+        children
+      )}
     </SlideContext.Provider>
   );
 };

@@ -1,6 +1,9 @@
 import { styled } from "styled-components/native";
 import theme from "../../assets/theme.json";
-import CheckBox from "../svgs/CheckBox";
+import {
+  responsiveFontSize,
+  responsiveHeight,
+} from "react-native-responsive-dimensions";
 
 export const Slides_container = styled.View`
   flex: 1;
@@ -12,7 +15,7 @@ export const Slides_container = styled.View`
 `;
 
 export const Slide_image = styled.Image`
-  width: 70%;
+  height: ${() => responsiveHeight(35)}px;
   object-fit: contain;
 `;
 
@@ -27,7 +30,8 @@ export const Slide_Text_View = styled.View`
 export const Slide_title = styled.Text`
   color: ${theme.palettes.neutral[0]};
   text-align: center;
-  font-size: 26px;
+  font-size: ${() => responsiveFontSize(3.5)}px;
+
   font-family: sans-serif;
   font-style: normal;
   font-weight: 700;
@@ -42,7 +46,7 @@ export const Slide_subtitle = styled.Text`
   justify-content: center;
   color: ${theme.palettes.neutral[10]};
   text-align: center;
-  font-size: 16px;
+  font-size: ${() => responsiveFontSize(2)}px;
   font-family: Roboto;
   font-style: normal;
   font-weight: 400;

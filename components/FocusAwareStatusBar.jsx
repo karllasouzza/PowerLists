@@ -1,4 +1,3 @@
-import React from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 
