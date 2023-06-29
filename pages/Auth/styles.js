@@ -4,7 +4,6 @@ import {
   responsiveFontSize,
   responsiveHeight,
   responsiveScreenHeight,
-  responsiveWidth,
 } from "react-native-responsive-dimensions";
 
 export const ContainerLogin = styled.View`
@@ -50,7 +49,11 @@ export const LoginHeaderSection = styled.View`
 `;
 
 export const LoginTitle = styled.Text`
-  color: ${theme.coreColors.white};
+  color: ${theme.coreColors.black};
   font-size: ${() => responsiveFontSize(3.5)}px;
-  font-weight: bold;
+
+  font-family: sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  text-transform: capitalize;
 `;

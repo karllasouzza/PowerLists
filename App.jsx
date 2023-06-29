@@ -11,6 +11,10 @@ const Stack = createNativeStackNavigator();
 
 import theme from "./assets/theme.json";
 import Login from "./pages/Auth/Login";
+import CreateAccount from "./pages/Auth/CreateAccount";
+import { SlideProvider } from "./context/slidePage";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+
 const MyTheme = {
   dark: false,
   colors: {
@@ -28,23 +32,33 @@ export default function App() {
   return (
     <NavigationContainer theme={MyTheme}>
       {!user ? (
-        <Stack.Navigator initialRouteName='Auth'>
-          <Stack.Screen
-            name='Auth'
-            component={Auth}
-            options={{
-              headerShown: false,
-            }}
-          />
+        <SlideProvider>
+          <Stack.Navigator initialRouteName='Auth'>
+            <Stack.Screen
+              name='Auth'
+              component={Auth}
+              options={{
+                headerShown: false,
+              }}
+            />
 
-          <Stack.Screen
-            name='Login'
-            component={Login}
-            options={{
-              headerShown: false,
-            }}
-          />
-        </Stack.Navigator>
+            <Stack.Screen
+              name='Login'
+              component={Login}
+              options={{
+                headerShown: false,
+              }}
+            />
+
+            <Stack.Screen
+              name='CreateAccount'
+              component={CreateAccount}
+              options={{
+                headerShown: false,
+              }}
+            />
+          </Stack.Navigator>
+        </SlideProvider>
       ) : (
         <Tab.Navigator
           screenOptions={({ route }) => ({
@@ -84,6 +98,8 @@ export default function App() {
           <Tab.Screen name='Account' component={Home} />
         </Tab.Navigator>
       )}
+
+      <Toast />
     </NavigationContainer>
   );
 }
