@@ -1,12 +1,11 @@
 import { styled } from "styled-components/native";
-import theme from "../../assets/theme.json";
 import {
   responsiveFontSize,
   responsiveHeight,
   responsiveScreenHeight,
 } from "react-native-responsive-dimensions";
 
-export const ContainerLogin = styled.View`
+export const ContainerAuth = styled.View`
   width: 100%;
   height: 100%;
   padding: 0%;
@@ -16,11 +15,11 @@ export const ContainerLogin = styled.View`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: ${theme.palettes.primary[90]};
+  background-color: ${({ background }) => background};
   transition: all 0.5s ease-in-out;
 `;
 
-export const LoginImage = styled.Image`
+export const AuthImage = styled.Image`
   height: ${() => responsiveHeight(40)}px;
   object-fit: contain;
 `;
@@ -28,7 +27,7 @@ export const LoginImage = styled.Image`
 export const AccountContainer = styled.View`
   width: 100%;
   height: ${() => responsiveHeight(25)}px;
-  background-color: ${theme.palettes.secondary[80]};
+  background-color: ${({ background }) => background};
 
   display: flex;
   flex-direction: column;
@@ -38,7 +37,7 @@ export const AccountContainer = styled.View`
   border-radius: 20px 20px 0 0;
 `;
 
-export const LoginHeaderSection = styled.View`
+export const AuthHeaderSection = styled.View`
   width: 100%;
   height: ${() => responsiveScreenHeight(65)}px;
 
@@ -48,8 +47,8 @@ export const LoginHeaderSection = styled.View`
   justify-content: space-between;
 `;
 
-export const LoginTitle = styled.Text`
-  color: ${theme.coreColors.black};
+export const AuthTitle = styled.Text`
+  color: ${({ color }) => color};
   font-size: ${() => responsiveFontSize(3.5)}px;
 
   font-family: sans-serif;

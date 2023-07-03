@@ -1,7 +1,7 @@
 import React, { createContext, useState } from "react";
 import Slides from "../components/Slides";
 
-const SlideContext = createContext({ signed: true });
+const SlideContext = createContext();
 
 export const SlideProvider = ({ children }) => {
   const [current_slide, setCurrentSlide] = useState(0);

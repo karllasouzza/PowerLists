@@ -1,6 +1,6 @@
 import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   AccountScrollView,
   CreateAccountContainer,
@@ -11,13 +11,15 @@ import {
 } from "./styles";
 import theme from "../../../assets/theme.json";
 import * as NavigationBar from "expo-navigation-bar";
-import InputAccountForm from "../../../components/InputAccountForm";
 import PrimaryButton from "../../../components/PrimaryButton";
-import { supabase } from "../../../lib/supabase";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
+import PrimaryInput from "../../../components/PrimaryInput";
+import AuthContext from "../../../context/auth";
+import { showToast } from "../../../services/toast";
 
 export default () => {
-  NavigationBar.setBackgroundColorAsync(theme.palettes.tertiary[95]);
+  NavigationBar.setBackgroundColorAsync(theme.palettes.tertiary[99]);
+
+  const { singUp } = useContext(AuthContext);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,51 +27,70 @@ export default () => {
 
   const [loading, setLoading] = useState(false);
 
-  const showToast = () => {
-    Toast.show({
-      type: "success",
-      text1: "Sucesso",
-      text2: "Conta criada!",
-    });
-  };
-
   async function register() {
-    setLoading(true);
-    const { user, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          name: name,
-        },
-      },
-    });
-    if (!error && !user) {
+    if (validateName() && validateEmail() && validatePassword()) {
+      setLoading(true);
+      await singUp(name, email, password);
       setLoading(false);
-      showToast();
-    }
-    if (error) {
-      setLoading(false);
-      alert(error.message);
     }
   }
 
+  const validateName = () => {
+    if (name.length < 3) {
+      showToast({
+        type: "error",
+        title: "Nome inválido!",
+        subtitle: "O nome deve ter pelo menos 3 caracteres",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validateEmail = () => {
+    const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+    if (!regex.test(email)) {
+      showToast({
+        type: "error",
+        title: "E-mail inválido!",
+        subtitle: "Formato de email invalido",
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const validatePassword = () => {
+    if (password.length < 7) {
+      showToast({
+        type: "error",
+        title: "Senha incorreta!",
+        subtitle: "A senha deve ter pelo menos 7 caracteres",
+      });
+      return false;
+    }
+    return true;
+  };
+
   return (
-    <AccountScrollView>
-      <CreateAccountContainer>
-        <FocusAwareStatusBar color={theme.palettes.tertiary[95]} />
+    <AccountScrollView background={theme.palettes.tertiary[99]}>
+      <CreateAccountContainer background={theme.palettes.tertiary[99]}>
+        <FocusAwareStatusBar color={theme.palettes.tertiary[99]} />
 
         <CreateAccountHeader>
           <CreateAccountImage
             source={require("../../../assets/Images/Auth/Account/Illustration_one.png")}
           />
-          <CreateAccountTitle>Seja bem vindo!</CreateAccountTitle>
+          <CreateAccountTitle color={theme.coreColors.black}>
+            Seja bem vindo!
+          </CreateAccountTitle>
         </CreateAccountHeader>
 
         <CreateAccountForm>
-          <InputAccountForm
+          <PrimaryInput
             labelValue='Nome'
-            labelBackground={theme.palettes.tertiary[95]}
+            labelBackground={theme.palettes.tertiary[99]}
             labelColor={theme.coreColors.black}
             autoComplete='name'
             type='text'
@@ -77,9 +98,9 @@ export default () => {
             changeHandle={setName}
           />
 
-          <InputAccountForm
+          <PrimaryInput
             labelValue='E-Mail'
-            labelBackground={theme.palettes.tertiary[95]}
+            labelBackground={theme.palettes.tertiary[99]}
             labelColor={theme.coreColors.black}
             autoComplete='email'
             type='text'
@@ -87,9 +108,9 @@ export default () => {
             changeHandle={setEmail}
           />
 
-          <InputAccountForm
+          <PrimaryInput
             labelValue='Senha'
-            labelBackground={theme.palettes.tertiary[95]}
+            labelBackground={theme.palettes.tertiary[99]}
             labelColor={theme.coreColors.black}
             autoComplete='off'
             type='text'
@@ -101,7 +122,8 @@ export default () => {
           <PrimaryButton
             background={theme.coreColors.tertiary}
             color={theme.coreColors.white}
-            clickEvent={register}>
+            clickEvent={register}
+            loading={loading}>
             Criar Conta
           </PrimaryButton>
         </CreateAccountForm>
