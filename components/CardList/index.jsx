@@ -5,6 +5,7 @@ import {
   CardListProgress,
   CardListLabels,
   CardListOptions,
+  CardListPrice,
 } from "./styles";
 
 export const CardList = ({ list: { title, current, total, totalPrice } }) => (
@@ -16,7 +17,7 @@ export const CardList = ({ list: { title, current, total, totalPrice } }) => (
       </CardListProgress>
     </CardListLabels>
     <CardListOptions>
-      <CardListProgress>R${totalPrice}</CardListProgress>
+      <CardListPrice>R$ {totalPrice}</CardListPrice>
     </CardListOptions>
   </CardListContainer>
 );

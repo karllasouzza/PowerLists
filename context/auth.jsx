@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { GetUser, SingIn, SingOut, SingUp } from "../services/Supabase";
+import { GetUser, SingIn, SingOut, SingUp } from "../services/supabase/auth";
 import { showToast } from "../services/toast";
 
 const AuthContext = createContext();
@@ -13,6 +13,9 @@ export const AuthProvider = ({ children }) => {
     const getUser = async () => {
       try {
         const { user } = await GetUser();
+
+        if (!user) throw new Error();
+
         setUser(user);
         setAuth(!!user);
       } catch (error) {
@@ -29,6 +32,10 @@ export const AuthProvider = ({ children }) => {
         email: email,
         password: password,
       });
+
+      if (!user) throw new Error();
+      if (!session) throw new Error();
+
       setUser(user);
       setSession(session);
       showToast({
@@ -49,7 +56,10 @@ export const AuthProvider = ({ children }) => {
   async function singUp(name, email, password) {
     try {
       const { user, session } = await SingUp({ email, password, name });
-      console.log(user, session);
+
+      if (!user) throw new Error();
+      if (!session) throw new Error();
+
       setUser(user);
       setSession(session);
       showToast({
