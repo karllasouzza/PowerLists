@@ -17,8 +17,10 @@ import * as NavigationBar from "expo-navigation-bar";
 
 import theme from "../../assets/theme.json";
 import { GetLists } from "../../services/supabase/lists";
+import AddIcon from "../../assets/svgs/AddIcon";
+import { showToast } from "../../services/toast";
 
-const Home = () => {
+const Home = ({ navigation, route }) => {
   NavigationBar.setBackgroundColorAsync(theme.palettes.primary[99]);
 
   const { user } = useContext(AuthContext);
@@ -31,6 +33,12 @@ const Home = () => {
         setLists(data);
       } catch (erro) {
         console.log(erro);
+        showToast({
+          type: "error",
+          title: "Erro!",
+          subtitle:
+            "Erro ao carregar lista, tente mais tarde ou refaça o login!",
+        });
       }
     };
 
@@ -40,8 +48,8 @@ const Home = () => {
   const [lists, setLists] = useState([]);
 
   return (
-    <SafeContentEdge background={theme.palettes.primary[99]}>
-      <FocusAwareStatusBar color={theme.palettes.primary[99]} />
+    <SafeContentEdge background={theme.palettes.primary[95]}>
+      <FocusAwareStatusBar color={theme.palettes.primary[95]} />
       <Header>
         <HeaderTitle>
           Olá, <UserName>{user.user_metadata.name.split(" ")[0]}</UserName>
@@ -54,17 +62,34 @@ const Home = () => {
       </Header>
       <ListsContainer>
         {lists?.map((list, index) => (
-          <CardList key={index} list={list} />
+          <CardList
+            key={index}
+            list={{
+              ...list,
+              background: theme.coreColors.white,
+              accentColor: theme.coreColors[list.accent_color],
+              color: theme.coreColors.black,
+              subColor: theme.palettes.neutral[40],
+            }}
+            pressHandler={() =>
+              navigation.navigate("Add", {
+                params: { lists_id: list.id },
+              })
+            }
+          />
         ))}
       </ListsContainer>
       <Footer>
         <PrimaryButton
           color={theme.coreColors.white}
-          background={theme.coreColors.black}>
+          background={theme.coreColors.secondary}>
           Selecionar todos
         </PrimaryButton>
-        <Add>
-          <Ionicons name='add' size={24} />
+        <Add background={theme.coreColors.white}>
+          <AddIcon
+            background={theme.coreColors.primary}
+            color={theme.coreColors.black}
+          />
         </Add>
       </Footer>
     </SafeContentEdge>

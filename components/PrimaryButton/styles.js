@@ -4,7 +4,7 @@ import { styled } from "styled-components/native";
 export const ButtonTouch = styled.Pressable`
   width: ${() => responsiveWidth(20)}%;
   height: 50px;
-  border-radius: 10px;
+  border-radius: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,7 +17,7 @@ export const ButtonBackground = styled.View`
   bottom: 0;
   left: 0;
   background-color: ${({ background }) => background};
-  border-radius: 10px;
+  border-radius: 20px;
   opacity: 0.4000000059604645;
   z-index: -1;
 `;
