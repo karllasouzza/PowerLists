@@ -7,7 +7,12 @@ export const GetLists = async () => {
     console.log("User: ", user.id);
     const { data, error } = await supabase
       .from("Lists")
-      .select(`*`)
+      .select(
+        `*, List_item (
+        price,
+        status
+      )`
+      )
       .eq("user_id", user.id);
 
     console.log(error);

@@ -1,7 +1,8 @@
 import React from "react";
 import Home from "../pages/Home";
+import List from "../pages/List";
 
-export default ({ Stack, auth }) => {
+export default ({ Stack }) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -10,15 +11,14 @@ export default ({ Stack, auth }) => {
         options={{
           headerShown: false,
         }}
-        auth={auth}
       />
       <Stack.Screen
         name='Add'
-        component={Home}
+        component={List}
         options={{
           headerShown: false,
         }}
-        auth={auth}
+        initialParams={{ lists_id: null }}
       />
       <Stack.Screen
         name='Account'
@@ -26,7 +26,6 @@ export default ({ Stack, auth }) => {
         options={{
           headerShown: false,
         }}
-        auth={auth}
       />
     </Stack.Navigator>
   );
