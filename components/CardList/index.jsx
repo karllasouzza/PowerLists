@@ -24,15 +24,17 @@ export const CardList = ({
     </CardListLabels>
     <CardListOptions>
       <CardListPrice subColor={subColor}>
-        R${" "}
         {List_item?.map((item) => item.price).length
-          ? List_item?.map((item) => item.price)?.reduce(
-              (accum, curr) => accum + curr
-            )
+          ? List_item?.map((item) => item.price * item.amount)
+              ?.reduce((accum, curr) => accum + curr)
+              .toLocaleString("pt-br", {
+                style: "currency",
+                currency: "BRL",
+              })
           : List_item?.map((item) => item.price).length}
       </CardListPrice>
     </CardListOptions>
-    <CardListContainerBackground background={background} />
-    <CardListContainerAccentColor accentColor={accentColor} />
+    {/* <CardListContainerBackground background={background} /> */}
+    {/* <CardListContainerAccentColor accentColor={accentColor} /> */}
   </CardListContainer>
 );

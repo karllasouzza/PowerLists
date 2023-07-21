@@ -4,18 +4,16 @@ import { GetUser } from "./auth";
 export const GetLists = async () => {
   try {
     const { user } = await GetUser();
-    console.log("User: ", user.id);
     const { data, error } = await supabase
       .from("Lists")
       .select(
         `*, List_item (
         price,
+        amount,
         status
       )`
       )
       .eq("user_id", user.id);
-
-    console.log(error);
 
     if (error) throw error;
     if (!data) throw new Error("Data not found");

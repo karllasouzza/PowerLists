@@ -52,6 +52,7 @@ export default () => {
 
         <LoginForm>
           <PrimaryInput
+            width={20}
             labelValue='E-Mail'
             labelBackground={theme.palettes.primary[99]}
             labelColor={theme.coreColors.black}
@@ -62,6 +63,7 @@ export default () => {
           />
 
           <PrimaryInput
+            width={20}
             labelValue='Senha'
             labelBackground={theme.palettes.primary[99]}
             labelColor={theme.coreColors.black}

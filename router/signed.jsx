@@ -1,6 +1,6 @@
 import React from "react";
 import Home from "../pages/Home";
-import List from "../pages/List";
+import List from "../pages/ListItems";
 
 export default ({ Stack }) => {
   return (
@@ -18,7 +18,7 @@ export default ({ Stack }) => {
         options={{
           headerShown: false,
         }}
-        initialParams={{ lists_id: null }}
+        initialParams={{ list: null }}
       />
       <Stack.Screen
         name='Account'

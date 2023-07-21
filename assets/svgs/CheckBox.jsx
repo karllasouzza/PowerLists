@@ -6,12 +6,13 @@ export default function CheckBox({
   checked,
   next,
   prev,
+  width,
 }) {
   const NotCheck = () => (
     <Svg
       onPress={() => next()}
-      width='84'
-      height='84'
+      width={width ? width : "84"}
+      height={width ? width : "84"}
       viewBox='0 0 84 84'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'>
@@ -26,8 +27,8 @@ export default function CheckBox({
   const Checked = () => (
     <Svg
       onPress={() => prev()}
-      width='84'
-      height='84'
+      width={width ? width : "84"}
+      height={width ? width : "84"}
       viewBox='0 0 84 84'
       fill='none'
       xmlns='http://www.w3.org/2000/svg'>

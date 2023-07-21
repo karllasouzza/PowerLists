@@ -12,11 +12,14 @@ export default ({
   activeIconColor,
   offIconColor,
   changeHandle,
+  width,
 }) => {
   const [view, setView] = useState(true);
+  const [focus, setFocus] = useState(false);
+
   return (
-    <InputContainer>
-      <InputLabel color={labelColor} background={labelBackground}>
+    <InputContainer width={width}>
+      <InputLabel focus={focus} color={labelColor} background={labelBackground}>
         {labelValue}
       </InputLabel>
       <Input
@@ -25,6 +28,7 @@ export default ({
         secureTextEntry={secure ? view : false}
         cursorColor={labelColor}
         onChangeText={(value) => changeHandle(value)}
+        onFocus={() => setFocus(true)}
       />
       {secure ? (
         <InputIcon onPress={() => setView(!view)}>

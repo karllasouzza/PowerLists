@@ -33,8 +33,13 @@ export const HeaderTitle = styled.Text`
   color: ${theme.coreColors.black};
 `;
 
+export const SessionTitle = styled(HeaderTitle)`
+  font-family: 'serif';
+`;
+
 export const UserName = styled(HeaderTitle)`
   color: ${theme.palettes.primary[30]};
+  font-family: 'serif';
   text-transform: capitalize;
 `;
 

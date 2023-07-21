@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
-import { Ionicons } from "@expo/vector-icons";
+import { useIsFocused } from "@react-navigation/native";
+
 import {
   Add,
   SafeContentEdge,
@@ -9,6 +10,7 @@ import {
   HeaderTitle,
   ListsContainer,
   Footer,
+  SessionTitle,
 } from "./styles";
 import { CardList } from "../../components/CardList";
 import PrimaryButton from "../../components/PrimaryButton";
@@ -20,7 +22,8 @@ import { GetLists } from "../../services/supabase/lists";
 import AddIcon from "../../assets/svgs/AddIcon";
 import { showToast } from "../../services/toast";
 
-const Home = ({ navigation, route }) => {
+const Home = ({ navigation }) => {
+  const isFocused = useIsFocused();
   NavigationBar.setBackgroundColorAsync(theme.palettes.primary[99]);
 
   const { user } = useContext(AuthContext);
@@ -43,13 +46,13 @@ const Home = ({ navigation, route }) => {
     };
 
     getLists();
-  }, []);
+  }, [isFocused]);
 
   const [lists, setLists] = useState([]);
 
   return (
-    <SafeContentEdge background={theme.palettes.primary[95]}>
-      <FocusAwareStatusBar color={theme.palettes.primary[95]} />
+    <SafeContentEdge background={theme.palettes.primary[99]}>
+      <FocusAwareStatusBar color={theme.palettes.primary[99]} />
       <Header>
         <HeaderTitle>
           Olá, <UserName>{user.user_metadata.name.split(" ")[0]}</UserName>
@@ -58,7 +61,7 @@ const Home = ({ navigation, route }) => {
         {/* <UserImage /> */}
       </Header>
       <Header>
-        <HeaderTitle>Listas</HeaderTitle>
+        <SessionTitle>Listas</SessionTitle>
       </Header>
       <ListsContainer>
         {lists?.map((list, index) => (
@@ -73,7 +76,7 @@ const Home = ({ navigation, route }) => {
             }}
             pressHandler={() =>
               navigation.navigate("Add", {
-                params: { lists_id: list.id },
+                list: list,
               })
             }
           />
