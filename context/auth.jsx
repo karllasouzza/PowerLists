@@ -80,6 +80,7 @@ export const AuthProvider = ({ children }) => {
   async function singOut() {
     try {
       await SingOut();
+      setAuth(false);
       setUser(null);
       setSession(false);
 

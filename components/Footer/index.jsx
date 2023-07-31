@@ -1,98 +1,129 @@
 import React, { useState } from "react";
-import theme from "../../assets/theme.json";
 
 import ReturnIcon from "../../assets/svgs/ReturnIcon";
-import TrashIcon from "../../assets/svgs/TrashIcon";
 import AddIcon from "../../assets/svgs/AddIcon";
-import EditIcon from "../../assets/svgs/EditIcon";
-import { Footer, FooterIconContainer } from "./styles";
+import {
+  Footer,
+  FooterIconContainer,
+  FooterIconContainerAccent,
+  FooterIconLabel,
+} from "./styles";
 import PrimaryButton from "../PrimaryButton";
+import HomeIcon from "../../assets/svgs/HomeIcon";
+import AccountIcon from "../../assets/svgs/AccountIcon";
+import EditIcon from "../../assets/svgs/EditIcon";
 
 export default ({
+  background,
+  iconColor,
+  onIconColor,
+  onIconBackground,
+  returnColor,
+  returnBackground,
   mode,
-  setMode,
+  route,
+  homeHandle,
+  accountHandle,
+  addHandle,
   addNewItem,
-  returnOfAddMode,
-  deleteItems,
-  returnOfDeleteMode,
   editItems,
-  returnOfEditMode,
+  returnOfMode,
 }) => {
   const defaultFooter = () => (
-    <Footer>
+    <Footer background={background}>
       <FooterIconContainer
-        background={theme.palettes.error[90]}
-        onPress={() => setMode("delete")}>
-        <TrashIcon background={theme.coreColors.error} />
+        background={route === "Home" ? onIconBackground : background}
+        onPress={() => homeHandle()}>
+        <HomeIcon
+          width={20}
+          background={route === "Home" ? onIconColor : iconColor}
+          on={route === "Home"}
+        />
+        <FooterIconLabel color={route === "Home" ? onIconColor : iconColor}>
+          Inicio
+        </FooterIconLabel>
       </FooterIconContainer>
+      <FooterIconContainerAccent
+        border={onIconBackground}
+        background={background}
+        onPress={addHandle}>
+        {mode === "account" ? (
+          <EditIcon background={onIconBackground} width={30} />
+        ) : (
+          <AddIcon background={onIconBackground} width={35} />
+        )}
+      </FooterIconContainerAccent>
       <FooterIconContainer
-        background={theme.palettes.primary[90]}
-        onPress={() => setMode("add")}>
-        <AddIcon background={theme.coreColors.primary} />
-      </FooterIconContainer>
-      <FooterIconContainer
-        background={theme.palettes.tertiary[90]}
-        onPress={() => setMode("edit")}>
-        <EditIcon background={theme.coreColors.tertiary} width={20} />
-      </FooterIconContainer>
-    </Footer>
-  );
-
-  const addFooter = () => (
-    <Footer>
-      <PrimaryButton
-        background={theme.coreColors.primary}
-        color={theme.coreColors.white}
-        clickEvent={addNewItem}>
-        Adicionar
-      </PrimaryButton>
-      <FooterIconContainer
-        background={theme.palettes.error[90]}
-        onPress={returnOfAddMode}>
-        <ReturnIcon background={theme.coreColors.error} width={25} />
-      </FooterIconContainer>
-    </Footer>
-  );
-
-  const deleteFooter = () => (
-    <Footer>
-      <PrimaryButton
-        background={theme.coreColors.primary}
-        color={theme.coreColors.white}
-        clickEvent={() => deleteItems()}>
-        Confirmar
-      </PrimaryButton>
-      <FooterIconContainer
-        background={theme.palettes.error[90]}
-        onPress={() => returnOfDeleteMode()}>
-        <ReturnIcon background={theme.coreColors.error} width={25} />
+        background={route === "Account" ? onIconBackground : background}
+        onPress={() => accountHandle()}>
+        <AccountIcon
+          background={route === "Account" ? onIconColor : iconColor}
+          width={20}
+        />
+        <FooterIconLabel color={route === "Account" ? onIconColor : iconColor}>
+          Conta
+        </FooterIconLabel>
       </FooterIconContainer>
     </Footer>
   );
 
-  const editFooter = () => (
-    <Footer>
+  const actionFooter = () => (
+    <Footer background={background}>
       <PrimaryButton
-        background={theme.coreColors.primary}
-        color={theme.coreColors.white}
-        clickEvent={() => editItems()}>
-        Confirmar
+        width={15}
+        background={onIconBackground}
+        color={onIconColor}
+        clickEvent={mode === "add" ? addNewItem : editItems}>
+        {mode === "add" ? "Adicionar" : "Editar"}
       </PrimaryButton>
+      <FooterIconContainer background={returnBackground} onPress={returnOfMode}>
+        <ReturnIcon background={returnColor} width={20} />
+        <FooterIconLabel color={returnColor}>Voltar</FooterIconLabel>
+      </FooterIconContainer>
+    </Footer>
+  );
+
+  const defaultListItemFooter = () => (
+    <Footer background={background}>
       <FooterIconContainer
-        background={theme.palettes.error[90]}
-        onPress={() => returnOfEditMode()}>
-        <ReturnIcon background={theme.coreColors.error} width={25} />
+        background={route === "Home" ? onIconBackground : background}
+        onPress={() => homeHandle()}>
+        <ReturnIcon
+          width={20}
+          background={route === "Home" ? onIconColor : iconColor}
+          // on={route === "Home"}
+        />
+        <FooterIconLabel color={route === "Home" ? onIconColor : iconColor}>
+          Voltar
+        </FooterIconLabel>
+      </FooterIconContainer>
+      <FooterIconContainerAccent
+        border={onIconBackground}
+        background={background}
+        onPress={addHandle}>
+        <AddIcon background={onIconBackground} width={35} />
+      </FooterIconContainerAccent>
+      <FooterIconContainer
+        background={route === "Account" ? onIconBackground : background}
+        onPress={() => accountHandle()}>
+        <AccountIcon
+          background={route === "Account" ? onIconColor : iconColor}
+          width={20}
+        />
+        <FooterIconLabel color={route === "Account" ? onIconColor : iconColor}>
+          Conta
+        </FooterIconLabel>
       </FooterIconContainer>
     </Footer>
   );
 
   switch (mode) {
     case "add":
-      return addFooter();
-    case "delete":
-      return deleteFooter();
+      return actionFooter();
     case "edit":
-      return editFooter();
+      return actionFooter();
+    case "listItem":
+      return defaultListItemFooter();
     default:
       return defaultFooter();
   }

@@ -1,7 +1,20 @@
 import React, { useEffect, useState } from "react";
+import * as NavigationBar from "expo-navigation-bar";
+
+import {
+  CheckItem,
+  DeleteItems,
+  EditItem,
+  GetItems,
+  NewItem,
+} from "../../services/supabase/listItems";
+
+import NewListItem from "../../components/NewListItem";
+import ListItem from "../../components/ListItem";
+import Footer from "../../components/Footer";
+import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
 
 import theme from "../../assets/theme.json";
-import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
 import {
   ListContainer,
   ListHeader,
@@ -11,75 +24,165 @@ import {
   ItemsColumn,
   IconContainer,
 } from "./styles";
-import NewListItem from "../../components/NewListItem";
-import ListItem from "../../components/ListItem";
-import ReturnIcon from "../../assets/svgs/ReturnIcon";
-import Footer from "../../components/Footer";
-import { GetListItems, NewItem } from "../../services/supabase/listItems";
+import ReloadIcon from "../../assets/svgs/ReloadIcon";
+import BlurPopUp from "../../components/BlurPopUp";
+import { showToast } from "../../services/toast";
+import { UseRealtimeItems } from "../../services/supabase/realtime/Items";
+import { BackHandler } from "react-native";
 
-export default ({ route, navigation: { goBack } }) => {
+export default ({ route, navigation: { goBack, navigate } }) => {
   const { list } = route.params;
-
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
-  const [price, setPrice] = useState(0);
+  const [price, setPrice] = useState(0.0);
   const [amount, setAmount] = useState(0);
+  const [mode, setMode] = useState("listItem");
+  const [itemEditId, setItemEditId] = useState("");
+  const [reload, setReload] = useState(false);
+  const [errorInput, setErrorInput] = useState("");
 
-  const [mode, setMode] = useState("default");
+  const [colorMode, setListColorMode] = useState("light");
 
+  NavigationBar.setBackgroundColorAsync(
+    theme.schemes[colorMode][list.accent_color + "Container"]
+  );
+
+  UseRealtimeItems(list.id, items, setItems);
   useEffect(() => {
     const getItens = async () => {
       try {
-        const { data } = await GetListItems(list.id);
+        const { data } = await GetItems(list.id);
         if (!data) throw new Error();
 
         setItems(data);
-      } catch (error) {
-        console.log(error);
-      }
+        setReload(false);
+      } catch (error) {}
     };
     getItens();
-  }, [mode]);
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (mode === "add" || mode === "edit") {
+          returnOfMode();
+          return true;
+        }
+      }
+    );
+
+    return () => {
+      backHandler.remove();
+    };
+  }, [mode, reload]);
 
   const addNewItem = async () => {
     try {
+      if (product.length < 3) {
+        setErrorInput("title");
+        showToast({
+          type: "error",
+          title: "Titulo do produto invalido!",
+          subtitle: "O titulo tem que ter 3 ou mais caracteres!",
+        });
+        throw new Error();
+      }
+      if (parseInt(amount.replace(",", ".")) < 1) {
+        setErrorInput("amount");
+
+        showToast({
+          type: "error",
+          title: "Quantidade do produto invalida!",
+          subtitle: "A quantidade tem que ser maior que 0!",
+        });
+
+        throw new Error();
+      }
       const add = await NewItem(
         product,
         parseFloat(price.replace(",", ".")),
         parseInt(amount.replace(",", ".")),
         list.id
       );
-      if (!add) throw new Error("Data not found");
+      if (!add) throw new Error();
 
-      setProduct("");
-      setPrice("");
-      setAmount("");
-
-      setMode("default");
+      returnOfMode();
     } catch (error) {}
   };
 
-  const returnOfAddMode = () => {
-    setProduct("");
-    setPrice("");
-    setAmount("");
+  const checkItem = async (id, status) => {
+    try {
+      const erro = CheckItem(id, !status);
+      if (!erro) throw new Error();
+    } catch (error) {}
+  };
 
-    setMode("default");
+  const editItem = async () => {
+    try {
+      if (product.length < 3) {
+        setErrorInput("title");
+        showToast({
+          type: "error",
+          title: "Titulo do produto invalido!",
+          subtitle: "O titulo tem que ter 3 ou mais caracteres!",
+        });
+        throw new Error();
+      }
+      if (parseInt(amount.replace(",", ".")) < 1) {
+        setErrorInput("amount");
+
+        showToast({
+          type: "error",
+          title: "Quantidade do produto invalida!",
+          subtitle: "A quantidade tem que ser maior que 0!",
+        });
+
+        throw new Error();
+      }
+      const erro = await EditItem(
+        itemEditId,
+        product,
+        parseFloat(price.replace(",", ".")),
+        parseInt(amount.replace(",", "."))
+      );
+      if (!erro) throw new Error();
+
+      returnOfMode();
+    } catch (error) {}
+  };
+
+  const deleteItem = async (id) => {
+    try {
+      const erro = DeleteItems(id);
+      if (!erro) throw new Error();
+    } catch (error) {}
+  };
+
+  const returnOfMode = () => {
+    setProduct("");
+    setPrice(0.0);
+    setAmount(0.0);
+    setItemEditId("");
+    setErrorInput("");
+
+    setMode("listItem");
   };
 
   return (
-    <ListContainer background={theme.palettes.primary[100]}>
-      <FocusAwareStatusBar color={theme.palettes[list.accent_color][90]} />
-      <ListHeader background={theme.palettes[list.accent_color][90]}>
+    <ListContainer background={theme.schemes[colorMode].background}>
+      <FocusAwareStatusBar
+        color={theme.schemes[colorMode][list.accent_color + "Container"]}
+      />
+      <ListHeader
+        background={theme.schemes[colorMode][list.accent_color + "Container"]}>
         <ItemsColumn>
-          <ListHeaderTitle color={theme.coreColors.black}>
+          <ListHeaderTitle color={theme.schemes[colorMode].onBackground}>
             {list.title}
           </ListHeaderTitle>
-          <ListHeaderSubtitle color={theme.coreColors.black}>
+          <ListHeaderSubtitle color={theme.schemes[colorMode].onBackground}>
             Total:{" "}
             {items?.map((item) => item.price).length
               ? items
-                  ?.map((item) => item.price * item.amount)
+                  ?.map((item) => item?.price * item?.amount)
                   ?.reduce((accum, curr) => accum + curr)
                   .toLocaleString("pt-br", {
                     style: "currency",
@@ -88,45 +191,139 @@ export default ({ route, navigation: { goBack } }) => {
               : items?.map((item) => item.price).length}
           </ListHeaderSubtitle>
         </ItemsColumn>
-        <IconContainer background={theme.coreColors.white} onPress={goBack}>
-          <ReturnIcon width={25} background={theme.coreColors.black} />
+        <IconContainer onPress={() => setReload(true)}>
+          <ReloadIcon
+            on={reload}
+            background={theme.schemes[colorMode].onPrimaryContainer}
+          />
         </IconContainer>
       </ListHeader>
       <ListItemsContainer>
-        {items.map((item) => (
-          <ListItem
-            key={item.id}
-            item={item.title}
-            price={item.price.toLocaleString("pt-br", {
-              style: "currency",
-              currency: "BRL",
-            })}
-            amount={item.amount}
-            status={item.status}
-            background={theme.coreColors.primary}
-            checkColor={theme.coreColors.primary}
-            color={theme.coreColors.black}
-            subColor={theme.palettes.neutral[40]}
-          />
-        ))}
+        {items
+          .sort(function compare(a, b) {
+            let dateA = new Date(a.created_at);
+            let dateB = new Date(b.created_at);
+            return dateA - dateB;
+          })
+          .map((item) =>
+            !item.status ? (
+              <ListItem
+                key={item.id}
+                background={theme.schemes[colorMode][list.accent_color]}
+                options={{
+                  background: theme.schemes[colorMode][list.accent_color],
+                  deleteBackground: theme.schemes[colorMode].errorContainer,
+                  deleteColor: theme.schemes[colorMode].error,
+                  editBackground: theme.schemes[colorMode].tertiaryContainer,
+                  editColor: theme.schemes[colorMode].tertiary,
+                  shadow: theme.schemes[colorMode].shadow,
+                }}
+                status={item.status}
+                title={item.title}
+                item={item}
+                price={item?.price?.toLocaleString("pt-br", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+                amount={item.amount}
+                color={theme.schemes[colorMode].onBackground}
+                subColor={theme.schemes[colorMode].inverseSurface}
+                checkColor={theme.schemes[colorMode][list.accent_color]}
+                checkHandle={() => checkItem(item.id, item.status)}
+                editHandle={({ id, title, price, amount }) => {
+                  setMode("edit");
+                  setItemEditId(id);
+                  setProduct(title);
+                  setPrice(String(price));
+                  setAmount(String(amount));
+                }}
+                deleteHandle={deleteItem}
+              />
+            ) : null
+          )}
+        {items
+          .sort(function compare(a, b) {
+            let dateA = new Date(a.created_at);
+            let dateB = new Date(b.created_at);
+            return dateA - dateB;
+          })
+          .map((item) =>
+            item.status ? (
+              <ListItem
+                key={item.id}
+                background={theme.schemes[colorMode][list.accent_color]}
+                options={{
+                  background: theme.schemes[colorMode][list.accent_color],
+                  deleteBackground: theme.schemes[colorMode].errorContainer,
+                  deleteColor: theme.schemes[colorMode].error,
+                  editBackground: theme.schemes[colorMode].tertiaryContainer,
+                  editColor: theme.schemes[colorMode].tertiary,
+                  shadow: theme.schemes[colorMode].shadow,
+                }}
+                status={item.status}
+                title={item.title}
+                item={item}
+                price={item?.price?.toLocaleString("pt-br", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+                amount={item.amount}
+                color={theme.schemes[colorMode].onBackground}
+                subColor={theme.schemes[colorMode].inverseSurface}
+                checkColor={theme.schemes[colorMode][list.accent_color]}
+                checkHandle={() => checkItem(item.id, item.status)}
+                editHandle={({ id, title, price, amount }) => {
+                  setMode("edit");
+                  setItemEditId(id);
+                  setProduct(title);
+                  setPrice(String(price));
+                  setAmount(String(amount));
+                }}
+                deleteHandle={deleteItem}
+              />
+            ) : null
+          )}
       </ListItemsContainer>
 
-      {mode !== "add" ? (
-        ""
-      ) : (
+      {mode !== "add" && mode !== "edit" ? null : (
+        <BlurPopUp
+          zIndex={1}
+          background={theme.schemes[colorMode].shadow}
+          closeHandle={returnOfMode}
+        />
+      )}
+
+      {mode !== "add" && mode !== "edit" ? null : (
         <NewListItem
-          labelColor={theme.coreColors.white}
-          labelBackground={theme.coreColors.primary}
+          type='ListItems'
+          background={theme.schemes[colorMode][list.accent_color + "Container"]}
+          labelColor={theme.schemes[colorMode].onBackground}
+          labelBackground={
+            theme.schemes[colorMode][list.accent_color + "Container"]
+          }
+          errorColor={theme.schemes[colorMode].error}
           setProduct={setProduct}
           setPrice={setPrice}
           setAmount={setAmount}
+          onEdit={mode === "edit"}
+          values={{ title: product, price, amount }}
+          error={errorInput}
         />
       )}
       <Footer
+        background={theme.schemes[colorMode][list.accent_color + "Container"]}
+        iconColor={theme.schemes[colorMode].onBackground}
+        onIconColor={theme.schemes[colorMode].background}
+        onIconBackground={theme.schemes[colorMode][list.accent_color]}
+        returnBackground={theme.schemes[colorMode].errorContainer}
+        returnColor={theme.schemes[colorMode].error}
         mode={mode}
-        setMode={setMode}
         addNewItem={addNewItem}
-        returnOfAddMode={returnOfAddMode}
+        returnOfMode={returnOfMode}
+        addHandle={() => setMode("add")}
+        homeHandle={goBack}
+        accountHandle={() => navigate("Account")}
+        editItems={editItem}
       />
     </ListContainer>
   );

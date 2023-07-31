@@ -13,13 +13,18 @@ export default ({
   offIconColor,
   changeHandle,
   width,
+  edit,
+  value,
 }) => {
   const [view, setView] = useState(true);
   const [focus, setFocus] = useState(false);
 
   return (
-    <InputContainer width={width}>
-      <InputLabel focus={focus} color={labelColor} background={labelBackground}>
+    <InputContainer width={width} border={labelColor}>
+      <InputLabel
+        focus={edit ? edit : focus}
+        color={labelColor}
+        background={labelBackground}>
         {labelValue}
       </InputLabel>
       <Input
@@ -29,6 +34,7 @@ export default ({
         cursorColor={labelColor}
         onChangeText={(value) => changeHandle(value)}
         onFocus={() => setFocus(true)}
+        value={edit ? value : null}
       />
       {secure ? (
         <InputIcon onPress={() => setView(!view)}>

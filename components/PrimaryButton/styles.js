@@ -1,8 +1,11 @@
-import { responsiveFontSize, responsiveWidth } from "react-native-responsive-dimensions";
+import {
+  responsiveFontSize,
+  responsiveWidth,
+} from "react-native-responsive-dimensions";
 import { styled } from "styled-components/native";
 
 export const ButtonTouch = styled.Pressable`
-  width: ${() => responsiveWidth(20)}%;
+  width: ${({ width }) => responsiveWidth(width ? width : 20)}%;
   height: 50px;
   border-radius: 20px;
   display: flex;

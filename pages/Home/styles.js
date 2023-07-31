@@ -1,46 +1,45 @@
-import React from "react";
 import { styled } from "styled-components/native";
 import theme from "../../assets/theme.json";
 import {
   responsiveFontSize,
   responsiveHeight,
 } from "react-native-responsive-dimensions";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export const SafeContentEdge = styled.View`
   width: 100%;
   height: 100%;
-  flex: 1;
+
+  display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   background-color: ${({ background }) => background};
-  padding-top: 30px;
+  padding-top: 15px;
 `;
 
 export const Header = styled.View`
   width: 100%;
   height: 70px;
-  margin-bottom: 20px;
+  margin: 0;
   padding: 0 25px;
+  margin-top: 8px;
 
+  display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+
+  background-color: ${({ background }) => background};
 `;
 
 export const HeaderTitle = styled.Text`
-  font-size: ${responsiveFontSize(3)}px;
+  height: auto;
+
+  font-size: ${responsiveFontSize(2.7)}px;
+  color: ${({ color }) => color};
+
   font-weight: bold;
-  color: ${theme.coreColors.black};
-`;
-
-export const SessionTitle = styled(HeaderTitle)`
-  font-family: 'serif';
-`;
-
-export const UserName = styled(HeaderTitle)`
-  color: ${theme.palettes.primary[30]};
-  font-family: 'serif';
-  text-transform: capitalize;
 `;
 
 export const Add = styled.TouchableOpacity`
@@ -54,12 +53,8 @@ export const Add = styled.TouchableOpacity`
   border-radius: 30px;
 `;
 
-export const ListsContainer = styled.ScrollView`
-  width: 90%;
+export const ListsContainer = styled(KeyboardAwareScrollView)`
+  width: 100%;
   height: ${responsiveHeight(8)}%;
-  padding: 0px;
-
-  overflow-y: auto;
+  padding: 0 10px;
 `;
-
-export const Footer = styled(Header)``;

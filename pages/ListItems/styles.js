@@ -8,7 +8,7 @@ import {
 } from "../Home/styles";
 
 export const ListContainer = styled(SafeContentEdge)`
-padding-top: 25px;
+  padding-top: 24px;
   background-color: ${({ background }) => background};
 `;
 
@@ -59,6 +59,5 @@ export const ListHeaderSubtitle = styled(ListHeaderTitle)`
 export const ListItemsContainer = styled(ListsContainer)`
   width: 100%;
   height: 100%;
-  padding: 0 20px;
   margin: 0;
 `;

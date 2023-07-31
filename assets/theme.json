@@ -64,13 +64,13 @@
       "surfaceBright": "#FEF7FC",
       "surfaceDim": "#DED8DD",
       "success": "#006972",
-      "on_success": "#FFFFFF",
-      "success_container": "#8EF2FF",
-      "on_success_container": "#001F23",
+      "onSuccess": "#FFFFFF",
+      "successContainer": "#8EF2FF",
+      "onSuccessContainer": "#001F23",
       "fourtiary": "#8133CA",
-      "on_fourtiary": "#FFFFFF",
-      "fourtiary_container": "#F0DBFF",
-      "on_fourtiary_container": "#2C0051"
+      "onFourtiary": "#FFFFFF",
+      "fourtiaryContainer": "#F0DBFF",
+      "onFourtiaryContainer": "#2C0051"
     },
     "dark": {
       "primary": "#DBB8FF",

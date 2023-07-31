@@ -1,6 +1,5 @@
 import { styled } from "styled-components/native";
 import {
-  AccountScrollView,
   CreateAccountContainer,
   CreateAccountForm,
   CreateAccountHeader,
@@ -8,8 +7,11 @@ import {
   CreateAccountTitle,
 } from "../CreateAccount/styles";
 import { responsiveScreenHeight } from "react-native-responsive-dimensions";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-export const LoginScrollView = styled(AccountScrollView)`
+export const LoginScrollView = styled(KeyboardAwareScrollView)`
+  width: 100%;
+  height: 100%;
   background-color: ${({ background }) => background};
 `;
 export const LoginContainer = styled(CreateAccountContainer)`

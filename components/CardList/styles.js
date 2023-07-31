@@ -4,45 +4,18 @@ import { responsiveFontSize } from "react-native-responsive-dimensions";
 export const CardListContainer = styled.Pressable`
   width: 100%;
   height: 100px;
-  margin-bottom: 16px;
 
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  overflow: hidden;
-`;
 
-export const CardListContainerBackground = styled.View`
-  width: 100%;
-  height: 100px;
-  padding: 15px;
+  padding: 0 20px;
+  margin-bottom: 5px;
+  margin-top: 5px;
+
   border-radius: 20px;
-
-  position: absolute;
-  z-index: -1;
-
-  right: 0;
-  top: 0;
-  bottom: 0;
-
-  background-color: ${({ background }) => background};
-  opacity: 0.4000000059604645;
-`;
-
-export const CardListContainerAccentColor = styled(CardListContainerBackground)`
-  width: 15px;
-  height: 100%;
-  padding: 0;
-
-  z-index: -1;
-  opacity: 1;
-  border-radius: 0;
-
-  left: 0px;
-  top: 0px;
-  bottom: 0px;
-  background-color: ${({ accentColor }) => accentColor};
+  overflow: hidden;
 `;
 
 export const CardListTitle = styled.Text`
@@ -63,6 +36,11 @@ export const CardListPrice = styled.Text`
   font-size: ${responsiveFontSize(2)}px;
   font-weight: bold;
   color: ${({ subColor }) => subColor};
+
+  width: 100px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const CardListLabels = styled.View`
@@ -71,8 +49,33 @@ export const CardListLabels = styled.View`
 `;
 
 export const CardListOptions = styled.View`
-  width: 100px;
+  width: 140px;
+  height: 100%;
+
+  background-color: ${({ background }) => background};
+  border-radius: 20px 0 0 20px;
+
   flex-direction: row;
   justify-content: center;
   align-items: center;
+
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 2;
+
+  gap: 10px;
+`;
+
+export const IconContainer = styled.Pressable`
+  width: 50px;
+  height: 50px;
+  border-radius: 50px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: ${({ background }) => background};
 `;

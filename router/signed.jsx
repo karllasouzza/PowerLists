@@ -1,6 +1,7 @@
 import React from "react";
 import Home from "../pages/Home";
 import List from "../pages/ListItems";
+import Account from "../pages/Account";
 
 export default ({ Stack }) => {
   return (
@@ -22,7 +23,7 @@ export default ({ Stack }) => {
       />
       <Stack.Screen
         name='Account'
-        component={Home}
+        component={Account}
         options={{
           headerShown: false,
         }}

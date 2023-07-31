@@ -1,9 +1,11 @@
-import { responsiveHeight } from "react-native-responsive-dimensions";
+import {
+  responsiveHeight,
+} from "react-native-responsive-dimensions";
 import { styled } from "styled-components/native";
 
 export const NewListItemContainer = styled.View`
   width: 90%;
-  height: ${() => responsiveHeight(25)}px;
+  height: ${() => responsiveHeight(23)}px;
   border-radius: 30px;
 
   display: flex;
@@ -12,17 +14,19 @@ export const NewListItemContainer = styled.View`
   align-items: center;
 
   transition: all 0.5s ease-in-out;
+  z-index: 2;
+  bottom: 20px;
 `;
 
 export const NewListItemForm = styled.View`
   width: 100%;
   height: 100%;
   border-radius: 30px;
-  padding:10px 20px;
+  padding: 10px 20px;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-items: flex-start;
 
   transition: all 0.5s ease-in-out;
@@ -34,6 +38,7 @@ export const NewListItemFormRow = styled.View`
   display: flex;
   flex-direction: row;
   gap: 10px;
+  justify-content: space-between;
 `;
 
 export const NewListItemContainerBackground = styled(NewListItemContainer)`
@@ -47,5 +52,4 @@ export const NewListItemContainerBackground = styled(NewListItemContainer)`
   right: 0;
   bottom: 0;
   z-index: -1;
-  
 `;

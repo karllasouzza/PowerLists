@@ -1,5 +1,4 @@
 import { styled } from "styled-components/native";
-import theme from "../../assets/theme.json";
 import { responsiveWidth } from "react-native-responsive-dimensions";
 import { ButtonText } from "../PrimaryButton/styles";
 
@@ -7,7 +6,7 @@ export const InputContainer = styled.View`
   height: 50px;
   width: ${({ width }) => responsiveWidth(width ? width : 20)}%;
 
-  border: 2px solid ${theme.coreColors.black};
+  border: 2px solid ${({ border }) => border};
   border-radius: 20px;
 
   transition: all 0.5s ease-in-out;
