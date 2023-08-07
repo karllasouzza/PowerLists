@@ -74,15 +74,6 @@ export default ({ navigation, route }) => {
             />
           </AccountCardIconContainer>
         </ProjectCard>
-
-        <AccountCard
-          background={theme.schemes[colorMode].successContainer}
-          onPress={() => Linking.openURL("https://bmc.link/karllasouzza")}>
-          <BookIcon width={30} background={theme.schemes[colorMode].success} />
-          <AccountCardTitle color={theme.schemes[colorMode].onSuccessContainer}>
-            Buy me a Book
-          </AccountCardTitle>
-        </AccountCard>
       </AccountCardContainer>
 
       <Footer
