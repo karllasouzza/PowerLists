@@ -1,5 +1,4 @@
 import { styled } from "styled-components/native";
-import theme from "../../assets/theme.json";
 import {
   responsiveFontSize,
   responsiveHeight,
@@ -28,7 +27,7 @@ export const Slide_Text_View = styled.View`
 `;
 
 export const Slide_title = styled.Text`
-  color: ${theme.palettes.neutral[0]};
+  color: ${({ color }) => color};
   text-align: center;
   font-size: ${() => responsiveFontSize(3.5)}px;
 
@@ -44,7 +43,7 @@ export const Slide_subtitle = styled.Text`
   padding: 10px;
   flex-direction: column;
   justify-content: center;
-  color: ${theme.palettes.neutral[10]};
+  color: ${({ color }) => color};
   text-align: center;
   font-size: ${() => responsiveFontSize(2)}px;
   font-family: Roboto;

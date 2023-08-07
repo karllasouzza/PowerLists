@@ -1,5 +1,6 @@
 import React from "react";
 import { ButtonBackground, ButtonText, ButtonTouch } from "./styles";
+import ReloadIcon from "../../assets/svgs/ReloadIcon";
 
 export default ({
   children,
@@ -11,7 +12,11 @@ export default ({
 }) => {
   return (
     <ButtonTouch onPress={() => clickEvent()} width={width}>
-      <ButtonText color={color}>{children}</ButtonText>
+      {loading ? (
+        <ReloadIcon background={color} width={30} on={loading} />
+      ) : (
+        <ButtonText color={color}>{children}</ButtonText>
+      )}
       <ButtonBackground background={background} />
     </ButtonTouch>
   );

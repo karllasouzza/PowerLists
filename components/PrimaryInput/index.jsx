@@ -35,6 +35,7 @@ export default ({
         onChangeText={(value) => changeHandle(value)}
         onFocus={() => setFocus(true)}
         value={edit ? value : null}
+        color={labelColor}
       />
       {secure ? (
         <InputIcon onPress={() => setView(!view)}>

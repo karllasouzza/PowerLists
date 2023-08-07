@@ -15,9 +15,14 @@ import PrimaryButton from "../../../components/PrimaryButton";
 import PrimaryInput from "../../../components/PrimaryInput";
 import AuthContext from "../../../context/auth";
 import { showToast } from "../../../services/toast";
+import ColorModeContext from "../../../context/colorMode";
 
-export default () => {
-  NavigationBar.setBackgroundColorAsync(theme.palettes.tertiary[99]);
+export default ({ navigation }) => {
+  const { colorScheme, theme } = useContext(ColorModeContext);
+
+  NavigationBar.setBackgroundColorAsync(
+    theme.schemes[colorScheme].tertiaryContainer
+  );
 
   const { singUp } = useContext(AuthContext);
 
@@ -74,15 +79,15 @@ export default () => {
   };
 
   return (
-    <AccountScrollView background={theme.palettes.tertiary[99]}>
-      <CreateAccountContainer background={theme.palettes.tertiary[99]}>
-        <FocusAwareStatusBar color={theme.palettes.tertiary[99]} />
+    <AccountScrollView background={theme.schemes[colorScheme].tertiaryContainer}>
+      <CreateAccountContainer background={theme.schemes[colorScheme].tertiaryContainer}>
+        <FocusAwareStatusBar color={theme.schemes[colorScheme].tertiaryContainer} />
 
         <CreateAccountHeader>
           <CreateAccountImage
             source={require("../../../assets/Images/Auth/Account/Illustration_one.png")}
           />
-          <CreateAccountTitle color={theme.coreColors.black}>
+          <CreateAccountTitle color={theme.schemes[colorScheme].onTertiaryContainer}>
             Seja bem vindo!
           </CreateAccountTitle>
         </CreateAccountHeader>
@@ -90,8 +95,8 @@ export default () => {
         <CreateAccountForm>
           <PrimaryInput
             labelValue='Nome'
-            labelBackground={theme.palettes.tertiary[99]}
-            labelColor={theme.coreColors.black}
+            labelBackground={theme.schemes[colorScheme].tertiaryContainer}
+            labelColor={theme.schemes[colorScheme].onTertiaryContainer}
             autoComplete='name'
             type='text'
             secure={false}
@@ -100,8 +105,8 @@ export default () => {
 
           <PrimaryInput
             labelValue='E-Mail'
-            labelBackground={theme.palettes.tertiary[99]}
-            labelColor={theme.coreColors.black}
+            labelBackground={theme.schemes[colorScheme].tertiaryContainer}
+            labelColor={theme.schemes[colorScheme].onTertiaryContainer}
             autoComplete='email'
             type='text'
             secure={false}
@@ -110,18 +115,18 @@ export default () => {
 
           <PrimaryInput
             labelValue='Senha'
-            labelBackground={theme.palettes.tertiary[99]}
-            labelColor={theme.coreColors.black}
+            labelBackground={theme.schemes[colorScheme].tertiaryContainer}
+            labelColor={theme.schemes[colorScheme].onTertiaryContainer}
             autoComplete='off'
             type='text'
             secure={true}
-            activeIconColor={theme.coreColors.tertiary}
-            offIconColor={theme.coreColors.black}
+            activeIconColor={theme.schemes[colorScheme].tertiary}
+            offIconColor={theme.schemes[colorScheme].onTertiaryContainer}
             changeHandle={setPassword}
           />
           <PrimaryButton
-            background={theme.coreColors.tertiary}
-            color={theme.coreColors.white}
+            background={theme.schemes[colorScheme].tertiary}
+            color={theme.schemes[colorScheme].onTertiaryContainer}
             clickEvent={register}
             loading={loading}>
             Criar Conta

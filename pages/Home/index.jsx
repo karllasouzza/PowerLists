@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 
 import { UseRealtimeLists } from "../../services/supabase/realtime/lists";
@@ -16,15 +16,21 @@ import BlurPopUp from "../../components/BlurPopUp";
 import NewListItem from "../../components/NewListItem";
 import Footer from "../../components/Footer";
 
-import theme from "../../assets/theme.json";
 import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
 import { IconContainer } from "../ListItems/styles";
 import { useIsFocused } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
 import { BackHandler } from "react-native";
+import ColorModeContext from "../../context/colorMode";
 
 const Home = ({ navigation, route }) => {
   const focused = useIsFocused();
+  const { theme, colorScheme } = useContext(ColorModeContext);
+
+  NavigationBar.setBackgroundColorAsync(
+    theme.schemes[colorScheme].primaryFixed
+  );
+
   const [lists, setLists] = useState([]);
   const [mode, setMode] = useState("default");
   const [title, setTitle] = useState("");
@@ -32,9 +38,6 @@ const Home = ({ navigation, route }) => {
   const [listEditId, setListEditId] = useState("");
   const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
-  const [colorMode, setListColorMode] = useState("light");
-
-  NavigationBar.setBackgroundColorAsync(theme.schemes[colorMode].primaryFixed);
 
   UseRealtimeLists(lists, setLists);
   useEffect(() => {
@@ -106,7 +109,6 @@ const Home = ({ navigation, route }) => {
   const deleteList = async (id, setLongPress) => {
     try {
       const erro = await DeleteList(id);
-      console.log(erro);
       if (!erro) throw new Error("Error");
 
       setLongPress(false);
@@ -123,16 +125,18 @@ const Home = ({ navigation, route }) => {
   };
 
   return (
-    <SafeContentEdge background={theme.schemes[colorMode].background}>
-      <FocusAwareStatusBar color={theme.schemes[colorMode].primaryContainer} />
-      <Header background={theme.schemes[colorMode].primaryContainer}>
-        <HeaderTitle color={theme.schemes[colorMode].onPrimaryContainer}>
+    <SafeContentEdge background={theme.schemes[colorScheme].background}>
+      <FocusAwareStatusBar
+        color={theme.schemes[colorScheme].primaryContainer}
+      />
+      <Header background={theme.schemes[colorScheme].primaryContainer}>
+        <HeaderTitle color={theme.schemes[colorScheme].onPrimaryContainer}>
           Listas
         </HeaderTitle>
         <IconContainer onPress={() => setReload(true)}>
           <ReloadIcon
             on={reload}
-            background={theme.schemes[colorMode].onPrimaryContainer}
+            background={theme.schemes[colorScheme].onPrimaryContainer}
           />
         </IconContainer>
       </Header>
@@ -142,13 +146,13 @@ const Home = ({ navigation, route }) => {
             key={index}
             list={{
               ...list,
-              background: theme.schemes[colorMode].background,
+              background: theme.schemes[colorScheme].background,
               accentColor: {
                 name: list.accent_color,
-                value: theme.schemes[colorMode][list.accent_color],
+                value: theme.schemes[colorScheme][list.accent_color],
               },
-              color: theme.coreColors.black,
-              subColor: theme.palettes.neutral[40],
+              color: theme.schemes[colorScheme][list.accent_color],
+              subColor: theme.schemes[colorScheme].onSurfaceVariant,
             }}
             pressHandler={
               mode === "default"
@@ -171,17 +175,17 @@ const Home = ({ navigation, route }) => {
       {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp
           zIndex={1}
-          background={theme.schemes[colorMode].shadow}
+          background={theme.schemes[colorScheme].shadow}
           closeHandle={returnOfMode}
         />
       )}
       {mode !== "add" && mode !== "edit" ? null : (
         <NewListItem
           type='Lists'
-          background={theme.schemes[colorMode].primaryFixed}
-          labelColor={theme.schemes[colorMode].onBackground}
-          labelBackground={theme.schemes[colorMode].primaryContainer}
-          errorColor={theme.schemes[colorMode].error}
+          background={theme.schemes[colorScheme].primaryFixed}
+          labelColor={theme.schemes[colorScheme].shadow}
+          labelBackground={theme.schemes[colorScheme].primaryFixed}
+          errorColor={theme.schemes[colorScheme].error}
           setProduct={setTitle}
           colors={[
             "primary",
@@ -196,15 +200,17 @@ const Home = ({ navigation, route }) => {
           onEdit={mode === "edit"}
           values={{ title }}
           error={errorInput}
+          onSelectedColor={theme.schemes[colorScheme].onBackground}
+          selectedColor={theme.schemes[colorScheme].background}
         />
       )}
       <Footer
-        background={theme.schemes[colorMode].primaryFixed}
-        iconColor={theme.schemes[colorMode].onPrimaryContainer}
-        onIconColor={theme.schemes[colorMode].onPrimary}
-        onIconBackground={theme.schemes[colorMode].onPrimaryFixedVariant}
-        returnColor={theme.schemes[colorMode].error}
-        returnBackground={theme.schemes[colorMode].errorContainer}
+        background={theme.schemes[colorScheme].primaryFixed}
+        iconColor={theme.schemes[colorScheme].onPrimaryFixed}
+        onIconColor={theme.schemes[colorScheme].primaryFixedDim}
+        onIconBackground={theme.schemes[colorScheme].onPrimaryFixedVariant}
+        returnColor={theme.schemes[colorScheme].error}
+        returnBackground={theme.schemes[colorScheme].errorContainer}
         mode={mode}
         route={route.name}
         addHandle={() => setMode("add")}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 
 import {
@@ -14,7 +14,6 @@ import ListItem from "../../components/ListItem";
 import Footer from "../../components/Footer";
 import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
 
-import theme from "../../assets/theme.json";
 import {
   ListContainer,
   ListHeader,
@@ -29,8 +28,11 @@ import BlurPopUp from "../../components/BlurPopUp";
 import { showToast } from "../../services/toast";
 import { UseRealtimeItems } from "../../services/supabase/realtime/Items";
 import { BackHandler } from "react-native";
+import ColorModeContext from "../../context/colorMode";
 
 export default ({ route, navigation: { goBack, navigate } }) => {
+  const { theme, colorScheme } = useContext(ColorModeContext);
+
   const { list } = route.params;
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
@@ -41,10 +43,8 @@ export default ({ route, navigation: { goBack, navigate } }) => {
   const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
 
-  const [colorMode, setListColorMode] = useState("light");
-
   NavigationBar.setBackgroundColorAsync(
-    theme.schemes[colorMode][list.accent_color + "Container"]
+    theme.schemes[colorScheme][list.accent_color + "Fixed"]
   );
 
   UseRealtimeItems(list.id, items, setItems);
@@ -168,17 +168,19 @@ export default ({ route, navigation: { goBack, navigate } }) => {
   };
 
   return (
-    <ListContainer background={theme.schemes[colorMode].background}>
+    <ListContainer background={theme.schemes[colorScheme].background}>
       <FocusAwareStatusBar
-        color={theme.schemes[colorMode][list.accent_color + "Container"]}
+        color={theme.schemes[colorScheme][list.accent_color + "Container"]}
       />
       <ListHeader
-        background={theme.schemes[colorMode][list.accent_color + "Container"]}>
+        background={
+          theme.schemes[colorScheme][list.accent_color + "Container"]
+        }>
         <ItemsColumn>
-          <ListHeaderTitle color={theme.schemes[colorMode].onBackground}>
+          <ListHeaderTitle color={theme.schemes[colorScheme].onBackground}>
             {list.title}
           </ListHeaderTitle>
-          <ListHeaderSubtitle color={theme.schemes[colorMode].onBackground}>
+          <ListHeaderSubtitle color={theme.schemes[colorScheme].onBackground}>
             Total:{" "}
             {items?.map((item) => item.price).length
               ? items
@@ -194,7 +196,7 @@ export default ({ route, navigation: { goBack, navigate } }) => {
         <IconContainer onPress={() => setReload(true)}>
           <ReloadIcon
             on={reload}
-            background={theme.schemes[colorMode].onPrimaryContainer}
+            background={theme.schemes[colorScheme].onPrimaryContainer}
           />
         </IconContainer>
       </ListHeader>
@@ -209,14 +211,14 @@ export default ({ route, navigation: { goBack, navigate } }) => {
             !item.status ? (
               <ListItem
                 key={item.id}
-                background={theme.schemes[colorMode][list.accent_color]}
+                background={theme.schemes[colorScheme][list.accent_color]}
                 options={{
-                  background: theme.schemes[colorMode][list.accent_color],
-                  deleteBackground: theme.schemes[colorMode].errorContainer,
-                  deleteColor: theme.schemes[colorMode].error,
-                  editBackground: theme.schemes[colorMode].tertiaryContainer,
-                  editColor: theme.schemes[colorMode].tertiary,
-                  shadow: theme.schemes[colorMode].shadow,
+                  background: theme.schemes[colorScheme][list.accent_color],
+                  deleteBackground: theme.schemes[colorScheme].errorContainer,
+                  deleteColor: theme.schemes[colorScheme].error,
+                  editBackground: theme.schemes[colorScheme].tertiaryContainer,
+                  editColor: theme.schemes[colorScheme].tertiary,
+                  shadow: theme.schemes[colorScheme].shadow,
                 }}
                 status={item.status}
                 title={item.title}
@@ -226,9 +228,9 @@ export default ({ route, navigation: { goBack, navigate } }) => {
                   currency: "BRL",
                 })}
                 amount={item.amount}
-                color={theme.schemes[colorMode].onBackground}
-                subColor={theme.schemes[colorMode].inverseSurface}
-                checkColor={theme.schemes[colorMode][list.accent_color]}
+                color={theme.schemes[colorScheme].onBackground}
+                subColor={theme.schemes[colorScheme].inverseSurface}
+                checkColor={theme.schemes[colorScheme][list.accent_color]}
                 checkHandle={() => checkItem(item.id, item.status)}
                 editHandle={({ id, title, price, amount }) => {
                   setMode("edit");
@@ -251,14 +253,14 @@ export default ({ route, navigation: { goBack, navigate } }) => {
             item.status ? (
               <ListItem
                 key={item.id}
-                background={theme.schemes[colorMode][list.accent_color]}
+                background={theme.schemes[colorScheme][list.accent_color]}
                 options={{
-                  background: theme.schemes[colorMode][list.accent_color],
-                  deleteBackground: theme.schemes[colorMode].errorContainer,
-                  deleteColor: theme.schemes[colorMode].error,
-                  editBackground: theme.schemes[colorMode].tertiaryContainer,
-                  editColor: theme.schemes[colorMode].tertiary,
-                  shadow: theme.schemes[colorMode].shadow,
+                  background: theme.schemes[colorScheme][list.accent_color],
+                  deleteBackground: theme.schemes[colorScheme].errorContainer,
+                  deleteColor: theme.schemes[colorScheme].error,
+                  editBackground: theme.schemes[colorScheme].tertiaryContainer,
+                  editColor: theme.schemes[colorScheme].tertiary,
+                  shadow: theme.schemes[colorScheme].shadow,
                 }}
                 status={item.status}
                 title={item.title}
@@ -268,9 +270,9 @@ export default ({ route, navigation: { goBack, navigate } }) => {
                   currency: "BRL",
                 })}
                 amount={item.amount}
-                color={theme.schemes[colorMode].onBackground}
-                subColor={theme.schemes[colorMode].inverseSurface}
-                checkColor={theme.schemes[colorMode][list.accent_color]}
+                color={theme.schemes[colorScheme].onBackground}
+                subColor={theme.schemes[colorScheme].inverseSurface}
+                checkColor={theme.schemes[colorScheme][list.accent_color]}
                 checkHandle={() => checkItem(item.id, item.status)}
                 editHandle={({ id, title, price, amount }) => {
                   setMode("edit");
@@ -288,7 +290,7 @@ export default ({ route, navigation: { goBack, navigate } }) => {
       {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp
           zIndex={1}
-          background={theme.schemes[colorMode].shadow}
+          background={theme.schemes[colorScheme].shadow}
           closeHandle={returnOfMode}
         />
       )}
@@ -296,12 +298,14 @@ export default ({ route, navigation: { goBack, navigate } }) => {
       {mode !== "add" && mode !== "edit" ? null : (
         <NewListItem
           type='ListItems'
-          background={theme.schemes[colorMode][list.accent_color + "Container"]}
-          labelColor={theme.schemes[colorMode].onBackground}
-          labelBackground={
-            theme.schemes[colorMode][list.accent_color + "Container"]
+          background={
+            theme.schemes[colorScheme][list.accent_color + "Container"]
           }
-          errorColor={theme.schemes[colorMode].error}
+          labelColor={theme.schemes[colorScheme].onBackground}
+          labelBackground={
+            theme.schemes[colorScheme][list.accent_color + "Container"]
+          }
+          errorColor={theme.schemes[colorScheme].error}
           setProduct={setProduct}
           setPrice={setPrice}
           setAmount={setAmount}
@@ -311,12 +315,26 @@ export default ({ route, navigation: { goBack, navigate } }) => {
         />
       )}
       <Footer
-        background={theme.schemes[colorMode][list.accent_color + "Container"]}
-        iconColor={theme.schemes[colorMode].onBackground}
-        onIconColor={theme.schemes[colorMode].background}
-        onIconBackground={theme.schemes[colorMode][list.accent_color]}
-        returnBackground={theme.schemes[colorMode].errorContainer}
-        returnColor={theme.schemes[colorMode].error}
+        background={theme.schemes[colorScheme][list.accent_color + "Fixed"]}
+        iconColor={
+          theme.schemes[colorScheme][
+            `on${
+              list.accent_color.charAt(0).toUpperCase() +
+              list.accent_color.slice(1)
+            }Fixed`
+          ]
+        }
+        onIconColor={theme.schemes[colorScheme][list.accent_color + "FixedDim"]}
+        onIconBackground={
+          theme.schemes[colorScheme][
+            `on${
+              list.accent_color.charAt(0).toUpperCase() +
+              list.accent_color.slice(1)
+            }FixedVariant`
+          ]
+        }
+        returnBackground={theme.schemes[colorScheme].errorContainer}
+        returnColor={theme.schemes[colorScheme].error}
         mode={mode}
         addNewItem={addNewItem}
         returnOfMode={returnOfMode}

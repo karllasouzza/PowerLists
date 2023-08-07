@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import {
   Slide_Checkboxes_Container,
   Slide_Text_View,
@@ -8,17 +8,19 @@ import {
   Slides_container,
 } from "./styles.js";
 import FocusAwareStatusBar from "../FocusAwareStatusBar.jsx";
-import theme from "../../assets/theme.json";
 import * as NavigationBar from "expo-navigation-bar";
 import CheckBox from "../../assets/svgs/CheckBox.jsx";
+import ColorModeContext from "../../context/colorMode.jsx";
 
 const Slides = ({ current_slide, nextSlide, prevSlide }) => {
+  const { colorScheme, theme } = useContext(ColorModeContext);
+
   const slide_pages = [
     {
       styles: {
-        background: theme.palettes.success[95],
-        check_background: theme.schemes.light.success,
-        check_color: theme.palettes.success[100],
+        background: theme.schemes[colorScheme].successContainer,
+        check_background: theme.schemes[colorScheme].success,
+        check_color: theme.schemes[colorScheme].success,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_1.png"),
@@ -29,9 +31,9 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
     },
     {
       styles: {
-        background: theme.palettes.secondary[95],
-        check_background: theme.schemes.light.secondary,
-        check_color: theme.palettes.secondary[100],
+        background: theme.schemes[colorScheme].secondaryContainer,
+        check_background: theme.schemes[colorScheme].secondary,
+        check_color: theme.schemes[colorScheme].secondary,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_2.png"),
@@ -42,9 +44,9 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
     },
     {
       styles: {
-        background: theme.palettes.error[95],
-        check_background: theme.palettes.error[70],
-        check_color: theme.palettes.error[100],
+        background: theme.schemes[colorScheme].errorContainer,
+        check_background: theme.schemes[colorScheme].error,
+        check_color: theme.schemes[colorScheme].error,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_3.png"),
@@ -68,8 +70,10 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       <Slide_image source={slide_pages[current_slide].content.img} />
 
       <Slide_Text_View>
-        <Slide_title>{slide_pages[current_slide].content.title}</Slide_title>
-        <Slide_subtitle>
+        <Slide_title color={theme.schemes[colorScheme].onBackground}>
+          {slide_pages[current_slide].content.title}
+        </Slide_title>
+        <Slide_subtitle color={theme.schemes[colorScheme].onSurface}>
           {slide_pages[current_slide].content.subtitle}
         </Slide_subtitle>
       </Slide_Text_View>
@@ -84,6 +88,12 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
               background={slide.styles.check_background}
               checked={index < current_slide}
               next={() => {
+                current_slide == 2
+                  ? NavigationBar.setBackgroundColorAsync(
+                      theme.schemes[colorScheme].secondaryContainer
+                    )
+                  : null;
+
                 nextSlide();
               }}
               prev={() => {
