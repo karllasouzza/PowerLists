@@ -6,7 +6,6 @@ import {
 } from "./styles";
 import PrimaryInput from "../PrimaryInput";
 import ColorCard from "./ColorCard";
-import { useState } from "react";
 
 export default ({
   type,
@@ -22,7 +21,9 @@ export default ({
   onEdit,
   values: { title, price, amount },
   errorColor,
-  error
+  error,
+  onSelectedColor,
+  selectedColor
 }) => {
   return (
     <NewListItemContainer>
@@ -77,6 +78,8 @@ export default ({
                   height={40}
                   tap={setColor}
                   selected={colorSelected}
+                  onSelectedColor={onSelectedColor}
+                  selectedColor={selectedColor}
                 />
               ))
             : null}

@@ -15,7 +15,7 @@ export const SlideProvider = ({ children }) => {
   }
 
   return (
-    <SlideContext.Provider value={{ current_slide, nextSlide, prevSlide }}>
+    <SlideContext.Provider value={{}}>
       {current_slide < 3 ? (
         <Slides
           current_slide={current_slide}

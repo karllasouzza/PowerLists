@@ -19,7 +19,8 @@ export const AuthProvider = ({ children }) => {
         setUser(user);
         setAuth(!!user);
       } catch (error) {
-        console.log(error);
+        setUser(null);
+        setAuth(false);
       }
     };
 

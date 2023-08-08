@@ -8,8 +8,8 @@ export const Color = styled.Pressable`
   border-radius: ${({ width }) => width}px;
   background-color: ${({ color }) => theme.coreColors[color]};
   border: solid 2px
-    ${({ selected }) =>
-      selected ? theme.coreColors.white : theme.coreColors.black};
+    ${({ selected, onSelectedColor, selectedColor }) =>
+      selected ? onSelectedColor : selectedColor};
 
   display: flex;
   align-items: center;

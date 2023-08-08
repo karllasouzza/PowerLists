@@ -29,6 +29,8 @@ export const Input = styled.TextInput`
   height: 100%;
   border-radius: 20px;
   padding: 10px;
+
+  color: ${({ color }) => color};
 `;
 
 export const InputIcon = styled.Pressable`

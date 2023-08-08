@@ -123,13 +123,13 @@
       "surfaceBright": "#3B383C",
       "surfaceDim": "#151316",
       "success": "#4ED8E8",
-      "on_success": "#FFFFFF",
-      "success_container": "#004F56",
-      "on_success_container": "#8EF2FF",
+      "onSuccess": "#FFFFFF",
+      "successContainer": "#004F56",
+      "onSuccessContainer": "#8EF2FF",
       "fourtiary": "#DDB8FF",
-      "on_fourtiary": "#490081",
-      "fourtiary_container": "#6708B1",
-      "on_fourtiary_container": "#F0DBFF"
+      "onFourtiary": "#490081",
+      "fourtiaryContainer": "#6708B1",
+      "onFourtiaryContainer": "#F0DBFF"
     }
   },
   "palettes": {

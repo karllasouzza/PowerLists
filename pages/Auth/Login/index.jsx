@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-import theme from "../../../assets/theme.json";
 import PrimaryInput from "../../../components/PrimaryInput";
 import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 import {
@@ -13,14 +12,17 @@ import {
 import PrimaryButton from "../../../components/PrimaryButton";
 import * as NavigationBar from "expo-navigation-bar";
 import AuthContext from "../../../context/auth";
+import ColorModeContext from "../../../context/colorMode";
 
 export default () => {
-  NavigationBar.setBackgroundColorAsync(theme.palettes.primary[99]);
+
+  const { colorScheme, theme } = useContext(ColorModeContext);
+
+  NavigationBar.setBackgroundColorAsync(theme.schemes[colorScheme].primaryContainer);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [colorMode, setListColorMode] = useState("light");
 
   const { singIn } = useContext(AuthContext);
 
@@ -31,21 +33,20 @@ export default () => {
       await singIn(email, password);
       setLoading(false);
     } catch (error) {
-      console.log(error);
       setLoading(false);
     }
   };
 
   return (
-    <LoginScrollView background={theme.palettes.primary[99]}>
-      <LoginContainer background={theme.palettes.primary[99]}>
-        <FocusAwareStatusBar color={theme.palettes.primary[99]} />
+    <LoginScrollView background={theme.schemes[colorScheme].primaryContainer}>
+      <LoginContainer background={theme.schemes[colorScheme].primaryContainer}>
+        <FocusAwareStatusBar color={theme.schemes[colorScheme].primaryContainer} />
 
         <LoginHeader>
           <LoginImage
             source={require("../../../assets/Images/Auth/Login/Illustration_one.png")}
           />
-          <LoginTitle color={theme.coreColors.black}>
+          <LoginTitle color={theme.schemes[colorScheme].onPrimaryContainer}>
             Seja bem vindo!
           </LoginTitle>
         </LoginHeader>
@@ -54,8 +55,8 @@ export default () => {
           <PrimaryInput
             width={20}
             labelValue='E-Mail'
-            labelBackground={theme.palettes.primary[99]}
-            labelColor={theme.coreColors.black}
+            labelBackground={theme.schemes[colorScheme].primaryContainer}
+            labelColor={theme.schemes[colorScheme].onPrimaryContainer}
             autoComplete='email'
             type='text'
             secure={false}
@@ -65,18 +66,18 @@ export default () => {
           <PrimaryInput
             width={20}
             labelValue='Senha'
-            labelBackground={theme.palettes.primary[99]}
-            labelColor={theme.coreColors.black}
+            labelBackground={theme.schemes[colorScheme].primaryContainer}
+            labelColor={theme.schemes[colorScheme].onPrimaryContainer}
             autoComplete='off'
             type='text'
             secure={true}
-            activeIconColor={theme.coreColors.primary}
-            offIconColor={theme.coreColors.black}
+            activeIconColor={theme.schemes[colorScheme].primary}
+            offIconColor={theme.schemes[colorScheme].onPrimaryContainer}
             changeHandle={setPassword}
           />
           <PrimaryButton
-            background={theme.coreColors.primary}
-            color={theme.coreColors.white}
+            background={theme.schemes[colorScheme].primary}
+            color={theme.schemes[colorScheme].onPrimaryContainer}
             clickEvent={login}
             loading={loading}>
             Entrar

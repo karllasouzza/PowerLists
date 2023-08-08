@@ -9,6 +9,7 @@ import { IconContainer } from "../ListItems/styles";
 import {
   responsiveFontSize,
   responsiveHeight,
+  responsiveWidth,
 } from "react-native-responsive-dimensions";
 
 export const AccountSafeContentEdge = styled(SafeContentEdge)`
@@ -18,7 +19,7 @@ export const AccountSafeContentEdge = styled(SafeContentEdge)`
   padding: 0;
 `;
 export const AccountHeader = styled(Header)`
-  height: ${responsiveHeight(34)}px;
+  height: ${responsiveHeight(28)}px;
   margin: 0;
 
   flex-direction: column;
@@ -26,8 +27,8 @@ export const AccountHeader = styled(Header)`
   padding-top: 10px;
 `;
 export const AccountImageContainer = styled(IconContainer)`
-  width: 100px;
-  height: 100px;
+  width: ${responsiveWidth(25)}px;
+  height: ${responsiveWidth(25)}px;
 `;
 export const AccountName = styled(HeaderTitle)`
   font-size: ${responsiveFontSize(3)}px;
