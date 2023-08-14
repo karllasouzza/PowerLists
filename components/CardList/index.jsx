@@ -12,6 +12,7 @@ import TrashIcon from "../../assets/svgs/TrashIcon";
 import EditIcon from "../../assets/svgs/EditIcon";
 import theme from "../../assets/theme.json";
 import BlurPopUp from "../BlurPopUp";
+import { List } from "react-native-paper";
 
 export const CardList = ({
   list: { id, title, List_item, subColor, color, accentColor },
@@ -20,34 +21,42 @@ export const CardList = ({
   editHandle,
 }) => {
   const [longPress, setLongPress] = useState(false);
+
   return (
-    <CardListContainer
+    <List.Item
+      title={title}
+      description={`${
+        List_item?.filter((item) => item?.status === true).length
+      }/${List_item?.length} compradas`}
       onPress={pressHandler}
-      onLongPress={() => setLongPress(true)}>
-      <CardListLabels>
-        <CardListTitle color={color}>{title}</CardListTitle>
-        <CardListProgress subColor={subColor}>
+      // onLongPress={() => setLongPress(true)}
+      left={(props) => <List.Icon {...props} icon='cart' />}
+      right={() => (
+        <CardListPrice subColor={subColor}>
+          {List_item?.map((item) => item.price).length
+            ? List_item?.map((item) => item.price * item.amount)
+                ?.reduce((accum, curr) => accum + curr)
+                .toLocaleString("pt-br", {
+                  style: "currency",
+                  currency: "BRL",
+                })
+            : List_item?.map((item) => item.price).length.toLocaleString(
+                "pt-br",
+                {
+                  style: "currency",
+                  currency: "BRL",
+                }
+              )}
+        </CardListPrice>
+      )}>
+      {/* <CardListLabels> */}
+      {/* <CardListProgress subColor={subColor}>
           {List_item?.filter((item) => item?.status === true).length}/
           {List_item?.length} compradas
         </CardListProgress>
       </CardListLabels>
-      <CardListPrice subColor={subColor}>
-        {List_item?.map((item) => item.price).length
-          ? List_item?.map((item) => item.price * item.amount)
-              ?.reduce((accum, curr) => accum + curr)
-              .toLocaleString("pt-br", {
-                style: "currency",
-                currency: "BRL",
-              })
-          : List_item?.map((item) => item.price).length.toLocaleString(
-              "pt-br",
-              {
-                style: "currency",
-                currency: "BRL",
-              }
-            )}
-      </CardListPrice>
-      {longPress ? (
+ */}
+      {/* {longPress ? (
         <CardListOptions background={accentColor.value}>
           <IconContainer
             background={theme.palettes.error[90]}
@@ -67,7 +76,7 @@ export const CardList = ({
           background={theme.coreColors.black}
           closeHandle={() => setLongPress(false)}
         />
-      ) : null}
-    </CardListContainer>
+      ) : null} */}
+    </List.Item>
   );
 };

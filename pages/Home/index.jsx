@@ -21,18 +21,18 @@ import { IconContainer } from "../ListItems/styles";
 import { useIsFocused } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
 import { BackHandler } from "react-native";
+
+import { useTheme } from "react-native-paper";
 import ColorModeContext from "../../context/colorMode";
+import { List, MD3Colors } from "react-native-paper";
 
 const Home = ({ navigation, route }) => {
   const focused = useIsFocused();
-  const { theme, colorScheme } = useContext(ColorModeContext);
+  const theme = useTheme();
 
-  NavigationBar.setBackgroundColorAsync(
-    theme.schemes[colorScheme].primaryFixed
-  );
+  NavigationBar.setBackgroundColorAsync(theme.colors.onBackground);
 
   const [lists, setLists] = useState([]);
-  const [mode, setMode] = useState("default");
   const [title, setTitle] = useState("");
   const [color, setColor] = useState("primary");
   const [listEditId, setListEditId] = useState("");
@@ -52,21 +52,21 @@ const Home = ({ navigation, route }) => {
 
     getLists();
   }, [reload]);
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (mode === "add" || mode === "edit") {
-          returnOfMode();
-          return true;
-        }
-      }
-    );
+  // useEffect(() => {
+  //   const backHandler = BackHandler.addEventListener(
+  //     "hardwareBackPress",
+  //     () => {
+  //       if (mode === "add" || mode === "edit") {
+  //         returnOfMode();
+  //         return true;
+  //       }
+  //     }
+  //   );
 
-    return () => {
-      backHandler.remove();
-    };
-  }, [mode]);
+  //   return () => {
+  //     backHandler.remove();
+  //   };
+  // }, [mode]);
 
   const addNewList = async () => {
     try {
@@ -121,50 +121,52 @@ const Home = ({ navigation, route }) => {
     setListEditId("");
     setErrorInput("");
 
-    setMode("default");
+    // setMode("default");
   };
 
   return (
-    <SafeContentEdge background={theme.schemes[colorScheme].background}>
-      <FocusAwareStatusBar
-        color={theme.schemes[colorScheme].primaryContainer}
-      />
-      <Header background={theme.schemes[colorScheme].primaryContainer}>
-        <HeaderTitle color={theme.schemes[colorScheme].onPrimaryContainer}>
+    <SafeContentEdge background={theme.colors.background}>
+      <FocusAwareStatusBar color={theme.colors.primaryContainer} />
+      <Header background={theme.colors.primaryContainer}>
+        <HeaderTitle color={theme.colors.onPrimaryContainer}>
           Listas
         </HeaderTitle>
         <IconContainer onPress={() => setReload(true)}>
           <ReloadIcon
             on={reload}
-            background={theme.schemes[colorScheme].onPrimaryContainer}
+            background={theme.colors.onPrimaryContainer}
           />
         </IconContainer>
       </Header>
       <ListsContainer>
         {lists?.map((list, index) => (
+          // <List.Item
+          //   key={index}
+          //   title='First Item'
+          //   description='Item description'
+          //   onPress={() => null}
+          //   left={(props) => <List.Icon {...props} icon='cart' />}
+          // />
           <CardList
             key={index}
             list={{
               ...list,
-              background: theme.schemes[colorScheme].background,
+              background: theme.colors.background,
               accentColor: {
                 name: list.accent_color,
-                value: theme.schemes[colorScheme][list.accent_color],
+                value: theme.colors[list.accent_color],
               },
-              color: theme.schemes[colorScheme][list.accent_color],
-              subColor: theme.schemes[colorScheme].onSurfaceVariant,
+              color: theme.colors[list.accent_color],
+              subColor: theme.colors.onSurfaceVariant,
             }}
-            pressHandler={
-              mode === "default"
-                ? () =>
-                    navigation.navigate("Add", {
-                      list: list,
-                    })
-                : null
+            pressHandler={() =>
+              navigation.navigate("Add", {
+                list: list,
+              })
             }
             deleteHandle={deleteList}
             editHandle={(id, title, color) => {
-              setMode("edit");
+              // setMode("edit");
               setListEditId(id);
               setTitle(title);
               setColor(color);
@@ -172,20 +174,20 @@ const Home = ({ navigation, route }) => {
           />
         ))}
       </ListsContainer>
-      {mode !== "add" && mode !== "edit" ? null : (
+      {/* {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp
           zIndex={1}
-          background={theme.schemes[colorScheme].shadow}
+          background={theme.colors.shadow}
           closeHandle={returnOfMode}
         />
       )}
       {mode !== "add" && mode !== "edit" ? null : (
         <NewListItem
           type='Lists'
-          background={theme.schemes[colorScheme].primaryFixed}
-          labelColor={theme.schemes[colorScheme].shadow}
-          labelBackground={theme.schemes[colorScheme].primaryFixed}
-          errorColor={theme.schemes[colorScheme].error}
+          background={theme.colors.onPrimary}
+          labelColor={theme.colors.shadow}
+          labelBackground={theme.colors.onPrimary}
+          errorColor={theme.colors.error}
           setProduct={setTitle}
           colors={[
             "primary",
@@ -200,17 +202,17 @@ const Home = ({ navigation, route }) => {
           onEdit={mode === "edit"}
           values={{ title }}
           error={errorInput}
-          onSelectedColor={theme.schemes[colorScheme].onBackground}
-          selectedColor={theme.schemes[colorScheme].background}
+          onSelectedColor={theme.colors.onBackground}
+          selectedColor={theme.colors.background}
         />
-      )}
-      <Footer
-        background={theme.schemes[colorScheme].primaryFixed}
-        iconColor={theme.schemes[colorScheme].onPrimaryFixed}
-        onIconColor={theme.schemes[colorScheme].primaryFixedDim}
-        onIconBackground={theme.schemes[colorScheme].onPrimaryFixedVariant}
-        returnColor={theme.schemes[colorScheme].error}
-        returnBackground={theme.schemes[colorScheme].errorContainer}
+      )} */}
+      {/* <Footer
+        background={theme.colors.onPrimary}
+        iconColor={theme.colors.ononPrimary}
+        onIconColor={theme.colors.onPrimaryDim}
+        onIconBackground={theme.colors.ononPrimaryVariant}
+        returnColor={theme.colors.error}
+        returnBackground={theme.colors.errorContainer}
         mode={mode}
         route={route.name}
         addHandle={() => setMode("add")}
@@ -220,7 +222,7 @@ const Home = ({ navigation, route }) => {
         returnOfMode={returnOfMode}
         homeHandle={() => navigation.navigate("Home")}
         accountHandle={() => navigation.navigate("Account")}
-      />
+      /> */}
     </SafeContentEdge>
   );
 };
