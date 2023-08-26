@@ -3,21 +3,17 @@ import { Appearance } from "react-native";
 
 import theme from "../assets/theme.json";
 
-const ColorModeContext = createContext();
+const Portal = createContext();
 
 export const ColorModeProvider = ({ children }) => {
-  Appearance.addChangeListener(() =>
-    Appearance.setColorScheme(Appearance.getColorScheme())
-  );
-  const colorScheme = Appearance.getColorScheme();
-  const setColorScheme = () => {
-    Appearance.setColorScheme(colorScheme === "light" ? "dark" : "light");
-  };
+  const [userTheme, setUserTheme] = useState(false);
+
+
 
   return (
-    <ColorModeContext.Provider value={{ colorScheme, setColorScheme, theme }}>
+    <Portal.Provider value={{  }}>
       {children}
-    </ColorModeContext.Provider>
+    </Portal.Provider>
   );
 };
-export default ColorModeContext;
+export default Portal;

@@ -29,7 +29,7 @@ export default ({
     <NewListItemContainer>
       <NewListItemForm>
         <PrimaryInput
-          width={24}
+          width={100}
           labelValue={type === "ListItems" ? "Produto" : "Titulo"}
           labelColor={error === "title" ? errorColor : labelColor}
           labelBackground={labelBackground}

@@ -2,6 +2,7 @@ import * as React from "react";
 import { BottomNavigation } from "react-native-paper";
 import Home from "../../pages/Home";
 import Account from "../../pages/Account";
+import ListItems from "../../pages/ListItems";
 
 export default () => {
   const [index, setIndex] = React.useState(0);

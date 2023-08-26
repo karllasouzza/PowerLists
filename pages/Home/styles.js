@@ -5,14 +5,12 @@ import {
 } from "react-native-responsive-dimensions";
 import { List, MD3Colors } from "react-native-paper";
 
-
 export const SafeContentEdge = styled.View`
   width: 100%;
   height: 100%;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   background-color: ${({ background }) => background};
   padding-top: 15px;
@@ -55,6 +53,5 @@ export const Add = styled.TouchableOpacity`
 
 export const ListsContainer = styled(List.Section)`
   width: 100%;
-  height: ${responsiveHeight(8)}%;
-  padding: 0 10px;
+  padding: 10px 0;
 `;

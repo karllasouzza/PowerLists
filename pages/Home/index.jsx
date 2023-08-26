@@ -14,23 +14,20 @@ import ReloadIcon from "../../assets/svgs/ReloadIcon";
 import { CardList } from "../../components/CardList";
 import BlurPopUp from "../../components/BlurPopUp";
 import NewListItem from "../../components/NewListItem";
-import Footer from "../../components/Footer";
 
 import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
 import { IconContainer } from "../ListItems/styles";
 import { useIsFocused } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
-import { BackHandler } from "react-native";
+import { BackHandler, StyleSheet } from "react-native";
 
-import { useTheme } from "react-native-paper";
-import ColorModeContext from "../../context/colorMode";
-import { List, MD3Colors } from "react-native-paper";
+import { AnimatedFAB, useTheme } from "react-native-paper";
 
-const Home = ({ navigation, route }) => {
+const Home = ({ navigation }) => {
   const focused = useIsFocused();
   const theme = useTheme();
 
-  NavigationBar.setBackgroundColorAsync(theme.colors.onBackground);
+  NavigationBar.setBackgroundColorAsync(theme.colors.elevation.level2);
 
   const [lists, setLists] = useState([]);
   const [title, setTitle] = useState("");
@@ -38,6 +35,15 @@ const Home = ({ navigation, route }) => {
   const [listEditId, setListEditId] = useState("");
   const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
+  const [isExtended, setIsExtended] = React.useState(true);
+  const [mode, setMode] = React.useState(null);
+
+  const onScroll = ({ nativeEvent }) => {
+    const currentScrollPosition =
+      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+
+    setIsExtended(currentScrollPosition <= 0);
+  };
 
   UseRealtimeLists(lists, setLists);
   useEffect(() => {
@@ -138,15 +144,8 @@ const Home = ({ navigation, route }) => {
           />
         </IconContainer>
       </Header>
-      <ListsContainer>
+      <ListsContainer onScroll={onScroll}>
         {lists?.map((list, index) => (
-          // <List.Item
-          //   key={index}
-          //   title='First Item'
-          //   description='Item description'
-          //   onPress={() => null}
-          //   left={(props) => <List.Icon {...props} icon='cart' />}
-          // />
           <CardList
             key={index}
             list={{
@@ -157,7 +156,7 @@ const Home = ({ navigation, route }) => {
                 value: theme.colors[list.accent_color],
               },
               color: theme.colors[list.accent_color],
-              subColor: theme.colors.onSurfaceVariant,
+              iconBackground: theme.colors.background,
             }}
             pressHandler={() =>
               navigation.navigate("Add", {
@@ -166,7 +165,7 @@ const Home = ({ navigation, route }) => {
             }
             deleteHandle={deleteList}
             editHandle={(id, title, color) => {
-              // setMode("edit");
+              setMode("edit");
               setListEditId(id);
               setTitle(title);
               setColor(color);
@@ -174,7 +173,15 @@ const Home = ({ navigation, route }) => {
           />
         ))}
       </ListsContainer>
-      {/* {mode !== "add" && mode !== "edit" ? null : (
+      <AnimatedFAB
+        icon={"plus"}
+        label={"Nova lista"}
+        extended={isExtended}
+        onPress={() => setMode("edit")}
+        iconMode={"dynamic"}
+        style={[styles.fabStyle]}
+      />
+      {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp
           zIndex={1}
           background={theme.colors.shadow}
@@ -185,7 +192,7 @@ const Home = ({ navigation, route }) => {
         <NewListItem
           type='Lists'
           background={theme.colors.onPrimary}
-          labelColor={theme.colors.shadow}
+          labelColor={theme.colors.onBackground}
           labelBackground={theme.colors.onPrimary}
           errorColor={theme.colors.error}
           setProduct={setTitle}
@@ -205,7 +212,7 @@ const Home = ({ navigation, route }) => {
           onSelectedColor={theme.colors.onBackground}
           selectedColor={theme.colors.background}
         />
-      )} */}
+      )}
       {/* <Footer
         background={theme.colors.onPrimary}
         iconColor={theme.colors.ononPrimary}
@@ -228,3 +235,15 @@ const Home = ({ navigation, route }) => {
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  fabStyle: {
+    bottom: 16,
+    right: 10,
+    position: "absolute",
+    flexGrow: 1,
+  },
+});

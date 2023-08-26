@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Input, InputContainer, InputIcon, InputLabel } from "./styles";
-import { Ionicons } from "@expo/vector-icons";
+import { TextInput } from "react-native-paper";
 
 export default ({
   labelValue,
@@ -16,36 +15,25 @@ export default ({
   edit,
   value,
 }) => {
-  const [view, setView] = useState(true);
-  const [focus, setFocus] = useState(false);
+  const [view, setView] = useState(secure);
 
   return (
-    <InputContainer width={width} border={labelColor}>
-      <InputLabel
-        focus={edit ? edit : focus}
-        color={labelColor}
-        background={labelBackground}>
-        {labelValue}
-      </InputLabel>
-      <Input
-        inputMode={type}
-        autoComplete={autoComplete}
-        secureTextEntry={secure ? view : false}
-        cursorColor={labelColor}
-        onChangeText={(value) => changeHandle(value)}
-        onFocus={() => setFocus(true)}
-        value={edit ? value : null}
-        color={labelColor}
-      />
-      {secure ? (
-        <InputIcon onPress={() => setView(!view)}>
-          <Ionicons
-            name={view ? "eye" : "eye-off"}
-            size={28}
-            color={view ? offIconColor : activeIconColor}
-          />
-        </InputIcon>
-      ) : null}
-    </InputContainer>
+    <TextInput
+      mode='outlined'
+      inputMode={type}
+      label={labelValue}
+      autoComplete={autoComplete}
+      secureTextEntry={view}
+      style={{ width: width + "%" }}
+      cursorColor={labelColor}
+      color={labelColor}
+      onChangeText={(value) => changeHandle(value)}
+      value={edit ? value : null}
+      right={
+        secure ? (
+          <TextInput.Icon icon='eye' onPress={() => setView(!view)} />
+        ) : null
+      }
+    />
   );
 };

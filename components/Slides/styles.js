@@ -14,7 +14,7 @@ export const Slides_container = styled.View`
 `;
 
 export const Slide_image = styled.Image`
-  height: ${() => responsiveHeight(35)}px;
+  height: 300px;
   object-fit: contain;
 `;
 
