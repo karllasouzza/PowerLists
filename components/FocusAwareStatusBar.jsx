@@ -1,8 +1,6 @@
-import { useContext } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 
-import ColorModeContext from "../context/colorMode";
 import { useTheme } from "react-native-paper";
 import { useColorScheme } from "react-native";
 

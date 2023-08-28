@@ -13,7 +13,6 @@ export const SafeContentEdge = styled.View`
   flex-direction: column;
   align-items: center;
   background-color: ${({ background }) => background};
-  padding-top: 15px;
 `;
 
 export const Header = styled.View`

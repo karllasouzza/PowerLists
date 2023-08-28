@@ -23,7 +23,7 @@ import {
   ItemsColumn,
   IconContainer,
 } from "./styles";
-import ReloadIcon from "../../assets/svgs/ReloadIcon";
+// import ReloadIcon from "../../assets/svgs/ReloadIcon";
 import BlurPopUp from "../../components/BlurPopUp";
 import { showToast } from "../../services/toast";
 import { UseRealtimeItems } from "../../services/supabase/realtime/Items";

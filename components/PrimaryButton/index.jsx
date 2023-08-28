@@ -1,6 +1,6 @@
 import React from "react";
 import { ButtonBackground, ButtonText, ButtonTouch } from "./styles";
-import ReloadIcon from "../../assets/svgs/ReloadIcon";
+// import ReloadIcon from "../../assets/svgs/ReloadIcon";
 
 export default ({
   children,
