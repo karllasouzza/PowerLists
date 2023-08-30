@@ -20,11 +20,11 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       styles: {
         background: theme.colors.primaryContainer,
         check_background: theme.colors.primary,
-        check_color: theme.colors.primary,
+        check_color: theme.colors.background,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_1.png"),
-        title: "Planeje seu dia",
+        title: "Planeje suas compras",
         subtitle: "Comece marcando o incio de um ciclo de produtividade!",
       },
       check: false,
@@ -33,12 +33,13 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       styles: {
         background: theme.colors.tertiaryContainer,
         check_background: theme.colors.tertiary,
-        check_color: theme.colors.tertiary,
+        check_color: theme.colors.background,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_2.png"),
-        title: "Não se sobrecarregue",
-        subtitle: "Marque o fim da dependência exclusiva do seu cérebro!",
+        title: "Evite anotações físicas",
+        subtitle:
+          "Marque o fim da dependência exclusiva de papel para anotar suas compras!",
       },
       check: false,
     },
@@ -46,7 +47,7 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       styles: {
         background: theme.colors.errorContainer,
         check_background: theme.colors.error,
-        check_color: theme.colors.error,
+        check_color: theme.colors.background,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_3.png"),
@@ -70,10 +71,10 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       <Slide_image source={slide_pages[current_slide].content.img} />
 
       <Slide_Text_View>
-        <Slide_title color={theme.colors.onBackground}>
+        <Slide_title variant='headlineMedium' color={theme.colors.onBackground}>
           {slide_pages[current_slide].content.title}
         </Slide_title>
-        <Slide_subtitle color={theme.colors.onSurface}>
+        <Slide_subtitle variant='titleMedium' color={theme.colors.onSurface}>
           {slide_pages[current_slide].content.subtitle}
         </Slide_subtitle>
       </Slide_Text_View>

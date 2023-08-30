@@ -1,8 +1,5 @@
 import { styled } from "styled-components/native";
-import {
-  responsiveFontSize,
-  responsiveHeight,
-} from "react-native-responsive-dimensions";
+import { Text } from "react-native-paper";
 
 export const Slides_container = styled.View`
   flex: 1;
@@ -26,30 +23,23 @@ export const Slide_Text_View = styled.View`
   transition: all 0.5s ease-in-out;
 `;
 
-export const Slide_title = styled.Text`
+export const Slide_title = styled(Text)`
   color: ${({ color }) => color};
   text-align: center;
-  font-size: ${() => responsiveFontSize(3.5)}px;
-
-  font-family: sans-serif;
-  font-style: normal;
-  font-weight: 700;
+  font-weight: bold;
   text-transform: capitalize;
 `;
 
-export const Slide_subtitle = styled.Text`
+export const Slide_subtitle = styled(Text)`
   display: flex;
   width: 335px;
   padding: 10px;
   flex-direction: column;
   justify-content: center;
+
   color: ${({ color }) => color};
   text-align: center;
-  font-size: ${() => responsiveFontSize(2)}px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 400;
-  letter-spacing: 0.64px;
+  font-weight: normal;
   text-transform: capitalize;
 `;
 
