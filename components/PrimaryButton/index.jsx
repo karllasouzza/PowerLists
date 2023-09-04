@@ -12,11 +12,7 @@ export default ({
 }) => {
   return (
     <ButtonTouch onPress={() => clickEvent()} width={width}>
-      {loading ? (
-        <ReloadIcon background={color} width={30} on={loading} />
-      ) : (
         <ButtonText color={color}>{children}</ButtonText>
-      )}
       <ButtonBackground background={background} />
     </ButtonTouch>
   );

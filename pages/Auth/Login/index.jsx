@@ -9,16 +9,14 @@ import {
   LoginScrollView,
   LoginTitle,
 } from "./styles";
-import PrimaryButton from "../../../components/PrimaryButton";
 import * as NavigationBar from "expo-navigation-bar";
 import AuthContext from "../../../context/auth";
-import ColorModeContext from "../../../context/colorMode";
+import { Button, Text, useTheme } from "react-native-paper";
 
 export default () => {
+  const theme = useTheme();
 
-  const { colorScheme, theme } = useContext(ColorModeContext);
-
-  NavigationBar.setBackgroundColorAsync(theme.schemes[colorScheme].primaryContainer);
+  NavigationBar.setBackgroundColorAsync(theme.colors.primaryContainer);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,25 +36,27 @@ export default () => {
   };
 
   return (
-    <LoginScrollView background={theme.schemes[colorScheme].primaryContainer}>
-      <LoginContainer background={theme.schemes[colorScheme].primaryContainer}>
-        <FocusAwareStatusBar color={theme.schemes[colorScheme].primaryContainer} />
+    <LoginScrollView background={theme.colors.primaryContainer}>
+      <LoginContainer background={theme.colors.primaryContainer}>
+        <FocusAwareStatusBar color={theme.colors.primaryContainer} />
 
         <LoginHeader>
           <LoginImage
             source={require("../../../assets/Images/Auth/Login/Illustration_one.png")}
           />
-          <LoginTitle color={theme.schemes[colorScheme].onPrimaryContainer}>
+          <LoginTitle
+            color={theme.colors.onPrimaryContainer}
+            variant='headlineLarge'>
             Seja bem vindo!
           </LoginTitle>
         </LoginHeader>
 
         <LoginForm>
           <PrimaryInput
-            width={20}
+            width={80}
             labelValue='E-Mail'
-            labelBackground={theme.schemes[colorScheme].primaryContainer}
-            labelColor={theme.schemes[colorScheme].onPrimaryContainer}
+            labelBackground={theme.colors.primaryContainer}
+            labelColor={theme.colors.onPrimaryContainer}
             autoComplete='email'
             type='text'
             secure={false}
@@ -64,24 +64,28 @@ export default () => {
           />
 
           <PrimaryInput
-            width={20}
+            width={80}
             labelValue='Senha'
-            labelBackground={theme.schemes[colorScheme].primaryContainer}
-            labelColor={theme.schemes[colorScheme].onPrimaryContainer}
+            labelBackground={theme.colors.primaryContainer}
+            labelColor={theme.colors.onPrimaryContainer}
             autoComplete='off'
             type='text'
             secure={true}
-            activeIconColor={theme.schemes[colorScheme].primary}
-            offIconColor={theme.schemes[colorScheme].onPrimaryContainer}
+            activeIconColor={theme.colors.primary}
+            offIconColor={theme.colors.onPrimaryContainer}
             changeHandle={setPassword}
           />
-          <PrimaryButton
-            background={theme.schemes[colorScheme].primary}
-            color={theme.schemes[colorScheme].onPrimaryContainer}
-            clickEvent={login}
-            loading={loading}>
-            Entrar
-          </PrimaryButton>
+          <Button
+            mode='elevated'
+            style={{ width: "80%" }}
+            buttonColor={theme.colors.primary}
+            onPress={login}>
+            <Text
+              variant='titleLarge'
+              style={{ fontWeight: "bold", color: theme.colors.onPrimary }}>
+              Entrar
+            </Text>
+          </Button>
         </LoginForm>
       </LoginContainer>
     </LoginScrollView>

@@ -14,13 +14,13 @@ import {
   ContainerAuth,
 } from "./styles";
 import { useIsFocused } from "@react-navigation/native";
-import { useTheme } from "react-native-paper";
+import { Button, Text, useTheme } from "react-native-paper";
 
 const Auth = ({ navigation }) => {
   const isFocused = useIsFocused();
   const theme = useTheme();
 
-  NavigationBar.setBackgroundColorAsync(theme.colors.secondaryContainer);
+  NavigationBar.setBackgroundColorAsync(theme.colors.tertiaryContainer);
 
   return (
     <SlideProvider>
@@ -30,24 +30,30 @@ const Auth = ({ navigation }) => {
           <AuthImage
             source={require("../../assets/Images/Auth/Illustration_one.png")}
           />
-          <AuthTitle color={theme.colors.primaryContainer}>
+          <AuthTitle color={theme.colors.onPrimaryContainer} variant="headlineLarge">
             Conecte-se
           </AuthTitle>
-          <PrimaryButton
-            clickEvent={() => navigation.navigate("Login")}
+          <Button
+            onPress={() => navigation.navigate("CreateAccount")}
             background={theme.colors.primary}
-            color={theme.colors.onPrimaryContainer}>
-            Entrar
-          </PrimaryButton>
+            mode='elevated'
+            style={{ width: "80%" }}>
+            <Text variant='titleLarge' style={{ fontWeight: "bold" }}>
+              Criar conta
+            </Text>
+          </Button>
         </AuthHeaderSection>
 
-        <AccountContainer background={theme.colors.secondaryContainer}>
-          <PrimaryButton
-            clickEvent={() => navigation.navigate("CreateAccount")}
-            background={theme.colors.secondary}
-            color={theme.colors.onSecondaryContainer}>
-            Criar Conta
-          </PrimaryButton>
+        <AccountContainer background={theme.colors.tertiaryContainer}>
+          <Button
+            onPress={() => navigation.navigate("Login")}
+            background={theme.colors.primary}
+            mode='outlined'
+            style={{ width: "80%", borderWidth: 2 }}>
+            <Text variant='titleLarge' style={{ fontWeight: "bold" }}>
+              Entrar
+            </Text>
+          </Button>
         </AccountContainer>
       </ContainerAuth>
     </SlideProvider>

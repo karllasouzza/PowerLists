@@ -8,6 +8,7 @@ import {
 } from "../CreateAccount/styles";
 import { responsiveScreenHeight } from "react-native-responsive-dimensions";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { Text } from "react-native-paper";
 
 export const LoginScrollView = styled(KeyboardAwareScrollView)`
   width: 100%;
@@ -22,7 +23,8 @@ export const LoginHeader = styled(CreateAccountHeader)``;
 export const LoginImage = styled(CreateAccountImage)`
   height: ${responsiveScreenHeight(30)}px;
 `;
-export const LoginTitle = styled(CreateAccountTitle)`
+export const LoginTitle = styled(Text)`
+  font-weight: 700;
   color: ${({ color }) => color};
 `;
 export const LoginForm = styled(CreateAccountForm)``;

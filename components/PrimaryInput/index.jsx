@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextInput } from "react-native-paper";
+import { Input } from "./styles";
 
 export default ({
   labelValue,
@@ -18,17 +19,16 @@ export default ({
   const [view, setView] = useState(secure);
 
   return (
-    <TextInput
+    <Input
       mode='outlined'
       inputMode={type}
       label={labelValue}
       autoComplete={autoComplete}
       secureTextEntry={view}
-      style={{ width: width + "%" }}
       cursorColor={labelColor}
       color={labelColor}
       onChangeText={(value) => changeHandle(value)}
-      value={edit ? value : null}
+      value={value}
       right={
         secure ? (
           <TextInput.Icon icon='eye' onPress={() => setView(!view)} />

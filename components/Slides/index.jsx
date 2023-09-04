@@ -51,8 +51,8 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_3.png"),
-        title: "Lembre-se de tudo",
-        subtitle: "Marque tudo o que lhe é importante, desde listas a senhas!",
+        title: "Liste suas financias",
+        subtitle: "Marque todas as suas financias em um único lugar!",
       },
       check: false,
     },
@@ -91,7 +91,7 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
               next={() => {
                 current_slide == 2
                   ? NavigationBar.setBackgroundColorAsync(
-                      theme.colors.secondaryContainer
+                      theme.colors.tertiaryContainer
                     )
                   : null;
 
