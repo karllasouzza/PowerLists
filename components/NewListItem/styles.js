@@ -1,13 +1,7 @@
-import {
-  responsiveHeight,
-} from "react-native-responsive-dimensions";
+import { Modal } from "react-native-paper";
 import { styled } from "styled-components/native";
 
-export const NewListItemContainer = styled.View`
-  width: 90%;
-  height: ${() => responsiveHeight(23)}px;
-  border-radius: 30px;
-
+export const NewListItemContainer = styled(Modal)`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,14 +9,15 @@ export const NewListItemContainer = styled.View`
 
   transition: all 0.5s ease-in-out;
   z-index: 2;
-  bottom: 20px;
 `;
 
 export const NewListItemForm = styled.View`
-  width: 100%;
-  height: 100%;
+  width: 90%;
+  height: 60%;
   border-radius: 30px;
   padding: 10px 20px;
+
+  background-color: aqua;
 
   display: flex;
   flex-direction: column;

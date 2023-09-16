@@ -20,7 +20,13 @@ import { useIsFocused } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
 import { BackHandler, StyleSheet } from "react-native";
 
-import { AnimatedFAB, Appbar, Searchbar, useTheme } from "react-native-paper";
+import {
+  AnimatedFAB,
+  Appbar,
+  Portal,
+  Searchbar,
+  useTheme,
+} from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const Home = ({ navigation }) => {
@@ -259,42 +265,48 @@ const Home = ({ navigation }) => {
         icon={"plus"}
         label={"Nova lista"}
         extended={isExtended}
-        onPress={() => setMode("edit")}
+        onPress={() => setMode("add")}
         iconMode={"dynamic"}
         style={[styles.fabStyle]}
       />
-      {mode !== "add" && mode !== "edit" ? null : (
+
+
+      
+      {/* {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp
           zIndex={1}
           background={theme.colors.shadow}
           closeHandle={returnOfMode}
         />
-      )}
-      {mode !== "add" && mode !== "edit" ? null : (
-        <NewListItem
-          type='Lists'
-          background={theme.colors.onPrimary}
-          labelColor={theme.colors.onBackground}
-          labelBackground={theme.colors.onPrimary}
-          errorColor={theme.colors.error}
-          setProduct={setTitle}
-          colors={[
-            "primary",
-            "secondary",
-            "tertiary",
-            "error",
-            "success",
-            "fourtiary",
-          ]}
-          setColor={setColor}
-          colorSelected={color}
-          onEdit={mode === "edit"}
-          values={{ title }}
-          error={errorInput}
-          onSelectedColor={theme.colors.onBackground}
-          selectedColor={theme.colors.background}
-        />
-      )}
+      )} */}
+      {/* {mode !== "add" && mode !== "edit" ? null : (
+        <Portal>
+          <NewListItem
+            type='Lists'
+            background={theme.colors.onPrimary}
+            labelColor={theme.colors.onBackground}
+            labelBackground={theme.colors.onPrimary}
+            errorColor={theme.colors.error}
+            setProduct={setTitle}
+            colors={[
+              "primary",
+              "secondary",
+              "tertiary",
+              "error",
+              "success",
+              "fourtiary",
+            ]}
+            setColor={setColor}
+            colorSelected={color}
+            onEdit={mode === "edit"}
+            visible={mode === "edit" || mode === "add"}
+            values={{ title }}
+            error={errorInput}
+            onSelectedColor={theme.colors.onBackground}
+            selectedColor={theme.colors.background}
+          />
+        </Portal>
+      )} */}
       {/* <Footer
         background={theme.colors.onPrimary}
         iconColor={theme.colors.ononPrimary}

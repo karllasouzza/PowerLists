@@ -23,10 +23,11 @@ export default ({
   errorColor,
   error,
   onSelectedColor,
-  selectedColor
+  selectedColor,
+  visible
 }) => {
   return (
-    <NewListItemContainer>
+    <NewListItemContainer visible={visible}>
       <NewListItemForm>
         <PrimaryInput
           width={100}
