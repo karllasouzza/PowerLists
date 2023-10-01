@@ -28,6 +28,7 @@ export default ({
       cursorColor={labelColor}
       color={labelColor}
       onChangeText={(value) => changeHandle(value)}
+      outlineStyle={{borderRadius: 20}}
       value={value}
       right={
         secure ? (

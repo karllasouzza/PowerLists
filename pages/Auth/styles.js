@@ -17,8 +17,10 @@ export const ContainerAuth = styled.View`
 `;
 
 export const AuthImage = styled.Image`
-  height: 300px;
+  height: 200px;
   object-fit: contain;
+
+  flex-grow: 0.2;
 `;
 
 export const AccountContainer = styled.View`
@@ -28,24 +30,27 @@ export const AccountContainer = styled.View`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  flex-grow: 0.5;
+  justify-content: flex-end;
 
-  padding-top: 25px;
+  flex-grow: 0.5;
+  padding-bottom: 25px;
+  gap: 50px;
   border-radius: 20px 20px 0 0;
 `;
 
 export const AuthHeaderSection = styled.View`
   width: 100%;
 
+  max-height: 400px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+
+  gap: 30px;
 
   flex-grow: 0.8;
-
-  padding-bottom: 25px;
 `;
 
 export const AuthTitle = styled(Text)`

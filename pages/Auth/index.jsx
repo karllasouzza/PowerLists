@@ -23,40 +23,39 @@ const Auth = ({ navigation }) => {
   NavigationBar.setBackgroundColorAsync(theme.colors.tertiaryContainer);
 
   return (
-    <SlideProvider>
-      <ContainerAuth background={theme.colors.primaryContainer}>
-        <FocusAwareStatusBar color={theme.colors.primaryContainer} />
-        <AuthHeaderSection>
-          <AuthImage
-            source={require("../../assets/Images/Auth/Illustration_one.png")}
-          />
-          <AuthTitle color={theme.colors.onPrimaryContainer} variant="headlineLarge">
-            Conecte-se
-          </AuthTitle>
-          <Button
-            onPress={() => navigation.navigate("CreateAccount")}
-            background={theme.colors.primary}
-            mode='elevated'
-            style={{ width: "80%" }}>
-            <Text variant='titleLarge' style={{ fontWeight: "bold" }}>
-              Criar conta
-            </Text>
-          </Button>
-        </AuthHeaderSection>
+    <ContainerAuth background={theme.colors.background}>
+      <FocusAwareStatusBar color={theme.colors.background} />
+      <AuthHeaderSection>
+        <AuthImage source={require("../../assets/adaptive-icon.png")} />
+        <AuthTitle
+          color={theme.colors.onBackground}
+          variant='headlineLarge'>
+          Conecte-se
+        </AuthTitle>
+      </AuthHeaderSection>
 
-        <AccountContainer background={theme.colors.tertiaryContainer}>
-          <Button
-            onPress={() => navigation.navigate("Login")}
-            background={theme.colors.primary}
-            mode='outlined'
-            style={{ width: "80%", borderWidth: 2 }}>
-            <Text variant='titleLarge' style={{ fontWeight: "bold" }}>
-              Entrar
-            </Text>
-          </Button>
-        </AccountContainer>
-      </ContainerAuth>
-    </SlideProvider>
+      <AccountContainer background={theme.colors.background}>
+        <Button
+          onPress={() => navigation.navigate("CreateAccount")}
+          buttonColor={theme.colors.primary}
+          mode='elevated'
+          style={{ width: "80%" }}>
+          <Text
+            variant='titleLarge'
+            style={{ fontWeight: "bold", color: theme.colors.background }}>
+            Criar conta
+          </Text>
+        </Button>
+        <Button
+          onPress={() => navigation.navigate("Login")}
+          mode='outlined'
+          style={{ width: "80%", borderWidth: 2 }}>
+          <Text variant='titleLarge' style={{ fontWeight: "bold" }}>
+            Entrar
+          </Text>
+        </Button>
+      </AccountContainer>
+    </ContainerAuth>
   );
 };
 export default Auth;

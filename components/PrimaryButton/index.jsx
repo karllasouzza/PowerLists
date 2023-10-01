@@ -9,10 +9,16 @@ export default ({
   clickEvent,
   loading,
   width,
+  mode,
+  buttonColor,
 }) => {
   return (
-    <ButtonTouch onPress={() => clickEvent()} width={width}>
-        <ButtonText color={color}>{children}</ButtonText>
+    <ButtonTouch
+      mode={mode}
+      buttonColor={buttonColor}
+      onPress={() => clickEvent()}
+      width={width}>
+      <ButtonText color={color}>{children}</ButtonText>
       <ButtonBackground background={background} />
     </ButtonTouch>
   );

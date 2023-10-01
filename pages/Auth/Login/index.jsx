@@ -9,14 +9,11 @@ import {
   LoginScrollView,
   LoginTitle,
 } from "./styles";
-import * as NavigationBar from "expo-navigation-bar";
 import AuthContext from "../../../context/auth";
 import { Button, Text, useTheme } from "react-native-paper";
 
 export default () => {
   const theme = useTheme();
-
-  NavigationBar.setBackgroundColorAsync(theme.colors.primaryContainer);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,17 +33,13 @@ export default () => {
   };
 
   return (
-    <LoginScrollView background={theme.colors.primaryContainer}>
-      <LoginContainer background={theme.colors.primaryContainer}>
-        <FocusAwareStatusBar color={theme.colors.primaryContainer} />
+    <LoginScrollView background={theme.colors.background}>
+      <LoginContainer background={theme.colors.background}>
+        <FocusAwareStatusBar color={theme.colors.background} />
 
         <LoginHeader>
-          <LoginImage
-            source={require("../../../assets/Images/Auth/Login/Illustration_one.png")}
-          />
-          <LoginTitle
-            color={theme.colors.onPrimaryContainer}
-            variant='headlineLarge'>
+          <LoginImage source={require("../../../assets/adaptive-icon.png")} />
+          <LoginTitle color={theme.colors.onBackground} variant='headlineLarge'>
             Seja bem vindo!
           </LoginTitle>
         </LoginHeader>
@@ -55,7 +48,7 @@ export default () => {
           <PrimaryInput
             width={80}
             labelValue='E-Mail'
-            labelBackground={theme.colors.primaryContainer}
+            labelBackground={theme.colors.onBackground}
             labelColor={theme.colors.onPrimaryContainer}
             autoComplete='email'
             type='text'
@@ -79,10 +72,11 @@ export default () => {
             mode='elevated'
             style={{ width: "80%" }}
             buttonColor={theme.colors.primary}
-            onPress={login}>
+            onPress={login}
+            loading={loading}>
             <Text
               variant='titleLarge'
-              style={{ fontWeight: "bold", color: theme.colors.onPrimary }}>
+              style={{ fontWeight: "bold", color: theme.colors.background }}>
               Entrar
             </Text>
           </Button>

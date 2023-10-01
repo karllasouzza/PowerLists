@@ -23,26 +23,20 @@ export const CreateAccountContainer = styled(ContainerAuth)`
   transition: all 0.5s ease-in-out;
 `;
 
-export const CreateAccountImage = styled(AuthImage)`
-  height: ${responsiveScreenHeight(30)}px;
-`;
+export const CreateAccountImage = styled(AuthImage)``;
 
 export const CreateAccountTitle = styled(AuthTitle)`
   color: ${({ color }) => color};
 `;
 
-export const CreateAccountHeader = styled(AuthHeaderSection)`
-  height: ${responsiveScreenHeight(30)}px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-`;
+export const CreateAccountHeader = styled(AuthHeaderSection)``;
 
 export const CreateAccountForm = styled.View`
   width: 100%;
-  height: ${responsiveScreenHeight(50)}px;
 
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+
+  flex-grow: 1;
 `;

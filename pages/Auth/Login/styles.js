@@ -14,14 +14,18 @@ export const LoginScrollView = styled(KeyboardAwareScrollView)`
   width: 100%;
   height: 100%;
   background-color: ${({ background }) => background};
+
+  padding-top: 20px;
 `;
 export const LoginContainer = styled(CreateAccountContainer)`
   background-color: ${({ background }) => background};
 `;
-export const LoginHeader = styled(CreateAccountHeader)``;
+export const LoginHeader = styled(CreateAccountHeader)`
+  max-height: 300px;
+`;
 
 export const LoginImage = styled(CreateAccountImage)`
-  height: ${responsiveScreenHeight(30)}px;
+  height: 200px;
 `;
 export const LoginTitle = styled(Text)`
   font-weight: 700;

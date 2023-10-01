@@ -16,13 +16,10 @@ import PrimaryInput from "../../../components/PrimaryInput";
 import AuthContext from "../../../context/auth";
 import { showToast } from "../../../services/toast";
 import ColorModeContext from "../../../context/colorMode";
+import { Button, HelperText, Text, useTheme } from "react-native-paper";
 
 export default ({ navigation }) => {
-  const { colorScheme, theme } = useContext(ColorModeContext);
-
-  NavigationBar.setBackgroundColorAsync(
-    theme.schemes[colorScheme].tertiaryContainer
-  );
+  const theme = useTheme();
 
   const { singUp } = useContext(AuthContext);
 
@@ -42,11 +39,6 @@ export default ({ navigation }) => {
 
   const validateName = () => {
     if (name.length < 3) {
-      showToast({
-        type: "error",
-        title: "Nome inválido!",
-        subtitle: "O nome deve ter pelo menos 3 caracteres",
-      });
       return false;
     }
     return true;
@@ -56,11 +48,6 @@ export default ({ navigation }) => {
     const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
     if (!regex.test(email)) {
-      showToast({
-        type: "error",
-        title: "E-mail inválido!",
-        subtitle: "Formato de email invalido",
-      });
       return false;
     }
     return true;
@@ -68,26 +55,23 @@ export default ({ navigation }) => {
 
   const validatePassword = () => {
     if (password.length < 7) {
-      showToast({
-        type: "error",
-        title: "Senha incorreta!",
-        subtitle: "A senha deve ter pelo menos 7 caracteres",
-      });
       return false;
     }
     return true;
   };
 
   return (
-    <AccountScrollView background={theme.schemes[colorScheme].tertiaryContainer}>
-      <CreateAccountContainer background={theme.schemes[colorScheme].tertiaryContainer}>
-        <FocusAwareStatusBar color={theme.schemes[colorScheme].tertiaryContainer} />
+    <AccountScrollView background={theme.colors.background}>
+      <CreateAccountContainer background={theme.colors.background}>
+        <FocusAwareStatusBar color={theme.colors.background} />
 
         <CreateAccountHeader>
           <CreateAccountImage
-            source={require("../../../assets/Images/Auth/Account/Illustration_one.png")}
+            source={require("../../../assets/adaptive-icon.png")}
           />
-          <CreateAccountTitle color={theme.schemes[colorScheme].onTertiaryContainer}>
+          <CreateAccountTitle
+            variant='headlineLarge'
+            color={theme.colors.onBackground}>
             Seja bem vindo!
           </CreateAccountTitle>
         </CreateAccountHeader>
@@ -95,42 +79,57 @@ export default ({ navigation }) => {
         <CreateAccountForm>
           <PrimaryInput
             labelValue='Nome'
-            labelBackground={theme.schemes[colorScheme].tertiaryContainer}
-            labelColor={theme.schemes[colorScheme].onTertiaryContainer}
+            labelBackground={theme.colors.tertiaryContainer}
+            labelColor={theme.colors.onTertiaryContainer}
             autoComplete='name'
             type='text'
             secure={false}
             changeHandle={setName}
           />
+          <HelperText type='error' visible={!validateName() && name}>
+            O nome deve ter pelo menos 3 caracteres
+          </HelperText>
 
           <PrimaryInput
             labelValue='E-Mail'
-            labelBackground={theme.schemes[colorScheme].tertiaryContainer}
-            labelColor={theme.schemes[colorScheme].onTertiaryContainer}
+            labelBackground={theme.colors.tertiaryContainer}
+            labelColor={theme.colors.onTertiaryContainer}
             autoComplete='email'
             type='text'
             secure={false}
             changeHandle={setEmail}
           />
+          <HelperText type='error' visible={!validateEmail() && email}>
+            Formato de email invalido
+          </HelperText>
 
           <PrimaryInput
             labelValue='Senha'
-            labelBackground={theme.schemes[colorScheme].tertiaryContainer}
-            labelColor={theme.schemes[colorScheme].onTertiaryContainer}
+            labelBackground={theme.colors.tertiaryContainer}
+            labelColor={theme.colors.onTertiaryContainer}
             autoComplete='off'
             type='text'
             secure={true}
-            activeIconColor={theme.schemes[colorScheme].tertiary}
-            offIconColor={theme.schemes[colorScheme].onTertiaryContainer}
+            activeIconColor={theme.colors.tertiary}
+            offIconColor={theme.colors.onTertiaryContainer}
             changeHandle={setPassword}
           />
-          <PrimaryButton
-            background={theme.schemes[colorScheme].tertiary}
-            color={theme.schemes[colorScheme].onTertiaryContainer}
-            clickEvent={register}
+          <HelperText type='error' visible={!validatePassword() && password}>
+            A senha deve ter pelo menos 7 caracteres
+          </HelperText>
+
+          <Button
+            mode='elevated'
+            style={{ width: "80%" }}
+            buttonColor={theme.colors.primary}
+            onPress={register}
             loading={loading}>
-            Criar Conta
-          </PrimaryButton>
+            <Text
+              variant='titleLarge'
+              style={{ fontWeight: "bold", color: theme.colors.background }}>
+              Criar Conta
+            </Text>
+          </Button>
         </CreateAccountForm>
       </CreateAccountContainer>
     </AccountScrollView>
