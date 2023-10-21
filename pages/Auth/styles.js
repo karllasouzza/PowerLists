@@ -33,29 +33,27 @@ export const AccountContainer = styled.View`
   justify-content: flex-end;
 
   flex-grow: 0.5;
-  padding-bottom: 25px;
-  gap: 50px;
+  padding-bottom: 40px;
+  gap: 35px;
   border-radius: 20px 20px 0 0;
 `;
 
 export const AuthHeaderSection = styled.View`
-  width: 100%;
+  width: 80%;
 
-  max-height: 400px;
+  flex-grow: 1;
+  gap: 18px;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  gap: 30px;
-
-  flex-grow: 0.8;
 `;
 
 export const AuthTitle = styled(Text)`
+  /* width: 100%; */
   color: ${({ color }) => color};
 
   font-weight: 700;
-  text-transform: capitalize;
+  text-align: center;
 `;

@@ -35,19 +35,27 @@ const Home = ({ navigation }) => {
 
   NavigationBar.setBackgroundColorAsync(theme.colors.elevation.level2);
 
+  // Lists Add
   const [lists, setLists] = useState([]);
   const [title, setTitle] = useState("");
   const [color, setColor] = useState("primary");
+
+  // ListEdit
   const [listEditId, setListEditId] = useState("");
-  const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
-  const [isExtended, setIsExtended] = useState(true);
   const [mode, setMode] = useState(null);
+  
+  // AppBar
+  const { top } = useSafeAreaInsets();
+  const [reload, setReload] = useState(false);
   const [onSearch, setOnSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-
   const refSearchbar = useRef(null);
-  const { top } = useSafeAreaInsets();
+  
+  // AnimatedFAB
+  const [isExtended, setIsExtended] = useState(true);
+
+  
 
   const onScroll = ({ nativeEvent }) => {
     const currentScrollPosition =
@@ -97,8 +105,6 @@ const Home = ({ navigation }) => {
           list.title.toLowerCase().includes(searchQuery.toLowerCase())
         )
       : [];
-
-  // ;
 
   const addNewList = async () => {
     try {
@@ -270,8 +276,6 @@ const Home = ({ navigation }) => {
         style={[styles.fabStyle]}
       />
 
-
-      
       {/* {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp
           zIndex={1}

@@ -11,6 +11,11 @@ import {
 } from "./styles";
 import AuthContext from "../../../context/auth";
 import { Button, Text, useTheme } from "react-native-paper";
+import {
+  ButtonNavigate,
+  ChangeFormTipe,
+  IHaveAccount,
+} from "../CreateAccount/styles";
 
 export default () => {
   const theme = useTheme();
@@ -38,9 +43,13 @@ export default () => {
         <FocusAwareStatusBar color={theme.colors.background} />
 
         <LoginHeader>
-          <LoginImage source={require("../../../assets/adaptive-icon.png")} />
-          <LoginTitle color={theme.colors.onBackground} variant='headlineLarge'>
-            Seja bem vindo!
+          <LoginTitle
+            variant='headlineMedium'
+            color={theme.colors.onBackground}>
+            Seja bem vindo de volta!
+          </LoginTitle>
+          <LoginTitle variant='bodyMedium' color={theme.colors.onBackground}>
+            Acesse sua conta existente utilizando seu e-mail e senha.
           </LoginTitle>
         </LoginHeader>
 
@@ -55,7 +64,6 @@ export default () => {
             secure={false}
             changeHandle={setEmail}
           />
-
           <PrimaryInput
             width={80}
             labelValue='Senha'
@@ -68,6 +76,12 @@ export default () => {
             offIconColor={theme.colors.onPrimaryContainer}
             changeHandle={setPassword}
           />
+          <ButtonNavigate
+            mode='text'
+            color={theme.colors.background}
+            onPress={() => navigation.navigate("CreateAccount")}>
+            Esqueceu a senha?
+          </ButtonNavigate>
           <Button
             mode='elevated'
             style={{ width: "80%" }}
@@ -81,6 +95,17 @@ export default () => {
             </Text>
           </Button>
         </LoginForm>
+        <IHaveAccount>
+          <ChangeFormTipe variant='bodyMedium'>
+            Ainda não possui uma conta?{" "}
+          </ChangeFormTipe>
+          <ButtonNavigate
+            mode='text'
+            color={theme.colors.background}
+            onPress={() => navigation.navigate("CreateAccount")}>
+            Crie sua conta
+          </ButtonNavigate>
+        </IHaveAccount>
       </LoginContainer>
     </LoginScrollView>
   );

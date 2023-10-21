@@ -3,11 +3,14 @@ import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 import React, { useContext, useState } from "react";
 import {
   AccountScrollView,
+  ButtonNavigate,
+  ChangeFormTipe,
   CreateAccountContainer,
   CreateAccountForm,
   CreateAccountHeader,
   CreateAccountImage,
   CreateAccountTitle,
+  IHaveAccount,
 } from "./styles";
 import theme from "../../../assets/theme.json";
 import * as NavigationBar from "expo-navigation-bar";
@@ -17,6 +20,7 @@ import AuthContext from "../../../context/auth";
 import { showToast } from "../../../services/toast";
 import ColorModeContext from "../../../context/colorMode";
 import { Button, HelperText, Text, useTheme } from "react-native-paper";
+import { Link } from "@react-navigation/native";
 
 export default ({ navigation }) => {
   const theme = useTheme();
@@ -66,13 +70,16 @@ export default ({ navigation }) => {
         <FocusAwareStatusBar color={theme.colors.background} />
 
         <CreateAccountHeader>
-          <CreateAccountImage
-            source={require("../../../assets/adaptive-icon.png")}
-          />
           <CreateAccountTitle
-            variant='headlineLarge'
+            variant='headlineMedium'
             color={theme.colors.onBackground}>
             Seja bem vindo!
+          </CreateAccountTitle>
+          <CreateAccountTitle
+            variant='bodyMedium'
+            color={theme.colors.onBackground}>
+            Cadastre seu nome, seu email e sua senha para poder usar os recursos
+            de salvamento online...
           </CreateAccountTitle>
         </CreateAccountHeader>
 
@@ -131,6 +138,17 @@ export default ({ navigation }) => {
             </Text>
           </Button>
         </CreateAccountForm>
+        <IHaveAccount>
+          <ChangeFormTipe variant='bodyMedium'>
+            Ja possui uma conta?{" "}
+          </ChangeFormTipe>
+          <ButtonNavigate
+            mode='text'
+            color={theme.colors.background}
+            onPress={() => navigation.navigate("Login")}>
+            Faça o login
+          </ButtonNavigate>
+        </IHaveAccount>
       </CreateAccountContainer>
     </AccountScrollView>
   );

@@ -20,15 +20,11 @@ export const LoginScrollView = styled(KeyboardAwareScrollView)`
 export const LoginContainer = styled(CreateAccountContainer)`
   background-color: ${({ background }) => background};
 `;
-export const LoginHeader = styled(CreateAccountHeader)`
-  max-height: 300px;
-`;
+export const LoginHeader = styled(CreateAccountHeader)``;
 
-export const LoginImage = styled(CreateAccountImage)`
-  height: 200px;
+export const LoginTitle = styled(CreateAccountTitle)``;
+export const LoginForm = styled(CreateAccountForm)`
+  flex-grow: 1;
+  gap: 50px;
+  padding-bottom: 40px;
 `;
-export const LoginTitle = styled(Text)`
-  font-weight: 700;
-  color: ${({ color }) => color};
-`;
-export const LoginForm = styled(CreateAccountForm)``;

@@ -1,25 +1,12 @@
 import { useState } from "react";
 
 export const useVisible = () => {
-  const [joinPortalDialogVisible, setJoinPortalDialogVisible] = useState(false);
-  const [feedbackDialogVisible, setFeedbackDialogVisible] = useState(false);
-  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [listPortalScreenVisible, setListPortalScreenVisible] = useState(false);
 
   const handleShow = ({ dialogType }) => {
     switch (dialogType) {
-      case "joinPortal": {
-        setJoinPortalDialogVisible(true);
-
-        break;
-      }
-      case "feedback": {
-        setFeedbackDialogVisible(true);
-
-        break;
-      }
-      case "delete": {
-        setDeleteDialogVisible(true);
-
+      case "listPortal": {
+        setListPortalScreenVisible(true);
         break;
       }
       default: {
@@ -31,19 +18,8 @@ export const useVisible = () => {
 
   const handleHide = ({ dialogType }) => {
     switch (dialogType) {
-      case "joinPortal": {
-        setJoinPortalDialogVisible(false);
-
-        break;
-      }
-      case "feedback": {
-        setFeedbackDialogVisible(false);
-
-        break;
-      }
-      case "delete": {
-        setDeleteDialogVisible(false);
-
+      case "listPortal": {
+        setListPortalScreenVisible(false);
         break;
       }
       default: {
@@ -54,17 +30,13 @@ export const useVisible = () => {
   };
 
   const handleHideAll = () => {
-    setJoinPortalDialogVisible(false);
-    setFeedbackDialogVisible(false);
-    setDeleteDialogVisible(false);
+    setListPortalScreenVisible(false);
   };
 
   return {
-    deleteDialogVisible,
-    feedbackDialogVisible,
+    listPortalScreenVisible,
     handleHide,
     handleHideAll,
     handleShow,
-    joinPortalDialogVisible,
   };
 };
