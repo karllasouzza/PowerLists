@@ -14,7 +14,7 @@ import {
 } from "./styles";
 import theme from "../../../assets/theme.json";
 import * as NavigationBar from "expo-navigation-bar";
-import PrimaryButton from "../../../components/PrimaryButton";
+// import PrimaryButton from "../../../components/PrimaryButton";
 import PrimaryInput from "../../../components/PrimaryInput";
 import AuthContext from "../../../context/auth";
 import { showToast } from "../../../services/toast";

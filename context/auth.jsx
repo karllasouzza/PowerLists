@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from "react";
-import { GetUser, SingIn, SingOut, SingUp } from "../services/supabase/auth";
+import { GetUser, SingIn, SingOut, SingUp, ResetPassword } from "../services/supabase/auth";
 import { showToast } from "../services/toast";
 
 const AuthContext = createContext();
@@ -99,9 +99,26 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  async function resetPassword(){
+    try {
+      await ResetPassword();
+      showToast({
+        type: "success",
+        title: "Sucesso!",
+        subtitle: "Senha alterada!",
+      });
+    } catch (error) {
+      showToast({
+        type: "error",
+        title: "Erro ao alterar senha!",
+        subtitle: "Tente novamente mais tarde!",
+      });
+    }
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, session, auth, singIn, singUp, singOut }}>
+      value={{ user, session, auth, singIn, singUp, singOut, resetPassword }}>
       {children({ auth })}
     </AuthContext.Provider>
   );

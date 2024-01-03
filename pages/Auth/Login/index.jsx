@@ -17,7 +17,7 @@ import {
   IHaveAccount,
 } from "../CreateAccount/styles";
 
-export default () => {
+export default ({ navigation }) => {
   const theme = useTheme();
 
   const [email, setEmail] = useState("");
@@ -79,7 +79,7 @@ export default () => {
           <ButtonNavigate
             mode='text'
             color={theme.colors.background}
-            onPress={() => navigation.navigate("CreateAccount")}>
+            onPress={() => navigation.navigate("PasswordRecovery")}>
             Esqueceu a senha?
           </ButtonNavigate>
           <Button
