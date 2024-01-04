@@ -19,7 +19,21 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "intentFilters": [
+          {
+            "action": "VIEW",
+            "autoVerify": true,
+            "data": [
+              {
+                "scheme": "https",
+                "host": "*.powerlists.project",
+                "pathPrefix": "/records"
+              }
+            ],
+            "category": ["BROWSABLE", "DEFAULT"]
+          }
+        ]
       },
       "package": "com.karllasouzza.PowerLists"
     },

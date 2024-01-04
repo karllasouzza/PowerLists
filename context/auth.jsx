@@ -99,9 +99,9 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  async function resetPassword(){
+  async function changePassword(email){
     try {
-      await ResetPassword();
+      await ResetPassword(email);
       showToast({
         type: "success",
         title: "Sucesso!",
@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, auth, singIn, singUp, singOut, resetPassword }}>
+      value={{ user, session, auth, singIn, singUp, singOut, changePassword }}>
       {children({ auth })}
     </AuthContext.Provider>
   );
