@@ -67,7 +67,9 @@ export const SingOut = async () => {
 
 export const ResetPassword = async (email) => {
   try {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "powerlists.project://PasswordRecovery",
+    });
     if (error) throw error;
 
     return true;

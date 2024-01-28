@@ -6,15 +6,15 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "scheme": "https",
     "splash": {
       "image": "./assets/splash-light.png",
       "resizeMode": "contain"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.karllasouzza.PowerLists"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,15 +27,14 @@
             "data": [
               {
                 "scheme": "https",
-                "host": "*.powerlists.project",
-                "pathPrefix": "/records"
+                "host": "*.powerlists.project"
               }
             ],
             "category": ["BROWSABLE", "DEFAULT"]
           }
         ]
       },
-      "package": "com.karllasouzza.PowerLists"
+      "package": "com.powerlists.project"
     },
     "web": {
       "favicon": "./assets/favicon.png"

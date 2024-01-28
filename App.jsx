@@ -8,23 +8,36 @@ import { AuthProvider } from "./context/auth";
 
 import NoSigned from "./router/noSigned";
 import BottomNavigation from "./components/BottomNavigation";
+import * as Linking from "expo-linking";
 
 const Stack = createNativeStackNavigator();
 
 export default () => {
   const theme = useTheme();
 
+  const prefix = Linking.createURL("https://powerlists.project");
+  const linking = {
+    prefixes: [prefix],
+    config: {
+      screens: {
+        PasswordRecovery: {
+          path: "PasswordRecovery",
+        },
+      },
+    },
+  };
+
   return (
-    <NavigationContainer>
-        <PaperProvider>
-          <AuthProvider>
-            {({ auth }) =>
-              auth ? <BottomNavigation /> : <NoSigned Stack={Stack} />
-            }
-          </AuthProvider>
-          <Toast />
-          {/*  */}
-        </PaperProvider>
+    <NavigationContainer linking={linking}>
+      <PaperProvider>
+        <AuthProvider>
+          {({ auth }) =>
+            auth ? <BottomNavigation /> : <NoSigned Stack={Stack} />
+          }
+        </AuthProvider>
+        <Toast />
+        {/*  */}
+      </PaperProvider>
     </NavigationContainer>
   );
 };
