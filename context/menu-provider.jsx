@@ -1,25 +1,49 @@
 import PropTypes from "prop-types";
-import { useMemo } from "react";
-import { useVisible } from "../hooks/useVisible";
-import { MenuContext } from "./contexts";
+import { createContext, useState } from "react";
+
+const MenuContext = createContext();
 
 const MenuContextProvider = ({ children }) => {
-  const { handleHideAll, handleHide, handleShow, listPortalScreenVisible } =
-    useVisible();
+  const [listPortalScreenVisible, setListPortalScreenVisible] = useState(false);
 
-  const value = useMemo(
-    () => ({
-      handleHide,
-      handleHideAll,
-      handleShow,
-      listPortalScreenVisible,
-    }),
-    [handleHideAll, handleHide, handleShow, listPortalScreenVisible]
+  const handleShow = ({ dialogType }) => {
+    switch (dialogType) {
+      case "listPortal":
+        setListPortalScreenVisible(true);
+        break;
+      default:
+        break;
+    }
+    return true;
+  };
+
+  const handleHide = ({ dialogType }) => {
+    switch (dialogType) {
+      case "listPortal":
+        setListPortalScreenVisible(false);
+        break;
+
+      default:
+        break;
+    }
+    return true;
+  };
+
+  const handleHideAll = () => {
+    setListPortalScreenVisible(false);
+  };
+
+  return (
+    <MenuContext.Provider
+      value={{
+        handleShow,
+        handleHide,
+        handleHideAll,
+        listPortalScreenVisible,
+      }}>
+      {children}
+    </MenuContext.Provider>
   );
-
-  console.log(MenuContext === undefined);
-
-  return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>;
 };
 
 MenuContextProvider.propTypes = {

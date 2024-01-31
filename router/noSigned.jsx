@@ -6,7 +6,7 @@ import PasswordRecovery from "../pages/Auth/PasswordRecovery";
 
 export default ({ Stack }) => {
   return (
-    <Stack.Navigator initialRouteName='Auth'>
+    <Stack.Navigator initialRouteName='Auth' shifting>
       <Stack.Screen
         name='Auth'
         component={Auth}

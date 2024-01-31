@@ -18,7 +18,7 @@ import * as NavigationBar from "expo-navigation-bar";
 import PrimaryInput from "../../../components/PrimaryInput";
 import AuthContext from "../../../context/auth";
 import { showToast } from "../../../services/toast";
-import ColorModeContext from "../../../context/colorMode";
+// import ColorModeContext from "../../../context/colorMode";
 import { Button, HelperText, Text, useTheme } from "react-native-paper";
 import { Link } from "@react-navigation/native";
 

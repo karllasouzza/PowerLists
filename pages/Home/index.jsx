@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import * as NavigationBar from "expo-navigation-bar";
 
 import { UseRealtimeLists } from "../../services/supabase/realtime/lists";
@@ -16,7 +22,7 @@ import BlurPopUp from "../../components/BlurPopUp";
 import NewListItem from "../../components/NewListItem";
 
 import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
-import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
 import { BackHandler, StyleSheet } from "react-native";
 
@@ -28,6 +34,9 @@ import {
   useTheme,
 } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MenuContext } from "../../context/menu-provider";
+import { JoinTeamPortal } from "../../components/Portal/ListScreenVisible";
+import ListItems from "../ListItems";
 
 const Home = ({ navigation }) => {
   const focused = useIsFocused();
@@ -44,18 +53,29 @@ const Home = ({ navigation }) => {
   const [listEditId, setListEditId] = useState("");
   const [errorInput, setErrorInput] = useState("");
   const [mode, setMode] = useState(null);
-  
+
   // AppBar
   const { top } = useSafeAreaInsets();
   const [reload, setReload] = useState(false);
   const [onSearch, setOnSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const refSearchbar = useRef(null);
-  
+
   // AnimatedFAB
   const [isExtended, setIsExtended] = useState(true);
 
-  
+  const { handleShow, listPortalScreenVisible, handleHideAll } =
+    useContext(MenuContext);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        if (listPortalScreenVisible) {
+          handleHideAll();
+        }
+      };
+    }, [handleHideAll, listPortalScreenVisible])
+  );
 
   const onScroll = ({ nativeEvent }) => {
     const currentScrollPosition =
@@ -165,116 +185,120 @@ const Home = ({ navigation }) => {
   return (
     <SafeContentEdge background={theme.colors.background}>
       <FocusAwareStatusBar color={theme.colors.elevation.level2} />
-      <Appbar
-        safeAreaInsets={{ top }}
-        style={{
-          height: 90,
-          backgroundColor: theme.colors.elevation.level2,
-          paddingHorizontal: 10,
-        }}>
-        {onSearch ? (
-          <Searchbar
-            mode='view'
-            showDivider={false}
-            // elevation={1}
-            style={{
-              backgroundColor: theme.colors.elevation.level2,
-              columnGap: 20,
-              paddingHorizontal: 15,
-            }}
-            ref={refSearchbar}
-            placeholder='Pesquisar listas'
-            onChangeText={(query) => setSearchQuery(query)}
-            onIconPress={() => setOnSearch(false)}
-            icon='arrow-left'
-            value={searchQuery}
-          />
-        ) : (
-          <>
-            <Appbar.Content title='Listas' style={{ marginLeft: 10 }} />
-            <Appbar.Action
-              icon='magnify'
-              onPress={() => {
-                setOnSearch(true);
-              }}
-            />
-            <ReloadContainer on={reload}>
-              <Appbar.Action icon='reload' onPress={() => setReload(true)} />
-            </ReloadContainer>
-          </>
-        )}
-      </Appbar>
-
-      {searchQuery.length > 0 && onSearch ? (
-        <ListsContainer onScroll={onScroll}>
-          {filteredLists?.map((list, index) => (
-            <CardList
-              key={index}
-              list={{
-                ...list,
-                background: theme.colors.background,
-                accentColor: {
-                  name: list.accent_color,
-                  value: theme.colors[list.accent_color],
-                },
-                color: theme.colors[list.accent_color],
-                iconBackground: theme.colors.background,
-              }}
-              pressHandler={() =>
-                navigation.navigate("Add", {
-                  list: list,
-                })
-              }
-              deleteHandle={deleteList}
-              editHandle={(id, title, color) => {
-                setMode("edit");
-                setListEditId(id);
-                setTitle(title);
-                setColor(color);
-              }}
-            />
-          ))}
-        </ListsContainer>
+      {listPortalScreenVisible ? (
+        <Portal.Host>
+          <JoinTeamPortal>
+            {/* <ListItems /> */}
+          </JoinTeamPortal>
+        </Portal.Host>
       ) : (
-        <ListsContainer onScroll={onScroll}>
-          {lists?.map((list, index) => (
-            <CardList
-              key={index}
-              list={{
-                ...list,
-                background: theme.colors.background,
-                accentColor: {
-                  name: list.accent_color,
-                  value: theme.colors[list.accent_color],
-                },
-                color: theme.colors[list.accent_color],
-                iconBackground: theme.colors.background,
-              }}
-              pressHandler={() =>
-                navigation.navigate("Add", {
-                  list: list,
-                })
-              }
-              deleteHandle={deleteList}
-              editHandle={(id, title, color) => {
-                setMode("edit");
-                setListEditId(id);
-                setTitle(title);
-                setColor(color);
-              }}
-            />
-          ))}
-        </ListsContainer>
-      )}
+        <>
+          <Appbar
+            safeAreaInsets={{ top }}
+            style={{
+              height: 90,
+              backgroundColor: theme.colors.elevation.level2,
+              paddingHorizontal: 10,
+            }}>
+            {onSearch ? (
+              <Searchbar
+                mode='view'
+                showDivider={false}
+                style={{
+                  backgroundColor: theme.colors.elevation.level2,
+                  columnGap: 20,
+                  paddingHorizontal: 15,
+                }}
+                ref={refSearchbar}
+                placeholder='Pesquisar listas'
+                onChangeText={(query) => setSearchQuery(query)}
+                onIconPress={() => setOnSearch(false)}
+                icon='arrow-left'
+                value={searchQuery}
+              />
+            ) : (
+              <>
+                <Appbar.Content title='Listas' style={{ marginLeft: 10 }} />
+                <Appbar.Action
+                  icon='magnify'
+                  onPress={() => {
+                    setOnSearch(true);
+                  }}
+                />
+                <ReloadContainer on={reload}>
+                  <Appbar.Action
+                    icon='reload'
+                    onPress={() => setReload(true)}
+                  />
+                </ReloadContainer>
+              </>
+            )}
+          </Appbar>
 
-      <AnimatedFAB
-        icon={"plus"}
-        label={"Nova lista"}
-        extended={isExtended}
-        onPress={() => setMode("add")}
-        iconMode={"dynamic"}
-        style={[styles.fabStyle]}
-      />
+          {searchQuery.length > 0 && onSearch ? (
+            <ListsContainer onScroll={onScroll}>
+              {filteredLists?.map((list, index) => (
+                <CardList
+                  key={index}
+                  list={{
+                    ...list,
+                    background: theme.colors.background,
+                    accentColor: {
+                      name: list.accent_color,
+                      value: theme.colors[list.accent_color],
+                    },
+                    color: theme.colors[list.accent_color],
+                    iconBackground: theme.colors.background,
+                  }}
+                  pressHandler={() => handleShow({ dialogType: "listPortal" })}
+                  deleteHandle={deleteList}
+                  editHandle={(id, title, color) => {
+                    setMode("edit");
+                    setListEditId(id);
+                    setTitle(title);
+                    setColor(color);
+                  }}
+                />
+              ))}
+            </ListsContainer>
+          ) : (
+            <ListsContainer onScroll={onScroll}>
+              {lists?.map((list, index) => (
+                <CardList
+                  key={index}
+                  list={{
+                    ...list,
+                    background: theme.colors.background,
+                    accentColor: {
+                      name: list.accent_color,
+                      value: theme.colors[list.accent_color],
+                    },
+                    color: theme.colors[list.accent_color],
+                    iconBackground: theme.colors.background,
+                  }}
+                  pressHandler={() => handleShow({ dialogType: "listPortal" })}
+                  deleteHandle={deleteList}
+                  editHandle={(id, title, color) => {
+                    setMode("edit");
+                    setListEditId(id);
+                    setTitle(title);
+                    setColor(color);
+                  }}
+                />
+              ))}
+            </ListsContainer>
+          )}
+
+          <AnimatedFAB
+            icon={"plus"}
+            label={"Nova lista"}
+            extended={isExtended}
+            onPress={() => setMode("add")}
+            iconMode={"dynamic"}
+            style={[styles.fabStyle]}
+          />
+        </>
+      )}
 
       {/* {mode !== "add" && mode !== "edit" ? null : (
         <BlurPopUp

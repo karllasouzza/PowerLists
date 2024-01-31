@@ -10,7 +10,7 @@ const Stack = createMaterialBottomTabNavigator();
 
 export default () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator shifting>
       <Stack.Screen
         name='Home'
         component={Home}

@@ -28,12 +28,11 @@ import BlurPopUp from "../../components/BlurPopUp";
 import { showToast } from "../../services/toast";
 import { UseRealtimeItems } from "../../services/supabase/realtime/Items";
 import { BackHandler } from "react-native";
-import ColorModeContext from "../../context/colorMode";
+// import ColorModeContext from "../../context/colorMode";
 
-export default ({ route, navigation: { goBack, navigate } }) => {
+export default ({ list }) => {
   const { theme, colorScheme } = useContext(ColorModeContext);
 
-  const { list } = route.params;
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
   const [price, setPrice] = useState(0.0);
