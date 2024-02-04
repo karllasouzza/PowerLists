@@ -5,11 +5,15 @@ import {
   HeaderTitle,
   ListsContainer,
   SafeContentEdge,
-} from "../Home/styles";
+} from "../styles";
 
 export const ListContainer = styled(SafeContentEdge)`
-  padding-top: 24px;
+  margin-top: 24px;
+  padding: 0;
   background-color: ${({ background }) => background};
+
+  width: 100%;
+  height: 100%;
 `;
 
 export const ListHeader = styled(Header)`
@@ -57,7 +61,9 @@ export const ListHeaderSubtitle = styled(ListHeaderTitle)`
 `;
 
 export const ListItemsContainer = styled(ListsContainer)`
-  width: 100%;
+  /* width: 100%;
   height: 100%;
-  margin: 0;
+  margin: 0; */
+
+  overflow: scroll;
 `;

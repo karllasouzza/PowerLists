@@ -3,10 +3,13 @@ import Auth from "../pages/Auth";
 import Login from "../pages/Auth/Login";
 import CreateAccount from "../pages/Auth/CreateAccount";
 import PasswordRecovery from "../pages/Auth/PasswordRecovery";
+import { useTheme } from "react-native-paper";
 
 export default ({ Stack }) => {
+  const theme = useTheme();
+
   return (
-    <Stack.Navigator initialRouteName='Auth' shifting>
+    <Stack.Navigator initialRouteName='Auth' theme={theme}>
       <Stack.Screen
         name='Auth'
         component={Auth}

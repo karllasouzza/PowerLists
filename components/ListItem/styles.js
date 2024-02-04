@@ -4,8 +4,9 @@ import {
   CardListProgress,
   CardListTitle,
 } from "../CardList/styles";
+import { List } from "react-native-paper";
 
-export const ItemContainer = styled.Pressable`
+export const ItemContainer = styled(List.Item)`
   width: 100%;
   height: 100px;
   margin-bottom: 5px;
@@ -17,7 +18,6 @@ export const ItemContainer = styled.Pressable`
   justify-content: space-between;
   align-items: center;
 
-  border-radius: 20px;
   overflow: hidden;
 `;
 
@@ -31,9 +31,6 @@ export const ItemColumn = styled.View`
 `;
 
 export const ItemTitle = styled(CardListTitle)`
-  width: 40%;
-
-  margin-bottom: 0;
   color: ${({ color }) => color};
   text-decoration: ${({ status }) => (status ? "line-through" : null)};
 `;

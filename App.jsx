@@ -7,9 +7,8 @@ import { PaperProvider } from "react-native-paper";
 import { AuthProvider } from "./context/auth";
 
 import NoSigned from "./router/noSigned";
-import BottomNavigation from "./components/BottomNavigation";
+import Signed from "./router/signed";
 import * as Linking from "expo-linking";
-import { MenuContextProvider } from "./context/menu-provider";
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +19,7 @@ export default () => {
     config: {
       screens: {
         PasswordRecovery: {
-          path: "recovery",
+          path: "PasswordRecovery",
         },
       },
     },
@@ -31,13 +30,7 @@ export default () => {
       <PaperProvider>
         <AuthProvider>
           {({ auth }) =>
-            auth ? (
-              <MenuContextProvider>
-                <BottomNavigation />
-              </MenuContextProvider>
-            ) : (
-              <NoSigned Stack={Stack} />
-            )
+            auth ? <Signed Stack={Stack} /> : <NoSigned Stack={Stack} />
           }
         </AuthProvider>
         <Toast />
