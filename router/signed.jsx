@@ -2,12 +2,9 @@ import React from "react";
 import Home from "../pages/Home";
 import Account from "../pages/Account";
 
-import { useTheme } from "react-native-paper";
 import ListItems from "../pages/Home/ListItems";
 
-export default ({ Stack }) => {
-  const theme = useTheme();
-
+export default ({ Stack, theme }) => {
   return (
     <Stack.Navigator theme={theme}>
       <Stack.Screen

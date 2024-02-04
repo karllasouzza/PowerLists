@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ItemAmount, ItemContainer, ItemPrice, ItemColumn } from "./styles";
-import { List, Menu } from "react-native-paper";
+import { IconButton, Menu } from "react-native-paper";
 import { responsiveFontSize } from "react-native-responsive-dimensions";
 import { StyleSheet } from "react-native";
 
@@ -21,32 +21,40 @@ export default ({
   const [visible, setVisible] = useState(false);
 
   const styles = StyleSheet.create({
-    iconTitle: {
+    itemTitle: {
       fontSize: responsiveFontSize(2.3),
       fontWeight: "bold",
       color: color,
     },
-    iconContent: {
-      height: 100,
-      display: "flex",
+    itemContent: {
+      flex: 1,
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "flex-start",
+      paddingRight: 15,
+    },
+    itemIcon: {
+      height: 100,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
     },
   });
 
   return (
     <ItemContainer
       onLongPress={() => setVisible(true)}
-      onPress={() => checkHandle(item.id, status)}
+      onPress={checkHandle}
       style={{ backgroundColor: visible ? "#ffffff16" : null }}
       title={title}
-      titleStyle={styles.iconTitle}
-      contentStyle={styles.iconContent}
+      titleStyle={styles.itemTitle}
+      contentStyle={styles.itemContent}
       left={() => (
-        <List.Icon
-          color={status ? checkColor : background}
+        <IconButton
+          size={35}
+          style={styles.itemIcon}
           icon={status ? "check" : "checkbox-blank"}
+          iconColor={status ? checkColor : background}
         />
       )}
       right={() => (
@@ -72,34 +80,5 @@ export default ({
         </Menu>
       )}
     />
-
-    // <ItemContainer border={color} onLongPress={() => setLongPress(true)}>
-
-    //   <ItemTitle color={color} status={status}>
-    //     {title}
-    //   </ItemTitle>
-
-    //   {longPress ? (
-    //     <CardListOptions background={options.background}>
-    //       <IconContainer
-    //         background={options.deleteBackground}
-    //         onPress={() => deleteHandle(item.id)}>
-    //         <TrashIcon background={options.deleteColor} />
-    //       </IconContainer>
-    //       <IconContainer
-    //         background={options.editBackground}
-    //         onPress={() => editHandle(item)}>
-    //         <EditIcon background={options.editColor} width={20} />
-    //       </IconContainer>
-    //     </CardListOptions>
-    //   ) : null}
-    //   {longPress ? (
-    //     <BlurPopUp
-    //       zIndex={1}
-    //       background={options.shadow}
-    //       closeHandle={() => setLongPress(false)}
-    //     />
-    //   ) : null}
-    // </ItemContainer>
   );
 };

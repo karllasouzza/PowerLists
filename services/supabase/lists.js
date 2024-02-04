@@ -9,6 +9,7 @@ export const GetLists = async () => {
       .from("Lists")
       .select(
         `*, List_item (
+        id,
         price,
         amount,
         status

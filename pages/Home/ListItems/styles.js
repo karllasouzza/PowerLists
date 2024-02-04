@@ -6,9 +6,9 @@ import {
   ListsContainer,
   SafeContentEdge,
 } from "../styles";
+import { ScrollView, View } from "react-native";
 
 export const ListContainer = styled(SafeContentEdge)`
-  margin-top: 24px;
   padding: 0;
   background-color: ${({ background }) => background};
 
@@ -60,10 +60,9 @@ export const ListHeaderSubtitle = styled(ListHeaderTitle)`
   color: ${({ color }) => color};
 `;
 
-export const ListItemsContainer = styled(ListsContainer)`
-  /* width: 100%;
+export const ListItemsContainer = styled(ScrollView)`
+  width: 100%;
   height: 100%;
-  margin: 0; */
 
   overflow: scroll;
 `;

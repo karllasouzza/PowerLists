@@ -19,21 +19,14 @@ import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
 import ReloadContainer from "../../components/RotateAnimationContainer";
 import { CardList } from "../../components/CardList";
 
-import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
 import { BackHandler, StyleSheet } from "react-native";
 
-import {
-  AnimatedFAB,
-  Appbar,
-  Portal,
-  Searchbar,
-  useTheme,
-} from "react-native-paper";
+import { AnimatedFAB, Appbar, Searchbar, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { MenuContext } from "../../context/menu-provider";
-import { JoinTeamPortal } from "../../components/Portal/ListScreenVisible";
+
+import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
 
 const Home = ({ navigation }) => {
   const focused = useIsFocused();
@@ -60,9 +53,6 @@ const Home = ({ navigation }) => {
 
   // AnimatedFAB
   const [isExtended, setIsExtended] = useState(true);
-
-  // const { handleShow, listPortalScreenVisible, handleHideAll } =
-  //   useContext(MenuContext);
 
   // useFocusEffect(
   //   useCallback(() => {

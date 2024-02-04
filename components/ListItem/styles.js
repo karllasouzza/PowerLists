@@ -15,7 +15,7 @@ export const ItemContainer = styled(List.Item)`
 
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 
   overflow: hidden;
@@ -33,10 +33,15 @@ export const ItemColumn = styled.View`
 export const ItemTitle = styled(CardListTitle)`
   color: ${({ color }) => color};
   text-decoration: ${({ status }) => (status ? "line-through" : null)};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 `;
 export const ItemAmount = styled(CardListProgress)`
   color: ${({ color }) => color};
 `;
 export const ItemPrice = styled(CardListPrice)`
   color: ${({ color }) => color};
+  width: auto;
 `;

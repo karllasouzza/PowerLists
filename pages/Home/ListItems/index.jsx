@@ -1,17 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 
-import {
-  ListContainer,
-  ListHeader,
-  ListHeaderSubtitle,
-  ListHeaderTitle,
-  ListItemsContainer,
-  ItemsColumn,
-  IconContainer,
-} from "./styles";
+import { ListContainer, ListItemsContainer } from "./styles";
 import { BackHandler } from "react-native";
-import { useTheme } from "react-native-paper";
+import { Appbar, useTheme } from "react-native-paper";
 import { UseRealtimeItems } from "../../../services/supabase/realtime/Items";
 import {
   CheckItem,
@@ -24,10 +16,12 @@ import { showToast } from "../../../services/toast";
 import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 import ListItem from "../../../components/ListItem";
 import NewListItem from "../../../components/NewListItem";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default ({ action, navigation, route }) => {
   const theme = useTheme();
   const list = route.params?.list;
+  const { top, bottom } = useSafeAreaInsets();
 
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
@@ -42,7 +36,6 @@ export default ({ action, navigation, route }) => {
     theme.colors[list.accent_color + "Container"]
   );
 
-  UseRealtimeItems(list.id, items, setItems);
   useEffect(() => {
     const getItens = async () => {
       try {
@@ -50,7 +43,6 @@ export default ({ action, navigation, route }) => {
         if (!data) throw new Error();
 
         setItems(data);
-        setReload(false);
       } catch (error) {}
     };
     getItens();
@@ -64,11 +56,14 @@ export default ({ action, navigation, route }) => {
         }
       }
     );
-
     return () => {
       backHandler.remove();
     };
   }, [mode, reload]);
+
+  useEffect(() => {
+    UseRealtimeItems(list.id, items, setItems);
+  }, [items]);
 
   const addNewItem = async () => {
     try {
@@ -162,6 +157,17 @@ export default ({ action, navigation, route }) => {
     setMode("listItem");
   };
 
+  const sumTotal = () =>
+    items?.map((item) => item.price).length
+      ? items
+          ?.map((item) => item?.price * item?.amount)
+          ?.reduce((accum, curr) => accum + curr)
+          .toLocaleString("pt-br", {
+            style: "currency",
+            currency: "BRL",
+          })
+      : items?.map((item) => item.price).length;
+
   return (
     <ListContainer
       visible={true}
@@ -170,31 +176,18 @@ export default ({ action, navigation, route }) => {
       <FocusAwareStatusBar
         color={theme.colors[list.accent_color + "Container"]}
       />
-      <ListHeader background={theme.colors[list.accent_color + "Container"]}>
-        <ItemsColumn>
-          <ListHeaderTitle color={theme.colors.onBackground}>
-            {list.title}
-          </ListHeaderTitle>
-          <ListHeaderSubtitle color={theme.colors.onBackground}>
-            Total:{" "}
-            {items?.map((item) => item.price).length
-              ? items
-                  ?.map((item) => item?.price * item?.amount)
-                  ?.reduce((accum, curr) => accum + curr)
-                  .toLocaleString("pt-br", {
-                    style: "currency",
-                    currency: "BRL",
-                  })
-              : items?.map((item) => item.price).length}
-          </ListHeaderSubtitle>
-        </ItemsColumn>
-        <IconContainer onPress={() => setReload(true)}>
-          {/* <ReloadIcon
-            on={reload}
-            background={theme.colors.onPrimaryContainer}
-          /> */}
-        </IconContainer>
-      </ListHeader>
+
+      <Appbar
+        safeAreaInsets={{ top }}
+        style={{
+          height: 90,
+          backgroundColor: theme.colors[list.accent_color + "Container"],
+          paddingHorizontal: 10,
+        }}>
+        <Appbar.Action icon='arrow-left' onPress={() => navigation.goBack()} />
+        <Appbar.Content title={list.title} style={{ marginLeft: 10 }} />
+      </Appbar>
+
       <ListItemsContainer>
         {items
           .sort(function compare(a, b) {
@@ -297,35 +290,18 @@ export default ({ action, navigation, route }) => {
           error={errorInput}
         />
       )}
-      {/* <Footer
-        background={theme.colors[list.accent_color + "Fixed"]}
-        iconColor={
-          theme.colors[
-            `on${
-              list.accent_color.charAt(0).toUpperCase() +
-              list.accent_color.slice(1)
-            }Fixed`
-          ]
-        }
-        onIconColor={theme.colors[list.accent_color + "FixedDim"]}
-        onIconBackground={
-          theme.colors[
-            `on${
-              list.accent_color.charAt(0).toUpperCase() +
-              list.accent_color.slice(1)
-            }FixedVariant`
-          ]
-        }
-        returnBackground={theme.colors.errorContainer}
-        returnColor={theme.colors.error}
-        mode={mode}
-        addNewItem={addNewItem}
-        returnOfMode={returnOfMode}
-        addHandle={() => setMode("add")}
-        homeHandle={goBack}
-        accountHandle={() => navigate("Account")}
-        editItems={editItem}
-      /> */}
+      <Appbar
+        safeAreaInsets={{ bottom }}
+        style={{
+          height: 50,
+          backgroundColor: theme.colors[list.accent_color + "Container"],
+          paddingHorizontal: 20,
+        }}>
+        <Appbar.Content
+          title={`Total: ${sumTotal()}`}
+          style={{ marginRight: 10 }}
+        />
+      </Appbar>
     </ListContainer>
   );
 };
