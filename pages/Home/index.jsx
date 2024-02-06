@@ -29,7 +29,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
 
 const Home = ({ navigation }) => {
-  const focused = useIsFocused();
   const theme = useTheme();
 
   NavigationBar.setBackgroundColorAsync(theme.colors.elevation.level2);
@@ -54,16 +53,6 @@ const Home = ({ navigation }) => {
   // AnimatedFAB
   const [isExtended, setIsExtended] = useState(true);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     return () => {
-  //       if (listPortalScreenVisible) {
-  //         handleHideAll();
-  //       }
-  //     };
-  //   }, [handleHideAll, listPortalScreenVisible])
-  // );
-
   const onScroll = ({ nativeEvent }) => {
     const currentScrollPosition =
       Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
@@ -72,39 +61,41 @@ const Home = ({ navigation }) => {
   };
 
   UseRealtimeLists(lists, setLists);
-  useEffect(() => {
-    const getLists = async () => {
-      try {
+  useFocusEffect(
+    useCallback(() => {
+      const getList = async () => {
         const { data } = await GetLists();
-        if (!data) throw new Error();
         setLists(data);
         setReload(false);
-      } catch (erro) {}
-    };
+      };
+      getList();
+    }, [reload])
+  );
 
-    getLists();
-  }, [reload]);
-
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (mode === "add" || mode === "edit") {
-          returnOfMode();
-          return true;
-        } else if (onSearch) {
-          setOnSearch(false);
-          return true;
+  useFocusEffect(
+    useCallback(() => {
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          if (mode === "add" || mode === "edit") {
+            returnOfMode();
+            return true;
+          } else if (onSearch) {
+            setOnSearch(false);
+            return true;
+          }
         }
+      );
+
+      if (onSearch) {
+        refSearchbar?.current?.focus(), [onSearch];
       }
-    );
 
-    return () => {
-      backHandler.remove();
-    };
-  }, [mode, onSearch]);
-
-  useEffect(() => refSearchbar?.current?.focus(), [onSearch]);
+      return () => {
+        backHandler.remove();
+      };
+    }, [mode, onSearch])
+  );
 
   const filteredLists =
     searchQuery.length > 0
@@ -175,7 +166,7 @@ const Home = ({ navigation }) => {
       <Appbar
         safeAreaInsets={{ top }}
         style={{
-          height: 90,
+          height: onSearch ? 110 : 90,
           backgroundColor: theme.colors.elevation.level2,
           paddingHorizontal: 10,
         }}>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import * as NavigationBar from "expo-navigation-bar";
 
 import { ListContainer, ListItemsContainer } from "./styles";
@@ -17,6 +17,7 @@ import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 import ListItem from "../../../components/ListItem";
 import NewListItem from "../../../components/NewListItem";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default ({ action, navigation, route }) => {
   const theme = useTheme();
@@ -32,38 +33,42 @@ export default ({ action, navigation, route }) => {
   const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
 
-  NavigationBar.setBackgroundColorAsync(
-    theme.colors[list.accent_color + "Container"]
+  useFocusEffect(
+    useCallback(() => {
+      NavigationBar.setBackgroundColorAsync(
+        theme.colors[list.accent_color + "Container"]
+      );
+
+      const getItens = async () => {
+        try {
+          const { data } = await GetItems(list.id);
+          if (!data) throw new Error();
+
+          setItems(data);
+        } catch (error) {}
+      };
+      getItens();
+
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          if (mode === "add" || mode === "edit") {
+            returnOfMode();
+            return true;
+          }
+        }
+      );
+      return () => {
+        backHandler.remove();
+      };
+    }, [mode, reload])
   );
 
-  useEffect(() => {
-    const getItens = async () => {
-      try {
-        const { data } = await GetItems(list.id);
-        if (!data) throw new Error();
-
-        setItems(data);
-      } catch (error) {}
-    };
-    getItens();
-
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (mode === "add" || mode === "edit") {
-          returnOfMode();
-          return true;
-        }
-      }
-    );
-    return () => {
-      backHandler.remove();
-    };
-  }, [mode, reload]);
-
-  useEffect(() => {
-    UseRealtimeItems(list.id, items, setItems);
-  }, [items]);
+  useFocusEffect(
+    useCallback(() => {
+      UseRealtimeItems(list.id, items, setItems);
+    }, [items])
+  );
 
   const addNewItem = async () => {
     try {
