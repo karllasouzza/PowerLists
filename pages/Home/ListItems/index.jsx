@@ -1,5 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
-import * as NavigationBar from "expo-navigation-bar";
+import React, { useCallback, useState } from "react";
 
 import { ListContainer, ListItemsContainer } from "./styles";
 import { BackHandler } from "react-native";
@@ -35,10 +34,6 @@ export default ({ action, navigation, route }) => {
 
   useFocusEffect(
     useCallback(() => {
-      NavigationBar.setBackgroundColorAsync(
-        theme.colors[list.accent_color + "Container"]
-      );
-
       const getItens = async () => {
         try {
           const { data } = await GetItems(list.id);
@@ -180,8 +175,8 @@ export default ({ action, navigation, route }) => {
       contentContainerStyle={{ width: "100%" }}>
       <FocusAwareStatusBar
         color={theme.colors[list.accent_color + "Container"]}
+        navColor={theme.colors[list.accent_color + "Container"]}
       />
-
       <Appbar
         safeAreaInsets={{ top }}
         style={{

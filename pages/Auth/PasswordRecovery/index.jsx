@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import PrimaryInput from "../../../components/PrimaryInput";
 import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 import {
@@ -10,7 +10,6 @@ import {
 } from "./styles";
 import AuthContext from "../../../context/auth";
 import { Button, Text, useTheme } from "react-native-paper";
-import { supabase } from "../../../lib/supabase";
 
 export default ({ navigation }) => {
   const theme = useTheme();
@@ -22,8 +21,6 @@ export default ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const { changePassword } = useContext(AuthContext);
-
-
 
   const resetPassword = async () => {
     setLoading(true);
@@ -39,8 +36,10 @@ export default ({ navigation }) => {
   return (
     <PasswordResetScrollView background={theme.colors.background}>
       <PasswordResetContainer background={theme.colors.background}>
-        <FocusAwareStatusBar color={theme.colors.background} />
-
+        <FocusAwareStatusBar
+          color={theme.colors.background}
+          navColor={theme.colors.background}
+        />
         <PasswordResetHeader>
           <PasswordResetTitle
             variant='headlineMedium'

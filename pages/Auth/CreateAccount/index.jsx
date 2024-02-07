@@ -8,19 +8,12 @@ import {
   CreateAccountContainer,
   CreateAccountForm,
   CreateAccountHeader,
-  CreateAccountImage,
   CreateAccountTitle,
   IHaveAccount,
 } from "./styles";
-import theme from "../../../assets/theme.json";
-import * as NavigationBar from "expo-navigation-bar";
-// import PrimaryButton from "../../../components/PrimaryButton";
 import PrimaryInput from "../../../components/PrimaryInput";
 import AuthContext from "../../../context/auth";
-import { showToast } from "../../../services/toast";
-// import ColorModeContext from "../../../context/colorMode";
 import { Button, HelperText, Text, useTheme } from "react-native-paper";
-import { Link } from "@react-navigation/native";
 
 export default ({ navigation }) => {
   const theme = useTheme();
@@ -67,7 +60,10 @@ export default ({ navigation }) => {
   return (
     <AccountScrollView background={theme.colors.background}>
       <CreateAccountContainer background={theme.colors.background}>
-        <FocusAwareStatusBar color={theme.colors.background} />
+        <FocusAwareStatusBar
+          color={theme.colors.background}
+          navColor={theme.colors.background}
+        />
 
         <CreateAccountHeader>
           <CreateAccountTitle

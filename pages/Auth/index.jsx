@@ -1,5 +1,3 @@
-import * as NavigationBar from "expo-navigation-bar";
-
 import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
 
 import {
@@ -9,16 +7,17 @@ import {
   AuthTitle,
   ContainerAuth,
 } from "./styles";
-import { Button, Text, useTheme, Icon } from "react-native-paper";
+import { Button, Text, useTheme } from "react-native-paper";
 
 const Auth = ({ navigation }) => {
   const theme = useTheme();
 
-  NavigationBar.setBackgroundColorAsync(theme.colors.tertiaryContainer);
-
   return (
     <ContainerAuth background={theme.colors.background}>
-      <FocusAwareStatusBar color={theme.colors.background} />
+      <FocusAwareStatusBar
+        color={theme.colors.background}
+        navColor={theme.colors.tertiaryContainer}
+      />
       <AuthHeaderSection>
         <AuthImage source={require("../../assets/adaptive-icon.png")} />
         <AuthTitle variant='headlineMedium' color={theme.colors.onBackground}>

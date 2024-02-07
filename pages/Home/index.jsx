@@ -19,19 +19,17 @@ import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
 import ReloadContainer from "../../components/RotateAnimationContainer";
 import { CardList } from "../../components/CardList";
 
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
 import { BackHandler, StyleSheet } from "react-native";
 
 import { AnimatedFAB, Appbar, Searchbar, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
+import { SafeContentEdge, ListsContainer } from "./styles";
 
 const Home = ({ navigation }) => {
   const theme = useTheme();
-
-  NavigationBar.setBackgroundColorAsync(theme.colors.elevation.level2);
 
   // Lists Add
   const [lists, setLists] = useState([]);
@@ -162,7 +160,10 @@ const Home = ({ navigation }) => {
 
   return (
     <SafeContentEdge background={theme.colors.background}>
-      <FocusAwareStatusBar color={theme.colors.elevation.level2} />
+      <FocusAwareStatusBar
+        color={theme.colors.elevation.level2}
+        navColor={theme.colors.elevation.level2}
+      />
       <Appbar
         safeAreaInsets={{ top }}
         style={{

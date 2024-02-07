@@ -5,7 +5,6 @@ import {
   LoginContainer,
   LoginForm,
   LoginHeader,
-  LoginImage,
   LoginScrollView,
   LoginTitle,
 } from "./styles";
@@ -40,8 +39,10 @@ export default ({ navigation }) => {
   return (
     <LoginScrollView background={theme.colors.background}>
       <LoginContainer background={theme.colors.background}>
-        <FocusAwareStatusBar color={theme.colors.background} />
-
+        <FocusAwareStatusBar
+          color={theme.colors.background}
+          navColor={theme.colors.background}
+        />
         <LoginHeader>
           <LoginTitle
             variant='headlineMedium'
