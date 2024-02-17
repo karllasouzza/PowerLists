@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  CardListTitle,
-  CardListContainer,
-  CardListProgress,
-  CardListLabels,
-  CardListOptions,
-  CardListPrice,
-  IconContainer,
-} from "./styles";
-import { List, Text, Avatar, Menu, Button, Divider } from "react-native-paper";
-import { Background } from "@react-navigation/elements";
+import { List, Text, Avatar, Menu } from "react-native-paper";
 
 export const CardList = ({
   list: { id, title, List_item, color, accentColor, iconBackground },
@@ -17,7 +7,7 @@ export const CardList = ({
   deleteHandle,
   editHandle,
 }) => {
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
 
@@ -74,7 +64,7 @@ export const CardList = ({
             </Text>
           }>
           <Menu.Item
-            onPress={() => editHandle(id, title, accentColor)}
+            onPress={() => editHandle(id, title, accentColor.name, closeMenu)}
             leadingIcon='file-document-edit-outline'
             title='Editar'
           />

@@ -157,16 +157,20 @@ export default ({ action, navigation, route }) => {
     setMode("listItem");
   };
 
-  const sumTotal = () =>
-    items?.map((item) => item.price).length
-      ? items
-          ?.map((item) => item?.price * item?.amount)
-          ?.reduce((accum, curr) => accum + curr)
-          .toLocaleString("pt-br", {
-            style: "currency",
-            currency: "BRL",
-          })
-      : items?.map((item) => item.price).length;
+  const sumTotal = () => {
+    const totalItems = items?.map((item) => item.price);
+
+    if (totalItems.length) {
+      const total = items
+        ?.map((item) => item?.price * item?.amount)
+        ?.reduce((accum, curr) => accum + curr);
+
+      return total.toLocaleString("pt-br", {
+        style: "currency",
+        currency: "BRL",
+      });
+    } else return totalItems.length;
+  };
 
   return (
     <ListContainer
@@ -174,18 +178,26 @@ export default ({ action, navigation, route }) => {
       background={theme.colors.background}
       contentContainerStyle={{ width: "100%" }}>
       <FocusAwareStatusBar
-        color={theme.colors[list.accent_color + "Container"]}
-        navColor={theme.colors[list.accent_color + "Container"]}
+        color={theme.colors[list.accent_color]}
+        navColor={theme.colors[list.accent_color]}
       />
       <Appbar
         safeAreaInsets={{ top }}
         style={{
           height: 90,
-          backgroundColor: theme.colors[list.accent_color + "Container"],
-          paddingHorizontal: 10,
+          backgroundColor: theme.colors[list.accent_color],
+          paddingHorizontal: 20,
         }}>
-        <Appbar.Action icon='arrow-left' onPress={() => navigation.goBack()} />
-        <Appbar.Content title={list.title} style={{ marginLeft: 10 }} />
+        <Appbar.Action
+          color={theme.colors.background}
+          icon='arrow-left'
+          onPress={() => navigation.goBack()}
+        />
+        <Appbar.Content
+          color={theme.colors.background}
+          title={list.title}
+          style={{ marginLeft: 10 }}
+        />
       </Appbar>
 
       <ListItemsContainer>
@@ -293,13 +305,33 @@ export default ({ action, navigation, route }) => {
       <Appbar
         safeAreaInsets={{ bottom }}
         style={{
+          width: "100%",
           height: 50,
-          backgroundColor: theme.colors[list.accent_color + "Container"],
-          paddingHorizontal: 20,
+          backgroundColor: theme.colors[list.accent_color],
+          paddingLeft: 20,
+          paddingRight: 15,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}>
+        <Appbar.Action
+          icon='plus'
+          size={35}
+          color={theme.colors.background}
+          style={{ borderRadius: 5 }}
+          onPress={() => {}}
+        />
         <Appbar.Content
+          color={theme.colors.background}
           title={`Total: ${sumTotal()}`}
-          style={{ marginRight: 10 }}
+          titleStyle={{ width: "auto" }}
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
         />
       </Appbar>
     </ListContainer>

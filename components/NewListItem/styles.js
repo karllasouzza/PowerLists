@@ -14,14 +14,15 @@ export const NewListItemContainer = styled(Modal)`
 export const NewListItemForm = styled.View`
   width: 90%;
   height: 60%;
+  min-height: 280px;
   border-radius: 30px;
-  padding: 10px 20px;
+  padding: 10px 10px;
 
-  background-color: aqua;
+  background-color: ${({ background }) => background};
 
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: flex-start;
 
   transition: all 0.5s ease-in-out;

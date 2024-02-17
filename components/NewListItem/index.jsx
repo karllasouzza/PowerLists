@@ -1,15 +1,18 @@
 import {
   NewListItemContainer,
-  NewListItemContainerBackground,
   NewListItemForm,
   NewListItemFormRow,
 } from "./styles";
 import PrimaryInput from "../PrimaryInput";
 import ColorCard from "./ColorCard";
+import { Button, Text } from "react-native-paper";
 
 export default ({
   type,
+  mode,
+  theme,
   background,
+  blurBackground,
   labelColor,
   labelBackground,
   setProduct,
@@ -24,13 +27,18 @@ export default ({
   error,
   onSelectedColor,
   selectedColor,
-  visible
+  visible,
+  handlePress,
+  onDismiss,
 }) => {
   return (
-    <NewListItemContainer visible={visible}>
-      <NewListItemForm>
+    <NewListItemContainer
+      visible={visible}
+      onDismiss={onDismiss}
+      style={{ backgroundColor: blurBackground }}>
+      <NewListItemForm background={background}>
         <PrimaryInput
-          width={100}
+          width='85'
           labelValue={type === "ListItems" ? "Produto" : "Titulo"}
           labelColor={error === "title" ? errorColor : labelColor}
           labelBackground={labelBackground}
@@ -74,6 +82,7 @@ export default ({
             ? colors?.map((color, index) => (
                 <ColorCard
                   key={index}
+                  theme={theme}
                   color={color}
                   width={40}
                   height={40}
@@ -85,8 +94,46 @@ export default ({
               ))
             : null}
         </NewListItemFormRow>
+        <NewListItemFormRow>
+          <Button
+            mode='elevated'
+            style={{ width: "35%" }}
+            buttonColor={theme.colors.errorContainer}
+            onPress={onDismiss}>
+            <Text
+              variant='titleMedium'
+              style={{
+                fontWeight: "bold",
+                color: theme.colors.error,
+              }}>
+              Cancelar
+            </Text>
+          </Button>
+          <Button
+            mode='elevated'
+            style={{ width: "60%" }}
+            buttonColor={theme.colors[colorSelected]}
+            onPress={handlePress}
+            /*  loading={loading} */
+          >
+            <Text
+              variant='titleMedium'
+              style={{
+                fontWeight: "bold",
+                color:
+                  theme.colors[
+                    `on${colorSelected[0]
+                      .toUpperCase()
+                      .concat(colorSelected.slice(1))}`
+                  ],
+              }}>
+              {`${mode == "add" ? "Criar" : "Editar"} ${
+                type === "Lists" ? "Lista" : "Produto"
+              }`}
+            </Text>
+          </Button>
+        </NewListItemFormRow>
       </NewListItemForm>
-      <NewListItemContainerBackground background={background} />
     </NewListItemContainer>
   );
 };

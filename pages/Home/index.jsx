@@ -27,6 +27,7 @@ import { AnimatedFAB, Appbar, Searchbar, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { SafeContentEdge, ListsContainer } from "./styles";
+import NewListItem from "../../components/NewListItem";
 
 const Home = ({ navigation }) => {
   const theme = useTheme();
@@ -155,7 +156,7 @@ const Home = ({ navigation }) => {
     setListEditId("");
     setErrorInput("");
 
-    // setMode("default");
+    setMode(null);
   };
 
   return (
@@ -169,7 +170,7 @@ const Home = ({ navigation }) => {
         style={{
           height: onSearch ? 110 : 90,
           backgroundColor: theme.colors.elevation.level2,
-          paddingHorizontal: 10,
+          paddingHorizontal: 20,
         }}>
         {onSearch ? (
           <Searchbar
@@ -189,20 +190,16 @@ const Home = ({ navigation }) => {
           />
         ) : (
           <>
-            <Appbar.Content title='Listas' style={{ marginLeft: 10 }} />
+            <Appbar.Content title='Listas' />
             <Appbar.Action
               icon='magnify'
               onPress={() => {
                 setOnSearch(true);
               }}
             />
-            <ReloadContainer on={reload}>
-              <Appbar.Action icon='reload' onPress={() => setReload(true)} />
-            </ReloadContainer>
           </>
         )}
       </Appbar>
-
       {searchQuery.length > 0 && onSearch ? (
         <ListsContainer onScroll={onScroll}>
           {filteredLists?.map((list, index) => (
@@ -231,11 +228,12 @@ const Home = ({ navigation }) => {
                 })
               }
               deleteHandle={deleteList}
-              editHandle={(id, title, color) => {
+              editHandle={(id, title, color, hideMenu) => {
                 setMode("edit");
                 setListEditId(id);
                 setTitle(title);
                 setColor(color);
+                hideMenu();
               }}
             />
           ))}
@@ -268,17 +266,17 @@ const Home = ({ navigation }) => {
                 })
               }
               deleteHandle={deleteList}
-              editHandle={(id, title, color) => {
+              editHandle={(id, title, color, hideMenu) => {
                 setMode("edit");
                 setListEditId(id);
                 setTitle(title);
                 setColor(color);
+                hideMenu();
               }}
             />
           ))}
         </ListsContainer>
       )}
-
       <AnimatedFAB
         icon={"plus"}
         label={"Nova lista"}
@@ -287,59 +285,30 @@ const Home = ({ navigation }) => {
         iconMode={"dynamic"}
         style={[styles.fabStyle]}
       />
-
-      {/* {mode !== "add" && mode !== "edit" ? null : (
-        <BlurPopUp
-          zIndex={1}
-          background={theme.colors.shadow}
-          closeHandle={returnOfMode}
+      {mode !== "add" && mode !== "edit" ? null : (
+        <NewListItem
+          type='Lists'
+          mode={mode}
+          theme={theme}
+          blurBackground={theme.colors.backdrop}
+          background={theme.colors.elevation.level5}
+          labelColor={theme.colors.onBackground}
+          labelBackground={theme.colors.elevation.level5}
+          errorColor={theme.colors.error}
+          colors={["primary", "secondary", "tertiary", "error"]}
+          colorSelected={color}
+          values={{ title }}
+          onSelectedColor={theme.colors.onBackground}
+          selectedColor={theme.colors.background}
+          setProduct={setTitle}
+          setColor={setColor}
+          handlePress={mode === "add" ? addNewList : editList}
+          onEdit={mode === "edit"}
+          onDismiss={returnOfMode}
+          visible={mode === "edit" || mode === "add"}
+          error={errorInput}
         />
-      )} */}
-      {/* {mode !== "add" && mode !== "edit" ? null : (
-        <Portal>
-          <NewListItem
-            type='Lists'
-            background={theme.colors.onPrimary}
-            labelColor={theme.colors.onBackground}
-            labelBackground={theme.colors.onPrimary}
-            errorColor={theme.colors.error}
-            setProduct={setTitle}
-            colors={[
-              "primary",
-              "secondary",
-              "tertiary",
-              "error",
-              "success",
-              "fourtiary",
-            ]}
-            setColor={setColor}
-            colorSelected={color}
-            onEdit={mode === "edit"}
-            visible={mode === "edit" || mode === "add"}
-            values={{ title }}
-            error={errorInput}
-            onSelectedColor={theme.colors.onBackground}
-            selectedColor={theme.colors.background}
-          />
-        </Portal>
-      )} */}
-      {/* <Footer
-        background={theme.colors.onPrimary}
-        iconColor={theme.colors.ononPrimary}
-        onIconColor={theme.colors.onPrimaryDim}
-        onIconBackground={theme.colors.ononPrimaryVariant}
-        returnColor={theme.colors.error}
-        returnBackground={theme.colors.errorContainer}
-        mode={mode}
-        route={route.name}
-        addHandle={() => setMode("add")}
-        addNewItem={addNewList}
-        returnOfAddMode={returnOfMode}
-        editItems={editList}
-        returnOfMode={returnOfMode}
-        homeHandle={() => navigation.navigate("Home")}
-        accountHandle={() => navigation.navigate("Account")}
-      /> */}
+      )}
     </SafeContentEdge>
   );
 };

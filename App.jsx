@@ -7,7 +7,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
-import { PaperProvider, useTheme } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
 import { AuthProvider } from "./context/auth";
 
 import NoSigned from "./router/noSigned";
@@ -68,7 +68,17 @@ export default () => {
       <PaperProvider theme={dark ? CombinedDarkTheme : CombinedDefaultTheme}>
         <AuthProvider>
           {({ auth }) =>
-            auth ? <Signed Stack={Stack} theme={dark ? CombinedDarkTheme : CombinedDefaultTheme} /> : <NoSigned Stack={Stack} theme={dark ? CombinedDarkTheme : CombinedDefaultTheme} />
+            auth ? (
+              <Signed
+                Stack={Stack}
+                theme={dark ? CombinedDarkTheme : CombinedDefaultTheme}
+              />
+            ) : (
+              <NoSigned
+                Stack={Stack}
+                theme={dark ? CombinedDarkTheme : CombinedDefaultTheme}
+              />
+            )
           }
         </AuthProvider>
         <Toast />

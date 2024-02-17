@@ -4,16 +4,18 @@ import { Color } from "./styles.js";
 export default ({
   width,
   height,
+  theme,
   color,
   selected,
-  tap,
   onSelectedColor,
   selectedColor,
+  tap,
 }) => {
   return (
     <Color
       width={width}
       height={height}
+      theme={theme}
       color={color}
       selected={selected === color}
       onSelectedColor={onSelectedColor}
