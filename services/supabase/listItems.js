@@ -69,12 +69,13 @@ export const EditItem = async (id, title, price, amount) => {
     const { error } = await supabase
       .from("List_item")
       .update({ title, price, amount })
-      .eq("List_item.id", id);
+      .eq("id", id);
 
     if (error) throw error;
 
     return true;
   } catch (error) {
+    console.log(error.message);
     showToast({
       type: "error",
       title: "Erro ao editar produto!",

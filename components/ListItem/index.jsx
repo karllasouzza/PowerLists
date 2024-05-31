@@ -68,7 +68,7 @@ export default ({
             </ItemColumn>
           }>
           <Menu.Item
-            onPress={() => editHandle(id, title, accentColor)}
+            onPress={() => editHandle(item)}
             leadingIcon='file-document-edit-outline'
             title='Editar'
           />

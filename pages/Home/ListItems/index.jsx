@@ -18,7 +18,7 @@ import NewListItem from "../../../components/NewListItem";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default ({ action, navigation, route }) => {
+export default ({navigation, route }) => {
   const theme = useTheme();
   const list = route.params?.list;
   const { top, bottom } = useSafeAreaInsets();
@@ -29,7 +29,6 @@ export default ({ action, navigation, route }) => {
   const [amount, setAmount] = useState(0);
   const [mode, setMode] = useState("listItem");
   const [itemEditId, setItemEditId] = useState("");
-  const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
 
   useFocusEffect(
@@ -56,7 +55,7 @@ export default ({ action, navigation, route }) => {
       return () => {
         backHandler.remove();
       };
-    }, [mode, reload])
+    }, [mode])
   );
 
   useFocusEffect(
@@ -176,7 +175,8 @@ export default ({ action, navigation, route }) => {
     <ListContainer
       visible={true}
       background={theme.colors.background}
-      contentContainerStyle={{ width: "100%" }}>
+      contentContainerStyle={{ width: "100%" }}
+    >
       <FocusAwareStatusBar
         color={theme.colors[list.accent_color]}
         navColor={theme.colors[list.accent_color]}
@@ -187,10 +187,11 @@ export default ({ action, navigation, route }) => {
           height: 90,
           backgroundColor: theme.colors[list.accent_color],
           paddingHorizontal: 20,
-        }}>
+        }}
+      >
         <Appbar.Action
           color={theme.colors.background}
-          icon='arrow-left'
+          icon="arrow-left"
           onPress={() => navigation.goBack()}
         />
         <Appbar.Content
@@ -279,61 +280,63 @@ export default ({ action, navigation, route }) => {
           )}
       </ListItemsContainer>
 
-      {mode !== "add" && mode !== "edit" ? null : (
-        <BlurPopUp
-          zIndex={1}
-          background={theme.colors.shadow}
-          closeHandle={returnOfMode}
-        />
-      )}
+      <NewListItem
+        type="ListItems"
+        mode={mode}
+        theme={theme}
+        colorSelected={list.accent_color}
+        blurBackground={theme.colors.backdrop}
+        background={theme.colors.elevation.level5}
+        labelBackground={theme.colors.elevation.level5}
+        labelColor={theme.colors.onBackground}
+        setProduct={setProduct}
+        setPrice={setPrice}
+        setAmount={setAmount}
+        onEdit={mode === "edit"}
+        values={{ title: product, price, amount }}
+        errorColor={theme.colors.error}
+        error={errorInput}
+        visible={mode === "edit" || mode === "add"}
+        handleSubmit={mode === "add"? addNewItem : editItem}
+        onDismiss={returnOfMode}
+      />
 
-      {mode !== "add" && mode !== "edit" ? null : (
-        <NewListItem
-          type='ListItems'
-          background={theme.colors[list.accent_color + "Container"]}
-          labelColor={theme.colors.onBackground}
-          labelBackground={theme.colors[list.accent_color + "Container"]}
-          errorColor={theme.colors.error}
-          setProduct={setProduct}
-          setPrice={setPrice}
-          setAmount={setAmount}
-          onEdit={mode === "edit"}
-          values={{ title: product, price, amount }}
-          error={errorInput}
-        />
-      )}
-      <Appbar
-        safeAreaInsets={{ bottom }}
-        style={{
-          width: "100%",
-          height: 50,
-          backgroundColor: theme.colors[list.accent_color],
-          paddingLeft: 20,
-          paddingRight: 15,
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}>
-        <Appbar.Action
-          icon='plus'
-          size={35}
-          color={theme.colors.background}
-          style={{ borderRadius: 5 }}
-          onPress={() => {}}
-        />
-        <Appbar.Content
-          color={theme.colors.background}
-          title={`Total: ${sumTotal()}`}
-          titleStyle={{ width: "auto" }}
+      {mode !== "edit" && mode !== "add" ? (
+        <Appbar
+          safeAreaInsets={{ bottom }}
           style={{
+            width: "100%",
+            height: 50,
+            backgroundColor: theme.colors[list.accent_color],
+            paddingLeft: 20,
+            paddingRight: 15,
             display: "flex",
             flexDirection: "row",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             alignItems: "center",
+            zIndex: 10,
           }}
-        />
-      </Appbar>
+        >
+          <Appbar.Action
+            icon="plus"
+            size={35}
+            color={theme.colors.background}
+            style={{ borderRadius: 5 }}
+            onPress={() => setMode("add")}
+          />
+          <Appbar.Content
+            color={theme.colors.background}
+            title={`Total: ${sumTotal()}`}
+            titleStyle={{ width: "auto" }}
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center",
+            }}
+          />
+        </Appbar>
+      ) : null}
     </ListContainer>
   );
 };

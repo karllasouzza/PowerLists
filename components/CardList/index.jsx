@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { List, Text, Avatar, Menu } from "react-native-paper";
 
 export const CardList = ({
-  list: { id, title, List_item, color, accentColor, iconBackground },
+  list: { id, title, List_item, color, accentColor, iconBackground, icon },
   pressHandler,
   deleteHandle,
   editHandle,
@@ -20,7 +20,7 @@ export const CardList = ({
           {...props}
           style={{ backgroundColor: color }}
           color={iconBackground}
-          icon={visible ? "check-bold" : "cart"}
+          icon={visible ? "check-bold" : icon}
           size={50}
         />
       )}

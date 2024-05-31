@@ -1,11 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import * as NavigationBar from "expo-navigation-bar";
+import React, { useCallback, useRef, useState } from "react";
 
 import { UseRealtimeLists } from "../../services/supabase/realtime/lists";
 import {
@@ -16,7 +9,6 @@ import {
 } from "../../services/supabase/lists";
 
 import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
-import ReloadContainer from "../../components/RotateAnimationContainer";
 import { CardList } from "../../components/CardList";
 
 import { useFocusEffect } from "@react-navigation/native";
@@ -36,6 +28,7 @@ const Home = ({ navigation }) => {
   const [lists, setLists] = useState([]);
   const [title, setTitle] = useState("");
   const [color, setColor] = useState("primary");
+  const [icon, setIcon] = useState("cart");
 
   // ListEdit
   const [listEditId, setListEditId] = useState("");
@@ -115,7 +108,7 @@ const Home = ({ navigation }) => {
         throw new Error();
       }
 
-      const data = await NewList(title, color);
+      const data = await NewList(title, color, icon);
       if (!data) throw new Error();
 
       returnOfMode();
@@ -134,7 +127,7 @@ const Home = ({ navigation }) => {
         throw new Error();
       }
 
-      const erro = await EditList(listEditId, title, color);
+      const erro = await EditList(listEditId, title, color, icon);
       if (!erro) throw new Error();
 
       returnOfMode();
@@ -153,6 +146,7 @@ const Home = ({ navigation }) => {
   const returnOfMode = () => {
     setTitle("");
     setColor("primary");
+    setIcon("cart");
     setListEditId("");
     setErrorInput("");
 
@@ -171,10 +165,11 @@ const Home = ({ navigation }) => {
           height: onSearch ? 110 : 90,
           backgroundColor: theme.colors.elevation.level2,
           paddingHorizontal: 20,
-        }}>
+        }}
+      >
         {onSearch ? (
           <Searchbar
-            mode='view'
+            mode="view"
             showDivider={false}
             style={{
               backgroundColor: theme.colors.elevation.level2,
@@ -182,17 +177,17 @@ const Home = ({ navigation }) => {
               paddingHorizontal: 15,
             }}
             ref={refSearchbar}
-            placeholder='Pesquisar listas'
+            placeholder="Pesquisar listas"
             onChangeText={(query) => setSearchQuery(query)}
             onIconPress={() => setOnSearch(false)}
-            icon='arrow-left'
+            icon="arrow-left"
             value={searchQuery}
           />
         ) : (
           <>
-            <Appbar.Content title='Listas' />
+            <Appbar.Content title="Listas" />
             <Appbar.Action
-              icon='magnify'
+              icon="magnify"
               onPress={() => {
                 setOnSearch(true);
               }}
@@ -251,7 +246,12 @@ const Home = ({ navigation }) => {
                   value: theme.colors[list.accent_color],
                 },
                 color: theme.colors[list.accent_color],
-                iconBackground: theme.colors.background,
+                iconBackground:
+                  theme.colors[
+                    `on${list.accent_color[0]
+                      .toUpperCase()
+                      .concat(list.accent_color.slice(1))}`
+                  ],
               }}
               pressHandler={() =>
                 navigation.navigate("List", {
@@ -285,30 +285,39 @@ const Home = ({ navigation }) => {
         iconMode={"dynamic"}
         style={[styles.fabStyle]}
       />
-      {mode !== "add" && mode !== "edit" ? null : (
-        <NewListItem
-          type='Lists'
-          mode={mode}
-          theme={theme}
-          blurBackground={theme.colors.backdrop}
-          background={theme.colors.elevation.level5}
-          labelColor={theme.colors.onBackground}
-          labelBackground={theme.colors.elevation.level5}
-          errorColor={theme.colors.error}
-          colors={["primary", "secondary", "tertiary", "error"]}
-          colorSelected={color}
-          values={{ title }}
-          onSelectedColor={theme.colors.onBackground}
-          selectedColor={theme.colors.background}
-          setProduct={setTitle}
-          setColor={setColor}
-          handlePress={mode === "add" ? addNewList : editList}
-          onEdit={mode === "edit"}
-          onDismiss={returnOfMode}
-          visible={mode === "edit" || mode === "add"}
-          error={errorInput}
-        />
-      )}
+      <NewListItem
+        type="Lists"
+        mode={mode}
+        theme={theme}
+        blurBackground={theme.colors.backdrop}
+        background={theme.colors.elevation.level5}
+        labelBackground={theme.colors.elevation.level5}
+        labelColor={theme.colors.onBackground}
+        errorColor={theme.colors.error}
+        colors={["primary", "secondary", "tertiary", "error"]}
+        colorSelected={color}
+        values={{ title }}
+        onSelectedColor={theme.colors.onBackground}
+        selectedColor={theme.colors.background}
+        setProduct={setTitle}
+        setColor={setColor}
+        icons={[
+          "cart",
+          "credit-card-chip",
+          "baby-carriage",
+          "bag-suitcase",
+          "ambulance",
+          "book",
+          "chef-hat",
+        ]}
+        setIcon={setIcon}
+        selectedIcon={icon}
+        handleSubmit={mode === "add" ? addNewList : editList}
+        onEdit={mode === "edit"}
+        onDismiss={returnOfMode}
+        visible={mode === "edit" || mode === "add"}
+        error={errorInput}
+      />
     </SafeContentEdge>
   );
 };

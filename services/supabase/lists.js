@@ -31,13 +31,18 @@ export const GetLists = async () => {
   }
 };
 
-export const NewList = async (title, color) => {
+export const NewList = async (title, color, icon) => {
   try {
     const { user } = await GetUser();
 
     const { error } = await supabase
       .from("Lists")
-      .insert({ user_id: user.id, title: title, accent_color: color });
+      .insert({
+        user_id: user.id,
+        title: title,
+        accent_color: color,
+        icon: icon,
+      });
 
     if (error) throw error;
 
@@ -51,11 +56,11 @@ export const NewList = async (title, color) => {
   }
 };
 
-export const EditList = async (id, title, color) => {
+export const EditList = async (id, title, color, icon) => {
   try {
     const { error } = await supabase
       .from("Lists")
-      .update({ title: title, accent_color: color })
+      .update({ title: title, accent_color: color, icon: icon })
       .eq("id", id);
 
     if (error) throw error;

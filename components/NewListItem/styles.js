@@ -12,11 +12,12 @@ export const NewListItemContainer = styled(Modal)`
 `;
 
 export const NewListItemForm = styled.View`
-  width: 90%;
-  height: 60%;
+  width: 95%;
+  height: max-content;
   min-height: 280px;
-  border-radius: 30px;
+  border-radius: 0 0 30px 30px;
   padding: 10px 10px;
+  gap: 20px;
 
   background-color: ${({ background }) => background};
 
@@ -48,4 +49,18 @@ export const NewListItemContainerBackground = styled(NewListItemContainer)`
   right: 0;
   bottom: 0;
   z-index: -1;
+`;
+
+export const NewListItemFormHeader = styled.View`
+  width: auto;
+  height: auto;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  background-color: ${({ background }) => background};
+  color: ${({ color }) => color};
+  border-radius: 30px 30px 0 0;
 `;
