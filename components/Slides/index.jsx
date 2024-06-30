@@ -10,48 +10,49 @@ import {
 import FocusAwareStatusBar from "../FocusAwareStatusBar.jsx";
 import * as NavigationBar from "expo-navigation-bar";
 import CheckBox from "../../assets/svgs/CheckBox.jsx";
-import ColorModeContext from "../../context/colorMode.jsx";
+import { useTheme } from "react-native-paper";
 
 const Slides = ({ current_slide, nextSlide, prevSlide }) => {
-  const { colorScheme, theme } = useContext(ColorModeContext);
+  const theme = useTheme();
 
   const slide_pages = [
     {
       styles: {
-        background: theme.schemes[colorScheme].successContainer,
-        check_background: theme.schemes[colorScheme].success,
-        check_color: theme.schemes[colorScheme].success,
+        background: theme.colors.primaryContainer,
+        check_background: theme.colors.primary,
+        check_color: theme.colors.background,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_1.png"),
-        title: "Planeje seu dia",
+        title: "Planeje suas compras",
         subtitle: "Comece marcando o incio de um ciclo de produtividade!",
       },
       check: false,
     },
     {
       styles: {
-        background: theme.schemes[colorScheme].secondaryContainer,
-        check_background: theme.schemes[colorScheme].secondary,
-        check_color: theme.schemes[colorScheme].secondary,
+        background: theme.colors.tertiaryContainer,
+        check_background: theme.colors.tertiary,
+        check_color: theme.colors.background,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_2.png"),
-        title: "Não se sobrecarregue",
-        subtitle: "Marque o fim da dependência exclusiva do seu cérebro!",
+        title: "Evite anotações físicas",
+        subtitle:
+          "Marque o fim da dependência exclusiva de papel para anotar suas compras!",
       },
       check: false,
     },
     {
       styles: {
-        background: theme.schemes[colorScheme].errorContainer,
-        check_background: theme.schemes[colorScheme].error,
-        check_color: theme.schemes[colorScheme].error,
+        background: theme.colors.errorContainer,
+        check_background: theme.colors.error,
+        check_color: theme.colors.background,
       },
       content: {
         img: require("../../assets/Images/Slides/Illustration_3.png"),
-        title: "Lembre-se de tudo",
-        subtitle: "Marque tudo o que lhe é importante, desde listas a senhas!",
+        title: "Liste suas financias",
+        subtitle: "Marque todas as suas financias em um único lugar!",
       },
       check: false,
     },
@@ -70,10 +71,10 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
       <Slide_image source={slide_pages[current_slide].content.img} />
 
       <Slide_Text_View>
-        <Slide_title color={theme.schemes[colorScheme].onBackground}>
+        <Slide_title variant='headlineMedium' color={theme.colors.onBackground}>
           {slide_pages[current_slide].content.title}
         </Slide_title>
-        <Slide_subtitle color={theme.schemes[colorScheme].onSurface}>
+        <Slide_subtitle variant='titleMedium' color={theme.colors.onSurface}>
           {slide_pages[current_slide].content.subtitle}
         </Slide_subtitle>
       </Slide_Text_View>
@@ -90,7 +91,7 @@ const Slides = ({ current_slide, nextSlide, prevSlide }) => {
               next={() => {
                 current_slide == 2
                   ? NavigationBar.setBackgroundColorAsync(
-                      theme.schemes[colorScheme].secondaryContainer
+                      theme.colors.tertiaryContainer
                     )
                   : null;
 

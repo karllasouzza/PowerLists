@@ -3,7 +3,8 @@ import {
   responsiveFontSize,
   responsiveHeight,
 } from "react-native-responsive-dimensions";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { List, MD3Colors } from "react-native-paper";
+import { ScrollView } from "react-native";
 
 export const SafeContentEdge = styled.View`
   width: 100%;
@@ -11,10 +12,8 @@ export const SafeContentEdge = styled.View`
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: center;
   background-color: ${({ background }) => background};
-  padding-top: 15px;
 `;
 
 export const Header = styled.View`
@@ -52,8 +51,7 @@ export const Add = styled.TouchableOpacity`
   border-radius: 30px;
 `;
 
-export const ListsContainer = styled(KeyboardAwareScrollView)`
+export const ListsContainer = styled(ScrollView)`
   width: 100%;
-  height: ${responsiveHeight(8)}%;
-  padding: 0 10px;
+  padding: 10px 0;
 `;

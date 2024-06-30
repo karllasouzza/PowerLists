@@ -1,73 +1,102 @@
 import React, { useState } from "react";
-import {
-  CardListTitle,
-  CardListContainer,
-  CardListProgress,
-  CardListLabels,
-  CardListOptions,
-  CardListPrice,
-  IconContainer,
-} from "./styles";
-import TrashIcon from "../../assets/svgs/TrashIcon";
-import EditIcon from "../../assets/svgs/EditIcon";
-import theme from "../../assets/theme.json";
-import BlurPopUp from "../BlurPopUp";
+import { List, Text, Avatar, Menu } from "react-native-paper";
 
 export const CardList = ({
-  list: { id, title, List_item, subColor, color, accentColor },
+  list: { id, title, List_item, color, accentColor, iconBackground, icon },
   pressHandler,
   deleteHandle,
   editHandle,
 }) => {
-  const [longPress, setLongPress] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
+
   return (
-    <CardListContainer
-      onPress={pressHandler}
-      onLongPress={() => setLongPress(true)}>
-      <CardListLabels>
-        <CardListTitle color={color}>{title}</CardListTitle>
-        <CardListProgress subColor={subColor}>
-          {List_item?.filter((item) => item?.status === true).length}/
-          {List_item?.length} compradas
-        </CardListProgress>
-      </CardListLabels>
-      <CardListPrice subColor={subColor}>
-        {List_item?.map((item) => item.price).length
-          ? List_item?.map((item) => item.price * item.amount)
-              ?.reduce((accum, curr) => accum + curr)
-              .toLocaleString("pt-br", {
-                style: "currency",
-                currency: "BRL",
-              })
-          : List_item?.map((item) => item.price).length.toLocaleString(
-              "pt-br",
-              {
-                style: "currency",
-                currency: "BRL",
-              }
-            )}
-      </CardListPrice>
-      {longPress ? (
-        <CardListOptions background={accentColor.value}>
-          <IconContainer
-            background={theme.palettes.error[90]}
-            onPress={() => deleteHandle(id, setLongPress)}>
-            <TrashIcon background={theme.coreColors.error} />
-          </IconContainer>
-          <IconContainer
-            background={theme.palettes.tertiary[90]}
-            onPress={() => editHandle(id, title, accentColor.name)}>
-            <EditIcon background={theme.coreColors.tertiary} width={20} />
-          </IconContainer>
-        </CardListOptions>
-      ) : null}
-      {longPress ? (
-        <BlurPopUp
-          zIndex={1}
-          background={theme.coreColors.black}
-          closeHandle={() => setLongPress(false)}
+    <List.Item
+      left={(props) => (
+        <Avatar.Icon
+          {...props}
+          style={{ backgroundColor: color }}
+          color={iconBackground}
+          icon={visible ? "check-bold" : icon}
+          size={50}
         />
-      ) : null}
-    </CardListContainer>
+      )}
+      title={title}
+      titleStyle={{ fontWeight: "bold" }}
+      description={`${
+        List_item?.filter((item) => item?.status === true).length
+      }/${List_item?.length} compradas`}
+      style={{
+        paddingHorizontal: 25,
+        backgroundColor: visible ? "#ffffff16" : null,
+      }}
+      onPress={pressHandler}
+      onLongPress={() => openMenu()}
+      right={() => (
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={
+            <Text
+              variant='titleMedium'
+              style={{
+                fontSize: 16,
+                marginVertical: 6,
+                fontWeight: "bold",
+              }}>
+              {List_item?.map((item) => item.price).length
+                ? List_item?.map((item) => item.price * item.amount)
+                    ?.reduce((accum, curr) => accum + curr)
+                    .toLocaleString("pt-br", {
+                      style: "currency",
+                      currency: "BRL",
+                    })
+                : List_item?.map((item) => item.price).length.toLocaleString(
+                    "pt-br",
+                    {
+                      style: "currency",
+                      currency: "BRL",
+                    }
+                  )}
+            </Text>
+          }>
+          <Menu.Item
+            onPress={() => editHandle(id, title, accentColor.name, closeMenu)}
+            leadingIcon='file-document-edit-outline'
+            title='Editar'
+          />
+          <Menu.Item
+            onPress={() => deleteHandle(id)}
+            leadingIcon='trash-can-outline'
+            title='Deletar'
+          />
+        </Menu>
+      )}
+    />
+    //       {/* {longPress ? (
+    //         <CardListOptions background={accentColor.value}>
+    //           <IconContainer
+    //             background={theme.palettes.error[90]}
+    //             onPress={() => }>
+    //             <TrashIcon background={theme.coreColors.error} />
+    //           </IconContainer>
+    //           <IconContainer
+    //             background={theme.palettes.tertiary[90]}
+    //             onPress={() => >
+    //             <EditIcon background={theme.coreColors.tertiary} width={20} />
+    //           </IconContainer>
+    //         </CardListOptions>
+    //       ) : null}
+    //       {longPress ? (
+    //         <BlurPopUp
+    //           zIndex={1}
+    //           background={theme.coreColors.black}
+    //           closeHandle={() => setLongPress(false)}
+    //         />
+    //       ) : null} */}
+    //     {/* </List.Item> */}
   );
 };

@@ -4,8 +4,9 @@ import {
   CardListProgress,
   CardListTitle,
 } from "../CardList/styles";
+import { List } from "react-native-paper";
 
-export const ItemContainer = styled.Pressable`
+export const ItemContainer = styled(List.Item)`
   width: 100%;
   height: 100px;
   margin-bottom: 5px;
@@ -14,10 +15,9 @@ export const ItemContainer = styled.Pressable`
 
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 
-  border-radius: 20px;
   overflow: hidden;
 `;
 
@@ -31,15 +31,17 @@ export const ItemColumn = styled.View`
 `;
 
 export const ItemTitle = styled(CardListTitle)`
-  width: 40%;
-
-  margin-bottom: 0;
   color: ${({ color }) => color};
   text-decoration: ${({ status }) => (status ? "line-through" : null)};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
 `;
 export const ItemAmount = styled(CardListProgress)`
   color: ${({ color }) => color};
 `;
 export const ItemPrice = styled(CardListPrice)`
   color: ${({ color }) => color};
+  width: auto;
 `;

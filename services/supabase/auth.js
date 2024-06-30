@@ -64,3 +64,16 @@ export const SingOut = async () => {
     return new Error(error);
   }
 };
+
+export const ResetPassword = async (email) => {
+  try {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "powerlists.project://PasswordRecovery",
+    });
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    return new Error(error);
+  }
+};

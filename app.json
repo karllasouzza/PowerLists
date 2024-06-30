@@ -1,21 +1,20 @@
 {
   "expo": {
     "name": "PowerLists",
-    "slug": "PowerLists",
+    "scheme": "powerlists",
+    "slug": "powerlists",
+    "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/splash-light.png",
+      "resizeMode": "contain"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.karllasouzza.PowerLists"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,8 +28,11 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c047d3b0-942b-41f8-b3b5-6f5fe0aec73b"
+        "projectId": "1a24e7ab-b7e5-47d1-b3d4-78d8fa867693"
       }
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

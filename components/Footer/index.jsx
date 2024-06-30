@@ -8,7 +8,7 @@ import {
   FooterIconContainerAccent,
   FooterIconLabel,
 } from "./styles";
-import PrimaryButton from "../PrimaryButton";
+// import PrimaryButton from "../PrimaryButton";
 import HomeIcon from "../../assets/svgs/HomeIcon";
 import AccountIcon from "../../assets/svgs/AccountIcon";
 import EditIcon from "../../assets/svgs/EditIcon";

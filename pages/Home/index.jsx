@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import * as NavigationBar from "expo-navigation-bar";
+import React, { useCallback, useRef, useState } from "react";
 
 import { UseRealtimeLists } from "../../services/supabase/realtime/lists";
 import {
@@ -10,63 +9,92 @@ import {
 } from "../../services/supabase/lists";
 
 import FocusAwareStatusBar from "../../components/FocusAwareStatusBar";
-import ReloadIcon from "../../assets/svgs/ReloadIcon";
 import { CardList } from "../../components/CardList";
-import BlurPopUp from "../../components/BlurPopUp";
-import NewListItem from "../../components/NewListItem";
-import Footer from "../../components/Footer";
 
-import { SafeContentEdge, Header, HeaderTitle, ListsContainer } from "./styles";
-import { IconContainer } from "../ListItems/styles";
-import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 import { showToast } from "../../services/toast";
-import { BackHandler } from "react-native";
-import ColorModeContext from "../../context/colorMode";
+import { BackHandler, StyleSheet } from "react-native";
 
-const Home = ({ navigation, route }) => {
-  const focused = useIsFocused();
-  const { theme, colorScheme } = useContext(ColorModeContext);
+import { AnimatedFAB, Appbar, Searchbar, useTheme } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-  NavigationBar.setBackgroundColorAsync(
-    theme.schemes[colorScheme].primaryFixed
-  );
+import { SafeContentEdge, ListsContainer } from "./styles";
+import NewListItem from "../../components/NewListItem";
 
+const Home = ({ navigation }) => {
+  const theme = useTheme();
+
+  // Lists Add
   const [lists, setLists] = useState([]);
-  const [mode, setMode] = useState("default");
   const [title, setTitle] = useState("");
   const [color, setColor] = useState("primary");
+  const [icon, setIcon] = useState("cart");
+
+  // ListEdit
   const [listEditId, setListEditId] = useState("");
-  const [reload, setReload] = useState(false);
   const [errorInput, setErrorInput] = useState("");
+  const [mode, setMode] = useState(null);
+
+  // AppBar
+  const { top } = useSafeAreaInsets();
+  const [reload, setReload] = useState(false);
+  const [onSearch, setOnSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const refSearchbar = useRef(null);
+
+  // AnimatedFAB
+  const [isExtended, setIsExtended] = useState(true);
+
+  const onScroll = ({ nativeEvent }) => {
+    const currentScrollPosition =
+      Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
+
+    setIsExtended(currentScrollPosition <= 0);
+  };
 
   UseRealtimeLists(lists, setLists);
-  useEffect(() => {
-    const getLists = async () => {
-      try {
+  useFocusEffect(
+    useCallback(() => {
+      const getList = async () => {
         const { data } = await GetLists();
-        if (!data) throw new Error();
         setLists(data);
         setReload(false);
-      } catch (erro) {}
-    };
+      };
+      getList();
+    }, [reload])
+  );
 
-    getLists();
-  }, [reload]);
-  useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      () => {
-        if (mode === "add" || mode === "edit") {
-          returnOfMode();
-          return true;
+  useFocusEffect(
+    useCallback(() => {
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => {
+          if (mode === "add" || mode === "edit") {
+            returnOfMode();
+            return true;
+          } else if (onSearch) {
+            setOnSearch(false);
+            return true;
+          }
         }
-      }
-    );
+      );
 
-    return () => {
-      backHandler.remove();
-    };
-  }, [mode]);
+      if (onSearch) {
+        refSearchbar?.current?.focus(), [onSearch];
+      }
+
+      return () => {
+        backHandler.remove();
+      };
+    }, [mode, onSearch])
+  );
+
+  const filteredLists =
+    searchQuery.length > 0
+      ? lists.filter((list) =>
+          list.title.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : [];
 
   const addNewList = async () => {
     try {
@@ -80,7 +108,7 @@ const Home = ({ navigation, route }) => {
         throw new Error();
       }
 
-      const data = await NewList(title, color);
+      const data = await NewList(title, color, icon);
       if (!data) throw new Error();
 
       returnOfMode();
@@ -99,7 +127,7 @@ const Home = ({ navigation, route }) => {
         throw new Error();
       }
 
-      const erro = await EditList(listEditId, title, color);
+      const erro = await EditList(listEditId, title, color, icon);
       if (!erro) throw new Error();
 
       returnOfMode();
@@ -118,111 +146,192 @@ const Home = ({ navigation, route }) => {
   const returnOfMode = () => {
     setTitle("");
     setColor("primary");
+    setIcon("cart");
     setListEditId("");
     setErrorInput("");
 
-    setMode("default");
+    setMode(null);
   };
 
   return (
-    <SafeContentEdge background={theme.schemes[colorScheme].background}>
+    <SafeContentEdge background={theme.colors.background}>
       <FocusAwareStatusBar
-        color={theme.schemes[colorScheme].primaryContainer}
+        color={theme.colors.elevation.level2}
+        navColor={theme.colors.elevation.level2}
       />
-      <Header background={theme.schemes[colorScheme].primaryContainer}>
-        <HeaderTitle color={theme.schemes[colorScheme].onPrimaryContainer}>
-          Listas
-        </HeaderTitle>
-        <IconContainer onPress={() => setReload(true)}>
-          <ReloadIcon
-            on={reload}
-            background={theme.schemes[colorScheme].onPrimaryContainer}
-          />
-        </IconContainer>
-      </Header>
-      <ListsContainer>
-        {lists?.map((list, index) => (
-          <CardList
-            key={index}
-            list={{
-              ...list,
-              background: theme.schemes[colorScheme].background,
-              accentColor: {
-                name: list.accent_color,
-                value: theme.schemes[colorScheme][list.accent_color],
-              },
-              color: theme.schemes[colorScheme][list.accent_color],
-              subColor: theme.schemes[colorScheme].onSurfaceVariant,
+      <Appbar
+        safeAreaInsets={{ top }}
+        style={{
+          height: onSearch ? 110 : 90,
+          backgroundColor: theme.colors.elevation.level2,
+          paddingHorizontal: 20,
+        }}
+      >
+        {onSearch ? (
+          <Searchbar
+            mode="view"
+            showDivider={false}
+            style={{
+              backgroundColor: theme.colors.elevation.level2,
+              columnGap: 20,
+              paddingHorizontal: 15,
             }}
-            pressHandler={
-              mode === "default"
-                ? () =>
-                    navigation.navigate("Add", {
-                      list: list,
-                    })
-                : null
-            }
-            deleteHandle={deleteList}
-            editHandle={(id, title, color) => {
-              setMode("edit");
-              setListEditId(id);
-              setTitle(title);
-              setColor(color);
-            }}
+            ref={refSearchbar}
+            placeholder="Pesquisar listas"
+            onChangeText={(query) => setSearchQuery(query)}
+            onIconPress={() => setOnSearch(false)}
+            icon="arrow-left"
+            value={searchQuery}
           />
-        ))}
-      </ListsContainer>
-      {mode !== "add" && mode !== "edit" ? null : (
-        <BlurPopUp
-          zIndex={1}
-          background={theme.schemes[colorScheme].shadow}
-          closeHandle={returnOfMode}
-        />
+        ) : (
+          <>
+            <Appbar.Content title="Listas" />
+            <Appbar.Action
+              icon="magnify"
+              onPress={() => {
+                setOnSearch(true);
+              }}
+            />
+          </>
+        )}
+      </Appbar>
+      {searchQuery.length > 0 && onSearch ? (
+        <ListsContainer onScroll={onScroll}>
+          {filteredLists?.map((list, index) => (
+            <CardList
+              key={index}
+              list={{
+                ...list,
+                background: theme.colors.background,
+                accentColor: {
+                  name: list.accent_color,
+                  value: theme.colors[list.accent_color],
+                },
+                color: theme.colors[list.accent_color],
+                iconBackground: theme.colors.background,
+              }}
+              pressHandler={() =>
+                navigation.navigate("List", {
+                  list: {
+                    ...list,
+                    background: theme.colors.background,
+                    accentColor: list.accent_color,
+                    color: theme.colors[list.accent_color],
+                    iconBackground: theme.colors.background,
+                  },
+                  action: "viewListItens",
+                })
+              }
+              deleteHandle={deleteList}
+              editHandle={(id, title, color, hideMenu) => {
+                setMode("edit");
+                setListEditId(id);
+                setTitle(title);
+                setColor(color);
+                hideMenu();
+              }}
+            />
+          ))}
+        </ListsContainer>
+      ) : (
+        <ListsContainer onScroll={onScroll}>
+          {lists?.map((list, index) => (
+            <CardList
+              key={index}
+              list={{
+                ...list,
+                background: theme.colors.background,
+                accentColor: {
+                  name: list.accent_color,
+                  value: theme.colors[list.accent_color],
+                },
+                color: theme.colors[list.accent_color],
+                iconBackground:
+                  theme.colors[
+                    `on${list.accent_color[0]
+                      .toUpperCase()
+                      .concat(list.accent_color.slice(1))}`
+                  ],
+              }}
+              pressHandler={() =>
+                navigation.navigate("List", {
+                  list: {
+                    ...list,
+                    background: theme.colors.background,
+                    accentColor: list.accent_color,
+                    color: theme.colors[list.accent_color],
+                    iconBackground: theme.colors.background,
+                  },
+                  action: "viewListItens",
+                })
+              }
+              deleteHandle={deleteList}
+              editHandle={(id, title, color, hideMenu) => {
+                setMode("edit");
+                setListEditId(id);
+                setTitle(title);
+                setColor(color);
+                hideMenu();
+              }}
+            />
+          ))}
+        </ListsContainer>
       )}
-      {mode !== "add" && mode !== "edit" ? null : (
-        <NewListItem
-          type='Lists'
-          background={theme.schemes[colorScheme].primaryFixed}
-          labelColor={theme.schemes[colorScheme].shadow}
-          labelBackground={theme.schemes[colorScheme].primaryFixed}
-          errorColor={theme.schemes[colorScheme].error}
-          setProduct={setTitle}
-          colors={[
-            "primary",
-            "secondary",
-            "tertiary",
-            "error",
-            "success",
-            "fourtiary",
-          ]}
-          setColor={setColor}
-          colorSelected={color}
-          onEdit={mode === "edit"}
-          values={{ title }}
-          error={errorInput}
-          onSelectedColor={theme.schemes[colorScheme].onBackground}
-          selectedColor={theme.schemes[colorScheme].background}
-        />
-      )}
-      <Footer
-        background={theme.schemes[colorScheme].primaryFixed}
-        iconColor={theme.schemes[colorScheme].onPrimaryFixed}
-        onIconColor={theme.schemes[colorScheme].primaryFixedDim}
-        onIconBackground={theme.schemes[colorScheme].onPrimaryFixedVariant}
-        returnColor={theme.schemes[colorScheme].error}
-        returnBackground={theme.schemes[colorScheme].errorContainer}
+      <AnimatedFAB
+        icon={"plus"}
+        label={"Nova lista"}
+        extended={isExtended}
+        onPress={() => setMode("add")}
+        iconMode={"dynamic"}
+        style={[styles.fabStyle]}
+      />
+      <NewListItem
+        type="Lists"
         mode={mode}
-        route={route.name}
-        addHandle={() => setMode("add")}
-        addNewItem={addNewList}
-        returnOfAddMode={returnOfMode}
-        editItems={editList}
-        returnOfMode={returnOfMode}
-        homeHandle={() => navigation.navigate("Home")}
-        accountHandle={() => navigation.navigate("Account")}
+        theme={theme}
+        blurBackground={theme.colors.backdrop}
+        background={theme.colors.elevation.level5}
+        labelBackground={theme.colors.elevation.level5}
+        labelColor={theme.colors.onBackground}
+        errorColor={theme.colors.error}
+        colors={["primary", "secondary", "tertiary", "error"]}
+        colorSelected={color}
+        values={{ title }}
+        onSelectedColor={theme.colors.onBackground}
+        selectedColor={theme.colors.background}
+        setProduct={setTitle}
+        setColor={setColor}
+        icons={[
+          "cart",
+          "credit-card-chip",
+          "baby-carriage",
+          "bag-suitcase",
+          "ambulance",
+          "book",
+          "chef-hat",
+        ]}
+        setIcon={setIcon}
+        selectedIcon={icon}
+        handleSubmit={mode === "add" ? addNewList : editList}
+        onEdit={mode === "edit"}
+        onDismiss={returnOfMode}
+        visible={mode === "edit" || mode === "add"}
+        error={errorInput}
       />
     </SafeContentEdge>
   );
 };
 
 export default Home;
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+  },
+  fabStyle: {
+    bottom: 16,
+    right: 10,
+    position: "absolute",
+    flexGrow: 1,
+  },
+});

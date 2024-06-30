@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Input, InputContainer, InputIcon, InputLabel } from "./styles";
-import { Ionicons } from "@expo/vector-icons";
+import { TextInput } from "react-native-paper";
+import { Input } from "./styles";
+import { responsiveWidth } from "react-native-responsive-dimensions";
 
 export default ({
   labelValue,
@@ -16,36 +17,33 @@ export default ({
   edit,
   value,
 }) => {
-  const [view, setView] = useState(true);
-  const [focus, setFocus] = useState(false);
+  const [view, setView] = useState(secure);
 
   return (
-    <InputContainer width={width} border={labelColor}>
-      <InputLabel
-        focus={edit ? edit : focus}
-        color={labelColor}
-        background={labelBackground}>
-        {labelValue}
-      </InputLabel>
-      <Input
-        inputMode={type}
-        autoComplete={autoComplete}
-        secureTextEntry={secure ? view : false}
-        cursorColor={labelColor}
-        onChangeText={(value) => changeHandle(value)}
-        onFocus={() => setFocus(true)}
-        value={edit ? value : null}
-        color={labelColor}
-      />
-      {secure ? (
-        <InputIcon onPress={() => setView(!view)}>
-          <Ionicons
-            name={view ? "eye" : "eye-off"}
-            size={28}
-            color={view ? offIconColor : activeIconColor}
-          />
-        </InputIcon>
-      ) : null}
-    </InputContainer>
+    <Input
+      mode='outlined'
+      inputMode={type}
+      label={labelValue}
+      textColor={labelColor}
+      outlineColor={labelColor}
+      activeOutlineColor={labelColor}
+      autoComplete={autoComplete}
+      secureTextEntry={view}
+      cursorColor={labelColor}
+      contentStyle={{ color: labelColor }}
+      onChangeText={(value) => changeHandle(value)}
+      outlineStyle={{ borderRadius: 20, borderColor: labelColor }}
+      value={value}
+      style={{
+        width: responsiveWidth(width),
+        backgroundColor: labelBackground,
+        color: labelColor,
+      }}
+      right={
+        secure ? (
+          <TextInput.Icon icon='eye' onPress={() => setView(!view)} />
+        ) : null
+      }
+    />
   );
 };

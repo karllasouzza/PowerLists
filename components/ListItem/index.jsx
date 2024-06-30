@@ -1,16 +1,8 @@
 import React, { useState } from "react";
-import CheckBox from "../../assets/svgs/CheckBox";
-import {
-  ItemAmount,
-  ItemContainer,
-  ItemPrice,
-  ItemColumn,
-  ItemTitle,
-} from "./styles";
-import { CardListOptions, IconContainer } from "../CardList/styles";
-import TrashIcon from "../../assets/svgs/TrashIcon";
-import EditIcon from "../../assets/svgs/EditIcon";
-import BlurPopUp from "../BlurPopUp";
+import { ItemAmount, ItemContainer, ItemPrice, ItemColumn } from "./styles";
+import { IconButton, Menu } from "react-native-paper";
+import { responsiveFontSize } from "react-native-responsive-dimensions";
+import { StyleSheet } from "react-native";
 
 export default ({
   title,
@@ -23,51 +15,70 @@ export default ({
   color,
   subColor,
   checkHandle,
-  options,
   deleteHandle,
   editHandle,
 }) => {
-  const [longPress, setLongPress] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  const styles = StyleSheet.create({
+    itemTitle: {
+      fontSize: responsiveFontSize(2.3),
+      fontWeight: "bold",
+      color: color,
+    },
+    itemContent: {
+      flex: 1,
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "flex-start",
+      paddingRight: 15,
+    },
+    itemIcon: {
+      height: 100,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });
 
   return (
-    <ItemContainer border={color} onLongPress={() => setLongPress(true)}>
-      <CheckBox
-        width={35}
-        background={background}
-        check_color={checkColor}
-        checked={status}
-        next={checkHandle}
-        prev={checkHandle}
-      />
-      <ItemTitle color={color} status={status}>
-        {title}
-      </ItemTitle>
-      <ItemColumn>
-        <ItemPrice color={subColor}>{price}</ItemPrice>
-        <ItemAmount color={subColor}>{amount} und</ItemAmount>
-      </ItemColumn>
-
-      {longPress ? (
-        <CardListOptions background={options.background}>
-          <IconContainer
-            background={options.deleteBackground}
-            onPress={() => deleteHandle(item.id)}>
-            <TrashIcon background={options.deleteColor} />
-          </IconContainer>
-          <IconContainer
-            background={options.editBackground}
-            onPress={() => editHandle(item)}>
-            <EditIcon background={options.editColor} width={20} />
-          </IconContainer>
-        </CardListOptions>
-      ) : null}
-      {longPress ? (
-        <BlurPopUp
-          zIndex={1}
-          background={options.shadow}
-          closeHandle={() => setLongPress(false)}
+    <ItemContainer
+      onLongPress={() => setVisible(true)}
+      onPress={checkHandle}
+      style={{ backgroundColor: visible ? "#ffffff16" : null }}
+      title={title}
+      titleStyle={styles.itemTitle}
+      contentStyle={styles.itemContent}
+      left={() => (
+        <IconButton
+          size={35}
+          style={styles.itemIcon}
+          icon={status ? "check" : "checkbox-blank"}
+          iconColor={status ? checkColor : background}
         />
-      ) : null}
-    </ItemContainer>
+      )}
+      right={() => (
+        <Menu
+          visible={visible}
+          onDismiss={() => setVisible(false)}
+          anchor={
+            <ItemColumn>
+              <ItemPrice color={subColor}>{price}</ItemPrice>
+              <ItemAmount color={subColor}>{amount} und</ItemAmount>
+            </ItemColumn>
+          }>
+          <Menu.Item
+            onPress={() => editHandle(item)}
+            leadingIcon='file-document-edit-outline'
+            title='Editar'
+          />
+          <Menu.Item
+            onPress={() => deleteHandle(item.id)}
+            leadingIcon='trash-can-outline'
+            title='Deletar'
+          />
+        </Menu>
+      )}
+    />
   );
 };

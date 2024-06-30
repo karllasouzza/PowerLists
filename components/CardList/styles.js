@@ -1,6 +1,7 @@
 import { styled } from "styled-components/native";
 import { responsiveFontSize } from "react-native-responsive-dimensions";
 
+
 export const CardListContainer = styled.Pressable`
   width: 100%;
   height: 100px;

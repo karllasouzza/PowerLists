@@ -5,11 +5,15 @@ import {
   HeaderTitle,
   ListsContainer,
   SafeContentEdge,
-} from "../Home/styles";
+} from "../styles";
+import { ScrollView, View } from "react-native";
 
 export const ListContainer = styled(SafeContentEdge)`
-  padding-top: 24px;
+  padding: 0;
   background-color: ${({ background }) => background};
+
+  width: 100%;
+  height: 100%;
 `;
 
 export const ListHeader = styled(Header)`
@@ -56,8 +60,9 @@ export const ListHeaderSubtitle = styled(ListHeaderTitle)`
   color: ${({ color }) => color};
 `;
 
-export const ListItemsContainer = styled(ListsContainer)`
+export const ListItemsContainer = styled(ScrollView)`
   width: 100%;
   height: 100%;
-  margin: 0;
+
+  overflow: scroll;
 `;

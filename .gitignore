@@ -6,6 +6,7 @@
 
 .expo
 __generated__
+.well-known/
 
 ### ReactNative.Xcode Stack ###
 ## User settings

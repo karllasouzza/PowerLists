@@ -5,20 +5,19 @@ import {
   LoginContainer,
   LoginForm,
   LoginHeader,
-  LoginImage,
   LoginScrollView,
   LoginTitle,
 } from "./styles";
-import PrimaryButton from "../../../components/PrimaryButton";
-import * as NavigationBar from "expo-navigation-bar";
 import AuthContext from "../../../context/auth";
-import ColorModeContext from "../../../context/colorMode";
+import { Button, Text, useTheme } from "react-native-paper";
+import {
+  ButtonNavigate,
+  ChangeFormTipe,
+  IHaveAccount,
+} from "../CreateAccount/styles";
 
-export default () => {
-
-  const { colorScheme, theme } = useContext(ColorModeContext);
-
-  NavigationBar.setBackgroundColorAsync(theme.schemes[colorScheme].primaryContainer);
+export default ({ navigation }) => {
+  const theme = useTheme();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,51 +37,76 @@ export default () => {
   };
 
   return (
-    <LoginScrollView background={theme.schemes[colorScheme].primaryContainer}>
-      <LoginContainer background={theme.schemes[colorScheme].primaryContainer}>
-        <FocusAwareStatusBar color={theme.schemes[colorScheme].primaryContainer} />
-
+    <LoginScrollView background={theme.colors.background}>
+      <LoginContainer background={theme.colors.background}>
+        <FocusAwareStatusBar
+          color={theme.colors.background}
+          navColor={theme.colors.background}
+        />
         <LoginHeader>
-          <LoginImage
-            source={require("../../../assets/Images/Auth/Login/Illustration_one.png")}
-          />
-          <LoginTitle color={theme.schemes[colorScheme].onPrimaryContainer}>
-            Seja bem vindo!
+          <LoginTitle
+            variant='headlineMedium'
+            color={theme.colors.onBackground}>
+            Seja bem vindo de volta!
+          </LoginTitle>
+          <LoginTitle variant='bodyMedium' color={theme.colors.onBackground}>
+            Acesse sua conta existente utilizando seu e-mail e senha.
           </LoginTitle>
         </LoginHeader>
 
         <LoginForm>
           <PrimaryInput
-            width={20}
+            width={80}
             labelValue='E-Mail'
-            labelBackground={theme.schemes[colorScheme].primaryContainer}
-            labelColor={theme.schemes[colorScheme].onPrimaryContainer}
+            labelBackground={theme.colors.onBackground}
+            labelColor={theme.colors.onPrimaryContainer}
             autoComplete='email'
             type='text'
             secure={false}
             changeHandle={setEmail}
           />
-
           <PrimaryInput
-            width={20}
+            width={80}
             labelValue='Senha'
-            labelBackground={theme.schemes[colorScheme].primaryContainer}
-            labelColor={theme.schemes[colorScheme].onPrimaryContainer}
+            labelBackground={theme.colors.primaryContainer}
+            labelColor={theme.colors.onPrimaryContainer}
             autoComplete='off'
             type='text'
             secure={true}
-            activeIconColor={theme.schemes[colorScheme].primary}
-            offIconColor={theme.schemes[colorScheme].onPrimaryContainer}
+            activeIconColor={theme.colors.primary}
+            offIconColor={theme.colors.onPrimaryContainer}
             changeHandle={setPassword}
           />
-          <PrimaryButton
-            background={theme.schemes[colorScheme].primary}
-            color={theme.schemes[colorScheme].onPrimaryContainer}
-            clickEvent={login}
+          <ButtonNavigate
+            mode='text'
+            color={theme.colors.background}
+            onPress={() => navigation.navigate("PasswordRecovery")}>
+            Esqueceu a senha?
+          </ButtonNavigate>
+          <Button
+            mode='elevated'
+            style={{ width: "80%" }}
+            buttonColor={theme.colors.primary}
+            onPress={login}
             loading={loading}>
-            Entrar
-          </PrimaryButton>
+            <Text
+              variant='titleLarge'
+              style={{ fontWeight: "bold", color: theme.colors.background }}>
+              Entrar
+            </Text>
+          </Button>
         </LoginForm>
+        <IHaveAccount>
+          <ChangeFormTipe variant='bodyMedium'>
+            Ainda não possui uma conta?{" "}
+          </ChangeFormTipe>
+          <ButtonNavigate
+            mode='text'
+            color={theme.colors.background}
+            onPress={() => navigation.navigate("CreateAccount")}>
+            Crie sua conta
+          </ButtonNavigate>
+        </IHaveAccount>
       </LoginContainer>
     </LoginScrollView>
   );

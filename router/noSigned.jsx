@@ -2,10 +2,11 @@ import React from "react";
 import Auth from "../pages/Auth";
 import Login from "../pages/Auth/Login";
 import CreateAccount from "../pages/Auth/CreateAccount";
+import PasswordRecovery from "../pages/Auth/PasswordRecovery";
 
-export default ({ Stack }) => {
+export default ({ Stack, theme }) => {
   return (
-    <Stack.Navigator initialRouteName='Auth'>
+    <Stack.Navigator initialRouteName='Auth' theme={theme}>
       <Stack.Screen
         name='Auth'
         component={Auth}
@@ -15,6 +16,13 @@ export default ({ Stack }) => {
       />
 
       <Stack.Screen
+        name='CreateAccount'
+        component={CreateAccount}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
         name='Login'
         component={Login}
         options={{
@@ -23,8 +31,8 @@ export default ({ Stack }) => {
       />
 
       <Stack.Screen
-        name='CreateAccount'
-        component={CreateAccount}
+        name='PasswordRecovery'
+        component={PasswordRecovery}
         options={{
           headerShown: false,
         }}

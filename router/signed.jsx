@@ -1,11 +1,12 @@
 import React from "react";
 import Home from "../pages/Home";
-import List from "../pages/ListItems";
 import Account from "../pages/Account";
 
-export default ({ Stack }) => {
+import ListItems from "../pages/Home/ListItems";
+
+export default ({ Stack, theme }) => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator theme={theme}>
       <Stack.Screen
         name='Home'
         component={Home}
@@ -13,14 +14,15 @@ export default ({ Stack }) => {
           headerShown: false,
         }}
       />
+
       <Stack.Screen
-        name='Add'
-        component={List}
+        name='List'
+        component={ListItems}
         options={{
           headerShown: false,
         }}
-        initialParams={{ list: null }}
       />
+
       <Stack.Screen
         name='Account'
         component={Account}

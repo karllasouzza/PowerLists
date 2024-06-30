@@ -1,4 +1,5 @@
 import { supabase } from "../../lib/supabase";
+import { showToast } from "../toast";
 
 export const GetItems = async (list_id) => {
   try {
@@ -49,11 +50,11 @@ export const CheckItem = async (id, status) => {
     const { error } = await supabase
       .from("List_item")
       .update({ status })
-      .eq("List_item.id", id);
+      .eq("id", id);
 
     if (error) throw error;
 
-    return true;
+    return false;
   } catch (error) {
     showToast({
       type: "error",
@@ -68,12 +69,13 @@ export const EditItem = async (id, title, price, amount) => {
     const { error } = await supabase
       .from("List_item")
       .update({ title, price, amount })
-      .eq("List_item.id", id);
+      .eq("id", id);
 
     if (error) throw error;
 
     return true;
   } catch (error) {
+    console.log(error.message);
     showToast({
       type: "error",
       title: "Erro ao editar produto!",

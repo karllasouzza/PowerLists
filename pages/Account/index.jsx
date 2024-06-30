@@ -13,7 +13,7 @@ import {
 import Footer from "../../components/Footer";
 import SingOutIcon from "../../assets/svgs/SingOutIcon";
 import AuthContext from "../../context/auth";
-import ColorModeContext from "../../context/colorMode";
+// import ColorModeContext from "../../context/colorMode";
 
 export default ({ navigation, route }) => {
   const { theme, colorScheme } = useContext(ColorModeContext);
