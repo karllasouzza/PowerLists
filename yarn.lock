@@ -2492,7 +2492,7 @@ babel-plugin-transform-flow-enums@^0.0.2:
   integrity sha512-g4aaCrDDOsWjbm0PUUeVnkcVd6AKJsVc/MbnPhEotEpkeJQP6b8nzewohQi7+QS8UyPehOhGWn0nOwjvWpmMvQ==
   dependencies:
     "@babel/plugin-syntax-flow" "^7.12.1"
-
+    
 babel-preset-expo@~11.0.6:
   version "11.0.6"
   resolved "https://registry.yarnpkg.com/babel-preset-expo/-/babel-preset-expo-11.0.6.tgz#b1ea2bd9f13338a9f7ca8d7089b5d6d6c7c03f79"
@@ -3495,6 +3495,7 @@ expo-modules-autolinking@1.11.1:
     fast-glob "^3.2.5"
     find-up "^5.0.0"
     fs-extra "^9.1.0"
+
 
 expo-modules-core@1.12.12, expo-modules-core@~1.12.12:
   version "1.12.12"
