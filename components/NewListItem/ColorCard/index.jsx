@@ -21,7 +21,7 @@ export default ({
       onSelectedColor={onSelectedColor}
       selectedColor={selectedColor}
       onPress={() => (selected !== color ? tap(color) : null)}>
-      {selected === color ? <CheckIcon width={20} background='white' /> : null}
+      {selected === color ? <CheckIcon width={20} background={onSelectedColor} /> : null}
     </Color>
   );
 };

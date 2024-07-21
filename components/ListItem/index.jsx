@@ -52,7 +52,7 @@ export default ({
       left={() => (
         <IconButton
           size={35}
-          style={styles.itemIcon}
+          style={{ ...styles.itemIcon, opacity: !status ? 0.5 : 1 }}
           icon={status ? "check" : "checkbox-blank"}
           iconColor={status ? checkColor : background}
         />
@@ -66,16 +66,23 @@ export default ({
               <ItemPrice color={subColor}>{price}</ItemPrice>
               <ItemAmount color={subColor}>{amount} und</ItemAmount>
             </ItemColumn>
-          }>
+          }
+        >
           <Menu.Item
-            onPress={() => editHandle(item)}
-            leadingIcon='file-document-edit-outline'
-            title='Editar'
+            onPress={() => {
+              setVisible(false);
+              editHandle(item);
+            }}
+            leadingIcon="file-document-edit-outline"
+            title="Editar"
           />
           <Menu.Item
-            onPress={() => deleteHandle(item.id)}
-            leadingIcon='trash-can-outline'
-            title='Deletar'
+            onPress={() => {
+              setVisible(false);
+              deleteHandle(item.id);
+            }}
+            leadingIcon="trash-can-outline"
+            title="Deletar"
           />
         </Menu>
       )}

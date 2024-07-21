@@ -11,8 +11,9 @@ export default function FocusAwareStatusBar({ color, navColor }) {
 
   useFocusEffect(() => {
     NavigationBar.setBackgroundColorAsync(navColor ? navColor : color);
-    NavigationBar.setButtonStyleAsync(colorScheme === "light" ? "dark" : "light");
-    console.log(colorScheme);
+    NavigationBar.setButtonStyleAsync(
+      colorScheme === "light" ? "dark" : "light"
+    );
   });
 
   return (

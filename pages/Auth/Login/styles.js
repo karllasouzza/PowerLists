@@ -11,10 +11,10 @@ export const LoginScrollView = styled(KeyboardAwareScrollView)`
   width: 100%;
   height: 100%;
   background-color: ${({ background }) => background};
-
-  padding-top: 20px;
+  padding-top: 0;
 `;
 export const LoginContainer = styled(CreateAccountContainer)`
+  padding-top: 0;
   background-color: ${({ background }) => background};
 `;
 export const LoginHeader = styled(CreateAccountHeader)``;
@@ -23,5 +23,4 @@ export const LoginTitle = styled(CreateAccountTitle)``;
 export const LoginForm = styled(CreateAccountForm)`
   flex-grow: 1;
   gap: 50px;
-  padding-bottom: 40px;
 `;

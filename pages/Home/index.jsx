@@ -290,14 +290,14 @@ const Home = ({ navigation }) => {
         mode={mode}
         theme={theme}
         blurBackground={theme.colors.backdrop}
-        background={theme.colors.elevation.level5}
+        background={theme.colors.background}
         labelBackground={theme.colors.elevation.level5}
         labelColor={theme.colors.onBackground}
         errorColor={theme.colors.error}
         colors={["primary", "secondary", "tertiary", "error"]}
         colorSelected={color}
         values={{ title }}
-        onSelectedColor={theme.colors.onBackground}
+        onSelectedColor={theme.colors.background}
         selectedColor={theme.colors.background}
         setProduct={setTitle}
         setColor={setColor}

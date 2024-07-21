@@ -37,7 +37,6 @@ export default () => {
   };
 
   const dark = useColorScheme() === "dark";
-  console.log(dark);
 
   const { LightTheme, DarkTheme } = adaptNavigationTheme({
     reactNavigationLight: NavigationDefaultTheme,
@@ -64,7 +63,8 @@ export default () => {
   return (
     <NavigationContainer
       theme={dark ? CombinedDarkTheme : CombinedDefaultTheme}
-      linking={linking}>
+      linking={linking}
+    >
       <PaperProvider theme={dark ? CombinedDarkTheme : CombinedDefaultTheme}>
         <AuthProvider>
           {({ auth }) =>

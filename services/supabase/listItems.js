@@ -75,7 +75,6 @@ export const EditItem = async (id, title, price, amount) => {
 
     return true;
   } catch (error) {
-    console.log(error.message);
     showToast({
       type: "error",
       title: "Erro ao editar produto!",

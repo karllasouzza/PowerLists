@@ -57,8 +57,8 @@ export default ({ navigation }) => {
           <PrimaryInput
             width={80}
             labelValue='E-Mail'
-            labelBackground={theme.colors.onBackground}
-            labelColor={theme.colors.onPrimaryContainer}
+            labelBackground={theme.colors.background}
+            labelColor={theme.colors.onBackground}
             autoComplete='email'
             type='text'
             secure={false}

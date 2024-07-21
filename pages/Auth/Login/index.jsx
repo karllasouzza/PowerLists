@@ -45,11 +45,12 @@ export default ({ navigation }) => {
         />
         <LoginHeader>
           <LoginTitle
-            variant='headlineMedium'
-            color={theme.colors.onBackground}>
+            variant="headlineMedium"
+            color={theme.colors.onBackground}
+          >
             Seja bem vindo de volta!
           </LoginTitle>
-          <LoginTitle variant='bodyMedium' color={theme.colors.onBackground}>
+          <LoginTitle variant="bodyMedium" color={theme.colors.onBackground}>
             Acesse sua conta existente utilizando seu e-mail e senha.
           </LoginTitle>
         </LoginHeader>
@@ -57,53 +58,57 @@ export default ({ navigation }) => {
         <LoginForm>
           <PrimaryInput
             width={80}
-            labelValue='E-Mail'
-            labelBackground={theme.colors.onBackground}
-            labelColor={theme.colors.onPrimaryContainer}
-            autoComplete='email'
-            type='text'
+            labelValue="E-Mail"
+            labelBackground={theme.colors.background}
+            labelColor={theme.colors.onBackground}
+            autoComplete="email"
+            type="text"
             secure={false}
             changeHandle={setEmail}
           />
           <PrimaryInput
             width={80}
-            labelValue='Senha'
-            labelBackground={theme.colors.primaryContainer}
-            labelColor={theme.colors.onPrimaryContainer}
-            autoComplete='off'
-            type='text'
+            labelValue="Senha"
+            labelBackground={theme.colors.background}
+            labelColor={theme.colors.onBackground}
+            autoComplete="off"
+            type="text"
             secure={true}
             activeIconColor={theme.colors.primary}
             offIconColor={theme.colors.onPrimaryContainer}
             changeHandle={setPassword}
           />
           <ButtonNavigate
-            mode='text'
+            mode="text"
             color={theme.colors.background}
-            onPress={() => navigation.navigate("PasswordRecovery")}>
+            onPress={() => navigation.navigate("PasswordRecovery")}
+          >
             Esqueceu a senha?
           </ButtonNavigate>
           <Button
-            mode='elevated'
+            mode="elevated"
             style={{ width: "80%" }}
             buttonColor={theme.colors.primary}
             onPress={login}
-            loading={loading}>
+            loading={loading}
+          >
             <Text
-              variant='titleLarge'
-              style={{ fontWeight: "bold", color: theme.colors.background }}>
+              variant="titleLarge"
+              style={{ fontWeight: "bold", color: theme.colors.background }}
+            >
               Entrar
             </Text>
           </Button>
         </LoginForm>
         <IHaveAccount>
-          <ChangeFormTipe variant='bodyMedium'>
+          <ChangeFormTipe variant="bodyMedium">
             Ainda não possui uma conta?{" "}
           </ChangeFormTipe>
           <ButtonNavigate
-            mode='text'
+            mode="text"
             color={theme.colors.background}
-            onPress={() => navigation.navigate("CreateAccount")}>
+            onPress={() => navigation.navigate("CreateAccount")}
+          >
             Crie sua conta
           </ButtonNavigate>
         </IHaveAccount>

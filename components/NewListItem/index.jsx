@@ -41,18 +41,12 @@ export default ({
       onDismiss={onDismiss}
       style={{ backgroundColor: blurBackground }}
     >
-      <NewListItemFormHeader background={theme.colors[colorSelected]}>
+      <NewListItemFormHeader background={theme.colors.elevation.level5}>
         <IconButton
           icon="arrow-left"
           size={24}
           onPress={onDismiss}
-          iconColor={
-            theme.colors[
-              `on${colorSelected[0]
-                .toUpperCase()
-                .concat(colorSelected.slice(1))}`
-            ]
-          }
+          iconColor={theme.colors.onBackground}
         />
         <Text
           variant="titleLarge"
@@ -60,12 +54,7 @@ export default ({
             paddingTop: 5,
             marginLeft: 10,
             fontWeight: "bold",
-            color:
-              theme.colors[
-                `on${colorSelected[0]
-                  .toUpperCase()
-                  .concat(colorSelected.slice(1))}`
-              ],
+            color: theme.colors.onBackground,
           }}
         >
           {mode === "add" ? "Adicionar " : "Editar "}
@@ -153,7 +142,7 @@ export default ({
                 color: theme.colors.onBackground,
               }}
             >
-              Icone
+              Ícone
             </Text>
             <NewListItemFormRow
               style={{
@@ -168,24 +157,24 @@ export default ({
                   icon={icon}
                   size={35}
                   onPress={() => setIcon(icon)}
-                  iconColor={
-                    theme.colors[
-                      `on${colorSelected[0]
-                        .toUpperCase()
-                        .concat(colorSelected.slice(1))}`
-                    ]
-                  }
+                  iconColor={theme.colors[colorSelected]}
                   style={{
                     border: "1px solid",
                     padding: 3,
-                    backgroundColor: icon === selectedIcon ? "white" : "black",
-                    borderColor: icon === selectedIcon ? "white" : "black",
+                    backgroundColor: theme.colors.elevation.level2,
+                    borderWidth: icon === selectedIcon ? 2 : 0,
+                    borderColor:
+                      icon === selectedIcon
+                        ? theme.colors[colorSelected]
+                        : "white",
+                    opacity: icon === selectedIcon ? 1 : 0.7,
                   }}
                 />
               ))}
             </NewListItemFormRow>
           </NewListItemFormRow>
         ) : null}
+
         <NewListItemFormRow>
           <Button
             mode="elevated"

@@ -81,22 +81,26 @@ export default ({ navigation }) => {
 
         <CreateAccountForm>
           <PrimaryInput
+            width={80}
             labelValue='Nome'
-            labelBackground={theme.colors.tertiaryContainer}
-            labelColor={theme.colors.onTertiaryContainer}
+            labelBackground={theme.colors.background}
+            labelColor={theme.colors.onBackground}
             autoComplete='name'
             type='text'
             secure={false}
             changeHandle={setName}
           />
+
           <HelperText type='error' visible={!validateName() && name}>
             O nome deve ter pelo menos 3 caracteres
           </HelperText>
 
           <PrimaryInput
+            width={80}
+
             labelValue='E-Mail'
-            labelBackground={theme.colors.tertiaryContainer}
-            labelColor={theme.colors.onTertiaryContainer}
+            labelBackground={theme.colors.background}
+            labelColor={theme.colors.onBackground}
             autoComplete='email'
             type='text'
             secure={false}
@@ -107,9 +111,11 @@ export default ({ navigation }) => {
           </HelperText>
 
           <PrimaryInput
+            width={80}
+
             labelValue='Senha'
-            labelBackground={theme.colors.tertiaryContainer}
-            labelColor={theme.colors.onTertiaryContainer}
+            labelBackground={theme.colors.background}
+            labelColor={theme.colors.onBackground}
             autoComplete='off'
             type='text'
             secure={true}

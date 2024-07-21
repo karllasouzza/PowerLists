@@ -18,15 +18,15 @@ import NewListItem from "../../../components/NewListItem";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default ({navigation, route }) => {
+export default ({ navigation, route }) => {
   const theme = useTheme();
   const list = route.params?.list;
   const { top, bottom } = useSafeAreaInsets();
 
   const [items, setItems] = useState([]);
   const [product, setProduct] = useState("");
-  const [price, setPrice] = useState(0.0);
-  const [amount, setAmount] = useState(0);
+  const [price, setPrice] = useState("0");
+  const [amount, setAmount] = useState("1");
   const [mode, setMode] = useState("listItem");
   const [itemEditId, setItemEditId] = useState("");
   const [errorInput, setErrorInput] = useState("");
@@ -148,8 +148,8 @@ export default ({navigation, route }) => {
 
   const returnOfMode = () => {
     setProduct("");
-    setPrice(0.0);
-    setAmount(0.0);
+    setPrice("0");
+    setAmount("1");
     setItemEditId("");
     setErrorInput("");
 
@@ -173,29 +173,29 @@ export default ({navigation, route }) => {
 
   return (
     <ListContainer
-      visible={true}
+      visible
       background={theme.colors.background}
       contentContainerStyle={{ width: "100%" }}
     >
       <FocusAwareStatusBar
-        color={theme.colors[list.accent_color]}
-        navColor={theme.colors[list.accent_color]}
+        color={theme.colors.elevation.level2}
+        navColor={theme.colors.elevation.level2}
       />
       <Appbar
         safeAreaInsets={{ top }}
         style={{
           height: 90,
-          backgroundColor: theme.colors[list.accent_color],
+          backgroundColor: theme.colors.elevation.level2,
           paddingHorizontal: 20,
         }}
       >
         <Appbar.Action
-          color={theme.colors.background}
+          color={theme.colors.onBackground}
           icon="arrow-left"
           onPress={() => navigation.goBack()}
         />
         <Appbar.Content
-          color={theme.colors.background}
+          color={theme.colors.onBackground}
           title={list.title}
           style={{ marginLeft: 10 }}
         />
@@ -286,7 +286,7 @@ export default ({navigation, route }) => {
         theme={theme}
         colorSelected={list.accent_color}
         blurBackground={theme.colors.backdrop}
-        background={theme.colors.elevation.level5}
+        background={theme.colors.background}
         labelBackground={theme.colors.elevation.level5}
         labelColor={theme.colors.onBackground}
         setProduct={setProduct}
@@ -297,7 +297,7 @@ export default ({navigation, route }) => {
         errorColor={theme.colors.error}
         error={errorInput}
         visible={mode === "edit" || mode === "add"}
-        handleSubmit={mode === "add"? addNewItem : editItem}
+        handleSubmit={mode === "add" ? addNewItem : editItem}
         onDismiss={returnOfMode}
       />
 
@@ -307,7 +307,7 @@ export default ({navigation, route }) => {
           style={{
             width: "100%",
             height: 50,
-            backgroundColor: theme.colors[list.accent_color],
+            backgroundColor: theme.colors.elevation.level2,
             paddingLeft: 20,
             paddingRight: 15,
             display: "flex",
@@ -320,12 +320,12 @@ export default ({navigation, route }) => {
           <Appbar.Action
             icon="plus"
             size={35}
-            color={theme.colors.background}
+            color={theme.colors[list.accent_color]}
             style={{ borderRadius: 5 }}
             onPress={() => setMode("add")}
           />
           <Appbar.Content
-            color={theme.colors.background}
+            color={theme.colors.onBackground}
             title={`Total: ${sumTotal()}`}
             titleStyle={{ width: "auto" }}
             style={{

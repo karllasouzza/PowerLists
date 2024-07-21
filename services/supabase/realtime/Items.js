@@ -29,7 +29,6 @@ export const UseRealtimeItems = async (list_id, items, setItems) => {
           filter: `lists_id=eq.${list_id}`,
         },
         (payload) => {
-          console.log(payload);
           setItems(
             items.map((item) =>
               item.id !== payload.old.id ? item : payload.new

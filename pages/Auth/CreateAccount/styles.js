@@ -14,12 +14,13 @@ export const AccountScrollView = styled(KeyboardAwareScrollView)`
   height: 100%;
 
   background-color: ${({ background }) => background};
-  display: flex;
+  margin-top: 0;
+  padding-top: 0;
 `;
 
 export const CreateAccountContainer = styled(ContainerAuth)`
   width: 100%;
-  height: ${() => responsiveScreenHeight(98)}px;
+  height: ${() => responsiveScreenHeight(95)}px;
 
   background-color: ${({ background }) => background};
   transition: all 0.5s ease-in-out;
@@ -28,6 +29,9 @@ export const CreateAccountContainer = styled(ContainerAuth)`
   align-items: center;
   justify-content: space-between;
   flex-grow: 1;
+
+  margin-top: 0;
+  padding-top: 0;
 `;
 
 export const CreateAccountImage = styled(AuthImage)``;

@@ -21,7 +21,7 @@ export default ({
 
   return (
     <Input
-      mode='outlined'
+      mode="outlined"
       inputMode={type}
       label={labelValue}
       textColor={labelColor}
@@ -41,7 +41,10 @@ export default ({
       }}
       right={
         secure ? (
-          <TextInput.Icon icon='eye' onPress={() => setView(!view)} />
+          <TextInput.Icon
+            icon={view ? "eye" : "eye-off"}
+            onPress={() => setView(!view)}
+          />
         ) : null
       }
     />

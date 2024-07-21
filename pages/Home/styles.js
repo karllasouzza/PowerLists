@@ -1,9 +1,5 @@
 import { styled } from "styled-components/native";
-import {
-  responsiveFontSize,
-  responsiveHeight,
-} from "react-native-responsive-dimensions";
-import { List, MD3Colors } from "react-native-paper";
+import { responsiveFontSize } from "react-native-responsive-dimensions";
 import { ScrollView } from "react-native";
 
 export const SafeContentEdge = styled.View`
