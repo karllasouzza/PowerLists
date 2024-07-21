@@ -16,7 +16,7 @@ const Auth = ({ navigation }) => {
     <ContainerAuth background={theme.colors.background}>
       <FocusAwareStatusBar
         color={theme.colors.background}
-        navColor={theme.colors.tertiaryContainer}
+        navColor={theme.colors.background}
       />
       <AuthHeaderSection>
         <AuthImage source={require("../../assets/adaptive-icon.png")} />
