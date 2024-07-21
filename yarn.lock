@@ -1859,10 +1859,15 @@
   resolved "https://registry.yarnpkg.com/@react-native/normalize-color/-/normalize-color-2.1.0.tgz#939b87a9849e81687d3640c5efa2a486ac266f91"
   integrity sha512-Z1jQI2NpdFJCVgpY+8Dq/Bt3d+YUi1928Q+/CZm/oh66fzM0RUl54vvuXlPJKybH4pdCZey1eDTPaLHkMPNgWA==
 
-"@react-native/normalize-colors@0.74.83", "@react-native/normalize-colors@~0.74.83":
+"@react-native/normalize-colors@0.74.83":
   version "0.74.83"
   resolved "https://registry.yarnpkg.com/@react-native/normalize-colors/-/normalize-colors-0.74.83.tgz#86ef925bacf219d74df115bcfb615f62d8142e85"
   integrity sha512-jhCY95gRDE44qYawWVvhTjTplW1g+JtKTKM3f8xYT1dJtJ8QWv+gqEtKcfmOHfDkSDaMKG0AGBaDTSK8GXLH8Q==
+
+"@react-native/normalize-colors@0.74.85", "@react-native/normalize-colors@~0.74.83":
+  version "0.74.85"
+  resolved "https://registry.yarnpkg.com/@react-native/normalize-colors/-/normalize-colors-0.74.85.tgz#62bcb9ab1b10b822ca0278fdfdf23d3b18e125da"
+  integrity sha512-pcE4i0X7y3hsAE0SpIl7t6dUc0B0NZLd1yv7ssm4FrLhWG+CGyIq4eFDXpmPU1XHmL5PPySxTAjEMiwv6tAmOw==
 
 "@react-native/virtualized-lists@0.74.83":
   version "0.74.83"
@@ -3443,12 +3448,12 @@ expo-modules-core@1.12.12, expo-modules-core@~1.12.12:
   dependencies:
     invariant "^2.2.4"
 
-expo-navigation-bar@~3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/expo-navigation-bar/-/expo-navigation-bar-3.0.4.tgz#c122194f720f0fb03430fa8a34c15980fc0a169f"
-  integrity sha512-hlnYnoFX3L1hHZxcnTVwAQW3AM5xf3clWYjqB2UMSIfTxCaE2PU8aHtAztLBQANrQhEvnbiwNcrkzfnWU2WWCQ==
+expo-navigation-bar@~3.0.7:
+  version "3.0.7"
+  resolved "https://registry.yarnpkg.com/expo-navigation-bar/-/expo-navigation-bar-3.0.7.tgz#1830a302a89fa5c26cb27ce4cf6ac6c1d22907ff"
+  integrity sha512-KCNHyZ58zoN4xdy7D1lUdJvveCYNVQHGSX4M6xO/SZypvI6GZbLzKSN6Lx4GDGEFxG6Kb+EAckZl48tSiNeGYQ==
   dependencies:
-    "@react-native/normalize-colors" "~0.74.83"
+    "@react-native/normalize-colors" "0.74.85"
     debug "^4.3.2"
 
 expo-secure-store@~13.0.1:
