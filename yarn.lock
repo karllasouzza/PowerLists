@@ -3456,10 +3456,10 @@ expo-navigation-bar@~3.0.7:
     "@react-native/normalize-colors" "0.74.85"
     debug "^4.3.2"
 
-expo-secure-store@~13.0.1:
-  version "13.0.1"
-  resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-13.0.1.tgz#fc886d3e0ed12890c8dd74e7cc44e35b03f2d79b"
-  integrity sha512-5DTKjbv98X7yPbm+1jER/sOEIlt2Ih7qwabTvkWDXry5bPcQGoulxH5zIX9+JvVH7of8GI4t7NSEbpAO3P7FZA==
+expo-secure-store@~13.0.2:
+  version "13.0.2"
+  resolved "https://registry.yarnpkg.com/expo-secure-store/-/expo-secure-store-13.0.2.tgz#ba8f6076fc38062a28bb2ce5edab9cd28ef88598"
+  integrity sha512-3QYgoneo8p8yeeBPBiAfokNNc2xq6+n8+Ob4fAlErEcf4H7Y72LH+K/dx0nQyWau2ZKZUXBxyyfuHFyVKrEVLg==
 
 expo-splash-screen@~0.27.4:
   version "0.27.4"
