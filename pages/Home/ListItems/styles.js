@@ -1,11 +1,8 @@
 import { styled } from "styled-components/native";
 import { responsiveFontSize } from "react-native-responsive-dimensions";
-import {
-  Header,
-  HeaderTitle,
-  SafeContentEdge,
-} from "../styles";
+import { Header, HeaderTitle, SafeContentEdge } from "../styles";
 import { ScrollView } from "react-native";
+import { View } from "react-native-web";
 
 export const ListContainer = styled(SafeContentEdge)`
   padding: 0;

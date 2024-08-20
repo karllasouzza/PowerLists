@@ -32,7 +32,15 @@
       }
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permitir que $(PRODUCT_NAME) acesse sua câmera",
+          "microphonePermission": "Permitir que $(PRODUCT_NAME) acesse seu microfone",
+          "recordAudioAndroid": false
+        }
+      ]
     ]
   }
 }

@@ -4,7 +4,7 @@ import { styled } from "styled-components/native";
 export const NewListItemContainer = styled(Modal)`
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
 
   transition: all 0.5s ease-in-out;
@@ -12,11 +12,11 @@ export const NewListItemContainer = styled(Modal)`
 `;
 
 export const NewListItemForm = styled.View`
-  width: 95%;
+  width: 100%;
   height: max-content;
   min-height: 280px;
-  border-radius: 0 0 30px 30px;
-  padding: 10px 10px;
+  border-radius: 0;
+  padding: 20px 10px;
   gap: 20px;
 
   background-color: ${({ background }) => background};

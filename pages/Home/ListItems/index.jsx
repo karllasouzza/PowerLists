@@ -1,9 +1,11 @@
 import React, { useCallback, useState } from "react";
-
-import { ListContainer, ListItemsContainer } from "./styles";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useFocusEffect } from "@react-navigation/native";
 import { BackHandler } from "react-native";
 import { Appbar, useTheme } from "react-native-paper";
 import { UseRealtimeItems } from "../../../services/supabase/realtime/Items";
+
+import { showToast } from "../../../services/toast";
 import {
   CheckItem,
   DeleteItems,
@@ -11,12 +13,12 @@ import {
   GetItems,
   NewItem,
 } from "../../../services/supabase/listItems";
-import { showToast } from "../../../services/toast";
+
 import FocusAwareStatusBar from "../../../components/FocusAwareStatusBar";
 import ListItem from "../../../components/ListItem";
 import NewListItem from "../../../components/NewListItem";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useFocusEffect } from "@react-navigation/native";
+
+import { ListContainer, ListItemsContainer } from "./styles";
 
 export default ({ navigation, route }) => {
   const theme = useTheme();
@@ -172,136 +174,115 @@ export default ({ navigation, route }) => {
   };
 
   return (
-    <ListContainer
-      visible
-      background={theme.colors.background}
-      contentContainerStyle={{ width: "100%" }}
-    >
-      <FocusAwareStatusBar
-        color={theme.colors.elevation.level2}
-        navColor={theme.colors.elevation.level2}
-      />
-      <Appbar
-        safeAreaInsets={{ top }}
-        style={{
-          height: 90,
-          backgroundColor: theme.colors.elevation.level2,
-          paddingHorizontal: 20,
-        }}
-      >
-        <Appbar.Action
-          color={theme.colors.onBackground}
-          icon="arrow-left"
-          onPress={() => navigation.goBack()}
-        />
-        <Appbar.Content
-          color={theme.colors.onBackground}
-          title={list.title}
-          style={{ marginLeft: 10 }}
-        />
-      </Appbar>
-
-      <ListItemsContainer>
-        {items
-          .sort(function compare(a, b) {
-            let dateA = new Date(a.created_at);
-            let dateB = new Date(b.created_at);
-            return dateA - dateB;
-          })
-          .map((item) =>
-            !item.status ? (
-              <ListItem
-                key={item.id}
-                background={theme.colors[list.accent_color]}
-                status={item.status}
-                title={item.title}
-                item={item}
-                price={item?.price?.toLocaleString("pt-br", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-                amount={item.amount}
-                color={theme.colors.onBackground}
-                subColor={theme.colors.inverseSurface}
-                checkColor={theme.colors[list.accent_color]}
-                checkHandle={() => checkItem(item.id, item.status)}
-                editHandle={({ id, title, price, amount }) => {
-                  setMode("edit");
-                  setItemEditId(id);
-                  setProduct(title);
-                  setPrice(String(price));
-                  setAmount(String(amount));
-                }}
-                deleteHandle={deleteItem}
-              />
-            ) : null
-          )}
-        {items
-          .sort(function compare(a, b) {
-            let dateA = new Date(a.created_at);
-            let dateB = new Date(b.created_at);
-            return dateA - dateB;
-          })
-          .map((item) =>
-            item.status ? (
-              <ListItem
-                key={item.id}
-                background={theme.colors[list.accent_color]}
-                options={{
-                  background: theme.colors[list.accent_color],
-                  deleteBackground: theme.colors.errorContainer,
-                  deleteColor: theme.colors.error,
-                  editBackground: theme.colors.tertiaryContainer,
-                  editColor: theme.colors.tertiary,
-                  shadow: theme.colors.shadow,
-                }}
-                status={item.status}
-                title={item.title}
-                item={item}
-                price={item?.price?.toLocaleString("pt-br", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-                amount={item.amount}
-                color={theme.colors.onBackground}
-                subColor={theme.colors.inverseSurface}
-                checkColor={theme.colors[list.accent_color]}
-                checkHandle={() => checkItem(item.id, item.status)}
-                editHandle={({ id, title, price, amount }) => {
-                  setMode("edit");
-                  setItemEditId(id);
-                  setProduct(title);
-                  setPrice(String(price));
-                  setAmount(String(amount));
-                }}
-                deleteHandle={deleteItem}
-              />
-            ) : null
-          )}
-      </ListItemsContainer>
-
-      <NewListItem
-        type="ListItems"
-        mode={mode}
-        theme={theme}
-        colorSelected={list.accent_color}
-        blurBackground={theme.colors.backdrop}
+    <>
+      <ListContainer
+        visible
         background={theme.colors.background}
-        labelBackground={theme.colors.elevation.level5}
-        labelColor={theme.colors.onBackground}
-        setProduct={setProduct}
-        setPrice={setPrice}
-        setAmount={setAmount}
-        onEdit={mode === "edit"}
-        values={{ title: product, price, amount }}
-        errorColor={theme.colors.error}
-        error={errorInput}
-        visible={mode === "edit" || mode === "add"}
-        handleSubmit={mode === "add" ? addNewItem : editItem}
-        onDismiss={returnOfMode}
-      />
+        contentContainerStyle={{ width: "100%" }}
+      >
+        <FocusAwareStatusBar
+          color={theme.colors.elevation.level2}
+          navColor={theme.colors.elevation.level2}
+        />
+        <Appbar
+          safeAreaInsets={{ top }}
+          style={{
+            height: 90,
+            backgroundColor: theme.colors.elevation.level2,
+            paddingHorizontal: 20,
+          }}
+        >
+          <Appbar.Action
+            color={theme.colors.onBackground}
+            icon="arrow-left"
+            onPress={() => navigation.goBack()}
+          />
+          <Appbar.Content
+            color={theme.colors.onBackground}
+            title={list.title}
+            style={{ marginLeft: 10 }}
+          />
+        </Appbar>
 
-      {mode !== "edit" && mode !== "add" ? (
+        <ListItemsContainer>
+          {items
+            .sort(function compare(a, b) {
+              let dateA = new Date(a.created_at);
+              let dateB = new Date(b.created_at);
+              return dateA - dateB;
+            })
+            .map((item) =>
+              !item.status ? (
+                <ListItem
+                  key={item.id}
+                  background={theme.colors[list.accent_color]}
+                  status={item.status}
+                  title={item.title}
+                  item={item}
+                  price={item?.price?.toLocaleString("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                  amount={item.amount}
+                  color={theme.colors.onBackground}
+                  subColor={theme.colors.inverseSurface}
+                  checkColor={theme.colors[list.accent_color]}
+                  checkHandle={() => checkItem(item.id, item.status)}
+                  editHandle={({ id, title, price, amount }) => {
+                    setMode("edit");
+                    setItemEditId(id);
+                    setProduct(title);
+                    setPrice(String(price));
+                    setAmount(String(amount));
+                  }}
+                  deleteHandle={deleteItem}
+                />
+              ) : null
+            )}
+          {items
+            .sort(function compare(a, b) {
+              let dateA = new Date(a.created_at);
+              let dateB = new Date(b.created_at);
+              return dateA - dateB;
+            })
+            .map((item) =>
+              item.status ? (
+                <ListItem
+                  key={item.id}
+                  background={theme.colors[list.accent_color]}
+                  options={{
+                    background: theme.colors[list.accent_color],
+                    deleteBackground: theme.colors.errorContainer,
+                    deleteColor: theme.colors.error,
+                    editBackground: theme.colors.tertiaryContainer,
+                    editColor: theme.colors.tertiary,
+                    shadow: theme.colors.shadow,
+                  }}
+                  status={item.status}
+                  title={item.title}
+                  item={item}
+                  price={item?.price?.toLocaleString("pt-br", {
+                    style: "currency",
+                    currency: "BRL",
+                  })}
+                  amount={item.amount}
+                  color={theme.colors.onBackground}
+                  subColor={theme.colors.inverseSurface}
+                  checkColor={theme.colors[list.accent_color]}
+                  checkHandle={() => checkItem(item.id, item.status)}
+                  editHandle={({ id, title, price, amount }) => {
+                    setMode("edit");
+                    setItemEditId(id);
+                    setProduct(title);
+                    setPrice(String(price));
+                    setAmount(String(amount));
+                  }}
+                  deleteHandle={deleteItem}
+                />
+              ) : null
+            )}
+        </ListItemsContainer>
+
         <Appbar
           safeAreaInsets={{ bottom }}
           style={{
@@ -324,6 +305,7 @@ export default ({ navigation, route }) => {
             style={{ borderRadius: 5 }}
             onPress={() => setMode("add")}
           />
+
           <Appbar.Content
             color={theme.colors.onBackground}
             title={`Total: ${sumTotal()}`}
@@ -336,7 +318,28 @@ export default ({ navigation, route }) => {
             }}
           />
         </Appbar>
-      ) : null}
-    </ListContainer>
+      </ListContainer>
+
+      <NewListItem
+        type="ListItems"
+        mode={mode}
+        theme={theme}
+        colorSelected={list.accent_color}
+        blurBackground={theme.colors.backdrop}
+        background={theme.colors.background}
+        labelBackground={theme.colors.elevation.level5}
+        labelColor={theme.colors.onBackground}
+        setProduct={setProduct}
+        setPrice={setPrice}
+        setAmount={setAmount}
+        onEdit={mode === "edit"}
+        values={{ title: product, price, amount }}
+        errorColor={theme.colors.error}
+        error={errorInput}
+        visible={mode === "edit" || mode === "add"}
+        handleSubmit={mode === "add" ? addNewItem : editItem}
+        onDismiss={returnOfMode}
+      />
+    </>
   );
 };

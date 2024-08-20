@@ -1,7 +1,7 @@
 import { Easing } from "react-native";
 import { Animated } from "react-native";
 
-export default ({ background, width, on, children }) => {
+export default ({ on, children, style }) => {
   spinValue = new Animated.Value(0);
 
   if (on) {
@@ -21,7 +21,7 @@ export default ({ background, width, on, children }) => {
   });
 
   return (
-    <Animated.View style={{ transform: [{ rotate: spin }] }}>
+    <Animated.View style={{ transform: [{ rotate: spin }], ...style }}>
       {children}
     </Animated.View>
   );
