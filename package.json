@@ -16,7 +16,7 @@
     "@react-navigation/native-stack": "^6.11.0",
     "@supabase/supabase-js": "^2.45.2",
     "axios": "^1.7.4",
-    "expo": "^51.0.9",
+    "expo": "^51.0.31",
     "expo-camera": "~15.0.14",
     "expo-dev-client": "~4.0.25",
     "expo-linking": "~6.3.1",
