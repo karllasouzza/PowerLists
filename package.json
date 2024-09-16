@@ -17,7 +17,7 @@
     "@supabase/supabase-js": "^2.45.2",
     "axios": "^1.7.4",
     "expo": "^51.0.31",
-    "expo-camera": "~15.0.14",
+    "expo-camera": "~15.0.16",
     "expo-dev-client": "~4.0.25",
     "expo-linking": "~6.3.1",
     "expo-modules-core": "~1.12.23",
