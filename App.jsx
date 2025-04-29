@@ -23,7 +23,7 @@ import { useColorScheme } from "react-native";
 
 const Stack = createNativeStackNavigator();
 
-export default () => {
+const main = () => {
   const prefix = Linking.createURL();
   const linking = {
     prefixes: [prefix],
@@ -86,3 +86,6 @@ export default () => {
     </NavigationContainer>
   );
 };
+
+
+export default main
