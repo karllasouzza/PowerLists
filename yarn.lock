@@ -3077,10 +3077,17 @@ expo-modules-autolinking@2.1.10:
     require-from-string "^2.0.2"
     resolve-from "^5.0.0"
 
-expo-modules-core@2.3.13, expo-modules-core@~2.3.13:
+expo-modules-core@2.3.13:
   version "2.3.13"
   resolved "https://registry.yarnpkg.com/expo-modules-core/-/expo-modules-core-2.3.13.tgz#04c08525ee65c5eac8ded1ddbcb9c15dfab2c1b3"
   integrity sha512-vmKHv7tEo2wUQoYDV6grhsLsQfD3DUnew5Up3yNnOE1gHGQE+zhV1SBYqaPMPB12OvpyD1mlfzGhu6r9PODnng==
+  dependencies:
+    invariant "^2.2.4"
+
+expo-modules-core@~3.0.22:
+  version "3.0.22"
+  resolved "https://registry.yarnpkg.com/expo-modules-core/-/expo-modules-core-3.0.22.tgz#3aec2b3474977cbef96a4f276d6c2eb64e3981a6"
+  integrity sha512-FqG5oelITFTLcIfGwoJP8Qsk65be/eiEjz354NdAurnhFARHAVYOOIsUehArvm75ISdZOIZEaTSjCudmkA3kKg==
   dependencies:
     invariant "^2.2.4"
 
