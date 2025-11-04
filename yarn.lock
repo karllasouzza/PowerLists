@@ -4878,10 +4878,10 @@ react-native-keyboard-aware-scroll-view@^0.9.5:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
 
-react-native-paper@^5.12.5:
-  version "5.13.5"
-  resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-5.13.5.tgz#e5c2e3ca444da59c214296af8bd1622928dc1204"
-  integrity sha512-aaUVy7bzv9PGTMB2+bfrGwX5D9bjQFPjPemOyUjHZxka/xgFozIyDjtLPUIaYZ5LcvJhXH4zhc/S6N+zpdIwrQ==
+react-native-paper@^5.14.5:
+  version "5.14.5"
+  resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-5.14.5.tgz#7995a2f8171c8355c1cb55c81a6d2074a7dd5abb"
+  integrity sha512-eaIH5bUQjJ/mYm4AkI6caaiyc7BcHDwX6CqNDi6RIxfxfWxROsHpll1oBuwn/cFvknvA8uEAkqLk/vzVihI3AQ==
   dependencies:
     "@callstack/react-theme-provider" "^3.0.9"
     color "^3.1.2"
