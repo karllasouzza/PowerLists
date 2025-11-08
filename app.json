@@ -3,14 +3,17 @@
     "name": "PowerLists",
     "scheme": "powerlists",
     "slug": "powerlists",
-    "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/splash-light.png",
-      "resizeMode": "contain"
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "experiments": {
+      "tsconfigPaths": true
     },
     "ios": {
       "supportsTablet": true,
@@ -26,11 +29,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "extra": {
-      "eas": {
-        "projectId": "1a24e7ab-b7e5-47d1-b3d4-78d8fa867693"
-      }
-    },
     "plugins": [
       "expo-secure-store",
       [
@@ -40,7 +38,24 @@
           "microphonePermission": "Permitir que $(PRODUCT_NAME) acesse seu microfone",
           "recordAudioAndroid": false
         }
-      ]
+      ],
+      [
+        "expo-sqlite",
+        {
+          "enableFTS": true,
+          "useSQLCipher": true,
+          "android": {
+            "enableFTS": false,
+            "useSQLCipher": false
+          },
+          "ios": {
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
+          }
+        }
+      ],
+      "expo-router"
     ]
   }
 }

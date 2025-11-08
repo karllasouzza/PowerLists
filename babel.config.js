@@ -1,18 +1,16 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ["babel-preset-expo"],
-
+    presets: [['babel-preset-expo', { jsxImportSource: 'nativewind' }], 'nativewind/babel'],
     env: {
       production: {
         plugins: [
-          "react-native-paper/babel",
           [
-            "module:react-native-dotenv",
+            'module:react-native-dotenv',
             {
-              envName: "APP_ENV",
-              moduleName: "@env",
-              path: ".env",
+              envName: 'APP_ENV',
+              moduleName: '@env',
+              path: '.env',
             },
           ],
         ],
@@ -21,14 +19,13 @@ module.exports = function (api) {
 
     plugins: [
       [
-        "module:react-native-dotenv",
+        'module:react-native-dotenv',
         {
-          envName: "APP_ENV",
-          moduleName: "@env",
-          path: ".env",
+          envName: 'APP_ENV',
+          moduleName: '@env',
+          path: '.env',
         },
       ],
-      "react-native-paper/babel",
     ],
   };
 };
