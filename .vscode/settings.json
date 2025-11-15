@@ -1,3 +1,6 @@
 {
+  "yaml.schemas": {
+    "./.vscode/yarnrc.schema.json": ".yarnrc.yml"
+  },
   "java.configuration.updateBuildConfiguration": "disabled"
 }
