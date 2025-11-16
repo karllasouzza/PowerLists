@@ -1,11 +1,14 @@
 import { Stack } from 'expo-router';
-import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { PortalHost } from '@rn-primitives/portal';
+import { verifyInstallation } from 'nativewind';
+import { Toaster } from 'sonner-native';
 
 import ThemeProvider from '@/context/themes/themes';
 import '@/css/global.css';
 
 export default function RootLayout() {
+  verifyInstallation();
+
   return (
     <ThemeProvider name="default">
       <Stack initialRouteName="loading">
@@ -15,6 +18,7 @@ export default function RootLayout() {
         <Stack.Screen name="reset-password" options={{ headerShown: false }} /> */}
       </Stack>
       <PortalHost />
+      <Toaster />
     </ThemeProvider>
   );
 }

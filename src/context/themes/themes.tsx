@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import { StatusBar, View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import * as SecureStore from 'expo-secure-store';
+import * as NavigationBar from 'expo-navigation-bar';
 
 import { ThemeProviderPropsT, ThemeContextT } from './types';
 import { themes } from './themeConfig';
@@ -31,6 +32,7 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
       if (storedColorScheme && (storedColorScheme === 'light' || storedColorScheme === 'dark')) {
         setColorScheme(storedColorScheme);
         setNativeWindColorScheme(storedColorScheme);
+        NavigationBar.setStyle(storedColorScheme);
       }
     };
 

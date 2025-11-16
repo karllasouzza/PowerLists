@@ -1,36 +1,22 @@
-import { View, Text, Pressable } from 'react-native';
-import { useTheme } from '@/context/themes/themes';
+import { View } from 'react-native';
+import { useAssets } from 'expo-asset';
+import { Image } from 'expo-image';
+import { Text } from '@/components/ui/text';
+import { cssInterop } from 'nativewind';
 
 export default function LoadingPage() {
-  const { theme, colorScheme, setTheme, setColorScheme } = useTheme();
+  const [assets, error] = useAssets([require('../../..//assets/adaptive-icon.png')]);
+
+  const StyledExpoImage = cssInterop(Image, {
+    className: 'style',
+  });
 
   return (
-    <View className="flex h-full w-full items-center justify-center gap-4 bg-background">
-      <Text className="text-2xl font-bold text-foreground">Login Page</Text>
-
-      <View className="gap-2">
-        <Text className="text-primary">Primary Color</Text>
-        <Text className="text-secondary">Secondary Color</Text>
-        <Text className="text-muted-foreground">Muted Text</Text>
-      </View>
-
-      <View className="gap-2">
-        <Pressable
-          className="rounded-lg bg-primary px-4 py-2"
-          onPress={() => setColorScheme(colorScheme === 'light' ? 'dark' : 'light')}>
-          <Text className="text-primary-foreground">Toggle Theme: {colorScheme}</Text>
-        </Pressable>
-
-        <Pressable
-          className="rounded-lg bg-secondary px-4 py-2"
-          onPress={() => setTheme(theme === 'default' ? 'purple' : 'default')}>
-          <Text className="text-secondary-foreground">Switch Theme: {theme}</Text>
-        </Pressable>
-      </View>
-
-      <View className="rounded-lg border border-border bg-card p-4">
-        <Text className="text-card-foreground">Card Example</Text>
-      </View>
+    <View className="flex h-full w-full items-center justify-center bg-background">
+      {assets && !error && (
+        <StyledExpoImage source={assets[0]} className="rounded-lg! !size-52" alt="Power Lists" />
+      )}
+      <Text variant="h1">Power Lists</Text>
     </View>
   );
 }
