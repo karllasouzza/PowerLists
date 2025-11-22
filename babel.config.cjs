@@ -26,6 +26,15 @@ module.exports = function (api) {
           path: '.env',
         },
       ],
+      ['@babel/plugin-proposal-decorators', { legacy: true }],
+      ['@babel/plugin-proposal-class-properties', { loose: true }],
+      [
+        '@babel/plugin-transform-runtime',
+        {
+          helpers: true,
+          regenerator: true,
+        },
+      ],
     ],
   };
 };

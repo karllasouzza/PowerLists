@@ -41,11 +41,42 @@
             "useSQLCipher": false
           },
           "ios": {
-            "customBuildFlags": ["-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"]
+            "customBuildFlags": [
+              "-DSQLITE_ENABLE_DBSTAT_VTAB=1 -DSQLITE_ENABLE_SNAPSHOT=1"
+            ]
           }
         }
       ],
-      "expo-router"
+      "expo-router",
+      "expo-asset",
+      [
+        "expo-navigation-bar",
+        {
+          "backgroundColor": "#0f172a",
+          "borderColor": "#1f2937",
+          "visibility": "visible",
+          "behavior": "inset-swipe",
+          "position": "relative"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "extraPods": [
+              {
+                "name": "simdjson",
+                "configurations": [
+                  "Debug",
+                  "Release"
+                ],
+                "path": "../node_modules/@nozbe/simdjson",
+                "modular_headers": true
+              }
+            ]
+          }
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
@@ -59,11 +90,27 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.karllasouzza.PowerLists"
+      "package": "com.karllasouzza.PowerLists",
+      "permissions": [
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro"
+    },
+    "extra": {
+      "router": {},
+      "expo-navigation-bar": {
+        "backgroundColor": "#0f172a",
+        "borderColor": "#1f2937",
+        "visibility": "visible",
+        "behavior": "inset-swipe",
+        "position": "relative"
+      },
+      "eas": {
+        "projectId": "1a24e7ab-b7e5-47d1-b3d4-78d8fa867693"
+      }
     }
   }
 }

@@ -3,8 +3,11 @@
   "compilerOptions": {
     "strict": true,
     "moduleResolution": "bundler",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "/assets/*": ["./assets/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "./*.d.ts", "nativewind-env.d.ts", "tailwind.config.js"]
