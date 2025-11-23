@@ -5,7 +5,7 @@ import {
   MakeSignInWithEmailAndPasswordProps,
   MakeSignInWithEmailAndPasswordResult,
   MakeSingUpWithEmailAndPasswordProps,
-} from '../types';
+} from '../../types';
 
 export const getUserAuth = async (): Promise<GetUserAuthResult> => {
   try {

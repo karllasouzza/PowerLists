@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { getUserAuth } from '../actions/auth';
+import { getUserAuth } from '../actions/auth.actions';
 
 export type UseRealtimeItemsProps = {
   list_id: string;

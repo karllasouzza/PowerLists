@@ -8,7 +8,6 @@ export default appSchema({
       columns: [
         { name: 'user_id', type: 'string', isIndexed: true },
         { name: 'name', type: 'string' },
-        { name: 'email', type: 'string' },
         { name: 'avatar_url', type: 'string' },
         { name: 'bio', type: 'string', isOptional: true },
         { name: 'created_at', type: 'number' },
@@ -24,6 +23,7 @@ export default appSchema({
         { name: 'icon', type: 'string' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
+        { name: 'deleted_at', type: 'number', isOptional: true },
       ],
     }),
     tableSchema({
@@ -37,6 +37,7 @@ export default appSchema({
         { name: 'is_checked', type: 'boolean' },
         { name: 'created_at', type: 'number' },
         { name: 'updated_at', type: 'number' },
+        { name: 'deleted_at', type: 'number', isOptional: true },
       ],
     }),
   ],
