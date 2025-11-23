@@ -11,7 +11,7 @@ class Profile extends Model {
   @readonly @date('created_at') createdAt!: Date;
   @date('updated_at') updatedAt!: Date;
 
-  @readonly @field('user_id') userId!: string;
+  @field('user_id') userId!: string;
   @field('name') name!: string;
   @field('avatar_url') avatarUrl!: string;
   @field('bio') bio?: string;

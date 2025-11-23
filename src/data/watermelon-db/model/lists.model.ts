@@ -13,7 +13,7 @@ class List extends Model {
   @date('updated_at') updatedAt!: Date;
   @date('deleted_at') deletedAt?: Date;
 
-  @readonly @field('profile_id') profileId!: string;
+  @field('profile_id') profileId!: string;
 
   @field('title') title!: string;
   @field('accent_color') accentColor!: string;

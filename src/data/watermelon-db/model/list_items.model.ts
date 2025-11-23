@@ -12,7 +12,7 @@ class ListItem extends Model {
   @date('updated_at') updatedAt!: Date;
   @date('deleted_at') deletedAt?: Date;
 
-  @readonly @field('profile_id') profileId!: string;
+  @field('profile_id') profileId!: string;
   @field('list_id') listId!: string;
 
   @field('title') title!: string;
