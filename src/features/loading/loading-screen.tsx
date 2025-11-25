@@ -1,3 +1,4 @@
+import React from 'react';
 import { View } from 'react-native';
 import { useAssets } from 'expo-asset';
 import { Image } from 'expo-image';
