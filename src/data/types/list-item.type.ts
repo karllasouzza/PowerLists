@@ -10,30 +10,26 @@ export interface ListItemType {
   updatedAt?: Date | string;
 }
 
+export type GetListItemsByListIdProps = {
+  listId: string;
+};
+
+export type GetListItemsByListIdResult = {
+  results: ListItemType[] | null;
+};
+
 export type CreateListItemProps = Omit<
   ListItemType,
   'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
 >;
 
-export type CreateNewListItemResult = {
-  newListItem: ListItemType | null;
-};
+export type CreateNewListItemResult = boolean;
 
 export type UpdateListItemProps = Omit<ListItemType, 'profileId' | 'listId' | 'createdAt'>;
 
-export type UpdateListItemResult = {
-  editItem: ListItemType | null;
-};
+export type UpdateListItemResult = boolean;
 
-export type GetListItemsProps = {
-  listId: string;
-};
-
-export type GetListItemsResult = {
-  results: ListItemType[] | null;
-};
-
-export type CheckListItemProps = {
+export type ToggleCheckListItemProps = {
   id: string;
   isChecked: boolean;
 };
