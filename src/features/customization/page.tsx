@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { useTheme } from '@/context/themes/themes';
+import { useTheme } from '@/context/themes/use-themes';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';

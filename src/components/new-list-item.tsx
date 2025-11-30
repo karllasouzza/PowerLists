@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Pressable } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,19 +25,25 @@ import {
   IconAmbulance,
   IconBook,
   IconChefHat,
-  IconX,
 } from '@tabler/icons-react-native';
+import { createNewListItem, updateListItem } from '@/data/actions/list-items.actions';
 
-// Schema de validação
-const formSchema = z.object({
+// Schema de validação para Items
+const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
   price: z.string().optional(),
   amount: z.string().optional(),
+});
+
+// Schema de validação para Lists
+const listFormSchema = z.object({
+  title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
   color: z.string().optional(),
   icon: z.string().optional(),
 });
 
-export type FormData = z.infer<typeof formSchema>;
+type ItemFormData = z.infer<typeof itemFormSchema>;
+type ListFormData = z.infer<typeof listFormSchema>;
 
 // Mapeamento de nomes de ícones para componentes Tabler
 export const iconMap: Record<string, any> = {
@@ -53,10 +59,11 @@ export const iconMap: Record<string, any> = {
 interface NewListItemProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: 'add' | 'edit' | null;
+  mode: 'add' | 'edit';
   type: 'Lists' | 'Items';
-  onSubmit: (data: FormData) => void;
-  defaultValues?: Partial<FormData>;
+  listId?: string;
+  editingItem?: any;
+  onSuccess?: () => void;
   colors?: string[];
   icons?: string[];
 }
@@ -66,14 +73,18 @@ export default function NewListItem({
   onOpenChange,
   mode,
   type,
-  onSubmit,
-  defaultValues,
+  listId,
+  editingItem,
+  onSuccess,
   colors,
   icons,
 }: NewListItemProps) {
   const { theme, colorScheme } = useTheme();
   // @ts-ignore
   const currentTheme = themes[theme][colorScheme];
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const schema = type === 'Items' ? itemFormSchema : listFormSchema;
 
   const {
     control,
@@ -82,36 +93,115 @@ export default function NewListItem({
     setValue,
     watch,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      price: '',
-      amount: '',
-      color: 'primary',
-      icon: 'cart',
-    },
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues:
+      type === 'Items'
+        ? {
+            title: '',
+            price: '',
+            amount: '1',
+          }
+        : {
+            title: '',
+            color: 'primary',
+            icon: 'cart',
+          },
   });
 
   const selectedColor = watch('color');
   const selectedIcon = watch('icon');
 
-  // Reset form when opening or defaultValues change
+  // Reset form when opening or editingItem changes
   useEffect(() => {
     if (open) {
-      reset({
-        title: defaultValues?.title || '',
-        price: defaultValues?.price || '',
-        amount: defaultValues?.amount || '',
-        color: defaultValues?.color || 'primary',
-        icon: defaultValues?.icon || 'cart',
-      });
+      if (editingItem) {
+        reset({
+          title: editingItem.title || '',
+          price: editingItem.price ? String(editingItem.price) : '',
+          amount: editingItem.amount ? String(editingItem.amount) : '1',
+          color: editingItem.accentColor || 'primary',
+          icon: editingItem.icon || 'cart',
+        });
+      } else {
+        reset(
+          type === 'Items'
+            ? {
+                title: '',
+                price: '',
+                amount: '1',
+              }
+            : {
+                title: '',
+                color: 'primary',
+                icon: 'cart',
+              }
+        );
+      }
     }
-  }, [open, defaultValues, reset]);
+  }, [open, editingItem, reset, type]);
 
-  const onFormSubmit = (data: FormData) => {
-    onSubmit(data);
-    // onOpenChange(false); // Let parent handle closing if needed, or close here
+  /**
+   * Converte string de preço para número
+   */
+  const parsePrice = (priceStr: string): number => {
+    const parsed = parseFloat(priceStr);
+    return isNaN(parsed) ? 0 : parsed;
+  };
+
+  /**
+   * Converte string de quantidade para número
+   */
+  const parseAmount = (amountStr: string): number => {
+    const parsed = parseInt(amountStr, 10);
+    return isNaN(parsed) || parsed < 1 ? 1 : parsed;
+  };
+
+  const onFormSubmit = async (data: ItemFormData | ListFormData) => {
+    if (type !== 'Items' || !listId) {
+      // TODO: Implementar lógica para Lists
+      console.warn('List creation/editing not implemented yet');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const itemData = data as ItemFormData;
+
+      if (mode === 'add') {
+        const success = await createNewListItem({
+          title: itemData.title,
+          price: parsePrice(itemData.price || '0'),
+          amount: parseAmount(itemData.amount || '1'),
+          listId,
+          profileId: '', // Será preenchido pela action
+          isChecked: false,
+        });
+
+        if (success) {
+          onSuccess?.();
+          onOpenChange(false);
+        }
+      } else if (mode === 'edit' && editingItem) {
+        const success = await updateListItem({
+          id: editingItem.id,
+          title: itemData.title,
+          price: parsePrice(itemData.price || '0'),
+          amount: parseAmount(itemData.amount || '1'),
+          isChecked: editingItem.isChecked || false,
+        });
+
+        if (success) {
+          onSuccess?.();
+          onOpenChange(false);
+        }
+      }
+    } catch (error) {
+      console.error('[NewListItem] Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -191,9 +281,6 @@ export default function NewListItem({
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-4 p-1">
                   {colors.map((color) => {
-                    // Resolve color value from theme config
-                    // Assuming color is a key like 'primary', 'secondary'
-                    // And theme config has --color-primary
                     const colorVar = `--color-${color}`;
                     const bgStyle = currentTheme[colorVar] || color;
 
@@ -241,7 +328,7 @@ export default function NewListItem({
         </View>
 
         <DialogFooter>
-          <Button onPress={handleSubmit(onFormSubmit)}>
+          <Button onPress={handleSubmit(onFormSubmit)} disabled={isSubmitting}>
             <Text>{mode === 'add' ? 'Criar' : 'Salvar'}</Text>
           </Button>
         </DialogFooter>

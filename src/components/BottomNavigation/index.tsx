@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import HomeScreen from '../../features/home/home-screen';
-import AccountScreen from '../../features/account/account-screen';
+import HomeScreen from '../../features/home/page';
+import AccountScreen from '../../features/account/page';
 import Footer from '../Footer';
 import { useTheme } from '@/context/themes/use-themes';
 import { themes } from '@/context/themes/themeConfig';
