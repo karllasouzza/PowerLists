@@ -29,7 +29,7 @@ export type ListItemRow = {
 };
 
 // Merge the generated database types with our custom types
-export type Database = MergeDeep<
+export type DatabaseWithCustomTypes = MergeDeep<
   DatabaseGenerated,
   {
     public: {
