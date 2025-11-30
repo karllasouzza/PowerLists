@@ -1,193 +1,251 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, ScrollView, Pressable } from 'react-native';
-import { Button, HelperText, IconButton, Modal, Portal, Text, TextInput } from 'react-native-paper';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
+import { Label } from '@/components/ui/label';
+import { Icon } from '@/components/ui/icon';
+import { useTheme } from '@/context/themes/use-themes';
+import { themes } from '@/context/themes/themeConfig';
+import {
+  IconShoppingCart,
+  IconCreditCard,
+  IconMoodKid,
+  IconBriefcase,
+  IconAmbulance,
+  IconBook,
+  IconChefHat,
+  IconX,
+} from '@tabler/icons-react-native';
+
+// Schema de validação
+const formSchema = z.object({
+  title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
+  price: z.string().optional(),
+  amount: z.string().optional(),
+  color: z.string().optional(),
+  icon: z.string().optional(),
+});
+
+export type FormData = z.infer<typeof formSchema>;
+
+// Mapeamento de nomes de ícones para componentes Tabler
+export const iconMap: Record<string, any> = {
+  cart: IconShoppingCart,
+  'credit-card-chip': IconCreditCard,
+  'baby-carriage': IconMoodKid,
+  'bag-suitcase': IconBriefcase,
+  ambulance: IconAmbulance,
+  book: IconBook,
+  'chef-hat': IconChefHat,
+};
 
 interface NewListItemProps {
-  visible: boolean;
-  onDismiss: () => void;
-  theme: any;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   mode: 'add' | 'edit' | null;
   type: 'Lists' | 'Items';
-  handleSubmit: () => void;
-  onEdit: boolean;
-  error: string;
-  values: {
-    title: string;
-    price?: string;
-    amount?: string;
-  };
-  setProduct: (value: string) => void;
-  setPrice?: (value: string) => void;
-  setAmount?: (value: string) => void;
+  onSubmit: (data: FormData) => void;
+  defaultValues?: Partial<FormData>;
   colors?: string[];
-  colorSelected?: string;
-  setColor?: (color: string) => void;
   icons?: string[];
-  selectedIcon?: string;
-  setIcon?: (icon: string) => void;
-  blurBackground?: string;
-  background?: string;
-  labelBackground?: string;
-  labelColor?: string;
-  errorColor?: string;
-  onSelectedColor?: string;
-  selectedColor?: string;
 }
 
 export default function NewListItem({
-  visible,
-  onDismiss,
-  theme,
+  open,
+  onOpenChange,
   mode,
   type,
-  handleSubmit,
-  onEdit,
-  error,
-  values,
-  setProduct,
-  setPrice,
-  setAmount,
+  onSubmit,
+  defaultValues,
   colors,
-  colorSelected,
-  setColor,
   icons,
-  selectedIcon,
-  setIcon,
-  blurBackground,
-  background,
-  labelBackground,
-  labelColor,
-  errorColor,
-  onSelectedColor,
-  selectedColor,
 }: NewListItemProps) {
+  const { theme, colorScheme } = useTheme();
+  // @ts-ignore
+  const currentTheme = themes[theme][colorScheme];
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      price: '',
+      amount: '',
+      color: 'primary',
+      icon: 'cart',
+    },
+  });
+
+  const selectedColor = watch('color');
+  const selectedIcon = watch('icon');
+
+  // Reset form when opening or defaultValues change
+  useEffect(() => {
+    if (open) {
+      reset({
+        title: defaultValues?.title || '',
+        price: defaultValues?.price || '',
+        amount: defaultValues?.amount || '',
+        color: defaultValues?.color || 'primary',
+        icon: defaultValues?.icon || 'cart',
+      });
+    }
+  }, [open, defaultValues, reset]);
+
+  const onFormSubmit = (data: FormData) => {
+    onSubmit(data);
+    // onOpenChange(false); // Let parent handle closing if needed, or close here
+  };
+
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={onDismiss}
-        contentContainerStyle={{
-          backgroundColor: background,
-          padding: 20,
-          margin: 20,
-          borderRadius: 20,
-          gap: 20,
-        }}>
-        <View className="w-full flex-row items-center justify-between">
-          <Text
-            variant="titleLarge"
-            style={{ fontWeight: 'bold', color: theme.colors.onBackground }}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>
             {mode === 'add'
               ? `Nova ${type === 'Lists' ? 'lista' : 'item'}`
               : `Editar ${type === 'Lists' ? 'lista' : 'item'}`}
-          </Text>
-          <IconButton icon="close" onPress={onDismiss} />
-        </View>
+          </DialogTitle>
+        </DialogHeader>
 
-        <View className="gap-4">
-          <View>
-            <TextInput
-              mode="outlined"
-              label={type === 'Lists' ? 'Nome da lista' : 'Nome do item'}
-              value={values.title}
-              onChangeText={setProduct}
-              error={error === 'title'}
-              style={{ backgroundColor: background }}
+        <View className="gap-4 py-4">
+          {/* Title Input */}
+          <View className="gap-2">
+            <Label nativeID="title">{type === 'Lists' ? 'Nome da lista' : 'Nome do item'}</Label>
+            <Controller
+              control={control}
+              name="title"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder={type === 'Lists' ? 'Minha lista...' : 'Meu item...'}
+                  value={value}
+                  onChangeText={onChange}
+                  aria-labelledby="title"
+                />
+              )}
             />
-            <HelperText type="error" visible={error === 'title'}>
-              O nome deve ter pelo menos 3 caracteres
-            </HelperText>
+            {errors.title && (
+              <Text className="text-sm text-destructive">{errors.title.message}</Text>
+            )}
           </View>
 
-          {type === 'Items' && setPrice && setAmount && (
+          {/* Price & Amount (Items only) */}
+          {type === 'Items' && (
             <View className="flex-row gap-4">
-              <View className="flex-1">
-                <TextInput
-                  mode="outlined"
-                  label="Preço"
-                  value={values.price}
-                  onChangeText={setPrice}
-                  keyboardType="numeric"
-                  style={{ backgroundColor: background }}
+              <View className="flex-1 gap-2">
+                <Label nativeID="price">Preço</Label>
+                <Controller
+                  control={control}
+                  name="price"
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      placeholder="0.00"
+                      value={value}
+                      onChangeText={onChange}
+                      keyboardType="numeric"
+                      aria-labelledby="price"
+                    />
+                  )}
                 />
               </View>
-              <View className="flex-1">
-                <TextInput
-                  mode="outlined"
-                  label="Qtd"
-                  value={values.amount}
-                  onChangeText={setAmount}
-                  keyboardType="numeric"
-                  style={{ backgroundColor: background }}
+              <View className="flex-1 gap-2">
+                <Label nativeID="amount">Qtd</Label>
+                <Controller
+                  control={control}
+                  name="amount"
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      placeholder="1"
+                      value={value}
+                      onChangeText={onChange}
+                      keyboardType="numeric"
+                      aria-labelledby="amount"
+                    />
+                  )}
                 />
               </View>
             </View>
           )}
 
-          {type === 'Lists' && colors && setColor && (
-            <View>
-              <Text variant="titleMedium" style={{ marginBottom: 10 }}>
-                Cor
-              </Text>
+          {/* Colors (Lists only) */}
+          {type === 'Lists' && colors && (
+            <View className="gap-2">
+              <Label>Cor</Label>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-4 p-1">
-                  {colors.map((color) => (
-                    <Pressable
-                      key={color}
-                      onPress={() => setColor(color)}
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor: theme.colors[color],
-                        borderWidth: colorSelected === color ? 2 : 0,
-                        borderColor: theme.colors.onBackground,
-                      }}
-                    />
-                  ))}
+                  {colors.map((color) => {
+                    // Resolve color value from theme config
+                    // Assuming color is a key like 'primary', 'secondary'
+                    // And theme config has --color-primary
+                    const colorVar = `--color-${color}`;
+                    const bgStyle = currentTheme[colorVar] || color;
+
+                    return (
+                      <Pressable
+                        key={color}
+                        onPress={() => setValue('color', color)}
+                        className={`h-10 w-10 rounded-full border-2 ${
+                          selectedColor === color ? 'border-foreground' : 'border-transparent'
+                        }`}
+                        style={{ backgroundColor: bgStyle }}
+                      />
+                    );
+                  })}
                 </View>
               </ScrollView>
             </View>
           )}
 
-          {type === 'Lists' && icons && setIcon && (
-            <View>
-              <Text variant="titleMedium" style={{ marginBottom: 10 }}>
-                Ícone
-              </Text>
+          {/* Icons (Lists only) */}
+          {type === 'Lists' && icons && (
+            <View className="gap-2">
+              <Label>Ícone</Label>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-4 p-1">
-                  {icons.map((iconName) => (
-                    <Pressable
-                      key={iconName}
-                      onPress={() => setIcon(iconName)}
-                      style={{
-                        width: 40,
-                        height: 40,
-                        borderRadius: 20,
-                        backgroundColor:
-                          selectedIcon === iconName ? theme.colors.primaryContainer : 'transparent',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      <MaterialCommunityIcons
-                        name={iconName as any}
-                        size={24}
-                        color={theme.colors.onBackground}
-                      />
-                    </Pressable>
-                  ))}
+                  {icons.map((iconName) => {
+                    const IconComponent = iconMap[iconName] || IconShoppingCart;
+                    const isSelected = selectedIcon === iconName;
+
+                    return (
+                      <Pressable
+                        key={iconName}
+                        onPress={() => setValue('icon', iconName)}
+                        className={`h-10 w-10 items-center justify-center rounded-full ${
+                          isSelected ? 'bg-primary/20' : 'bg-transparent'
+                        }`}>
+                        <Icon as={IconComponent} size={24} className="text-foreground" />
+                      </Pressable>
+                    );
+                  })}
                 </View>
               </ScrollView>
             </View>
           )}
         </View>
 
-        <Button mode="contained" onPress={handleSubmit} style={{ marginTop: 10 }}>
-          {mode === 'add' ? 'Criar' : 'Salvar'}
-        </Button>
-      </Modal>
-    </Portal>
+        <DialogFooter>
+          <Button onPress={handleSubmit(onFormSubmit)}>
+            <Text>{mode === 'add' ? 'Criar' : 'Salvar'}</Text>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

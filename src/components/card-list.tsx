@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
-import { List, Text, Avatar, Menu } from 'react-native-paper';
-import { View } from 'react-native';
-import { ListType } from '../data/types/list.type'; // Adjust import path as needed
-import { ItemType } from '../data/types/list-item.type'; // Adjust import path as needed
+import { Pressable, View } from 'react-native';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Text } from './ui/text';
+import { Icon } from './ui/icon';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { IconCheck, IconEdit, IconTrash } from '@tabler/icons-react-native';
 
 // Define props interface
 interface CardListProps {
@@ -13,7 +20,7 @@ interface CardListProps {
 }
 
 export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardListProps) => {
-  const { id, title, List_item, color, accentColor, iconBackground, icon } = list;
+  const { id, title, List_item, color, accentColor, iconBackground } = list;
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -34,52 +41,77 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
   };
 
   return (
-    <List.Item
-      left={(props) => (
-        <Avatar.Icon
-          {...props}
-          style={{ backgroundColor: color }}
-          color={iconBackground}
-          icon={visible ? 'check-bold' : icon}
-          size={50}
-        />
-      )}
-      title={title}
-      titleStyle={{ fontWeight: 'bold' }}
-      description={`${boughtCount}/${totalCount} compradas`}
-      style={{
-        paddingHorizontal: 25,
-        backgroundColor: visible ? '#ffffff16' : undefined,
-      }}
+    <Pressable
       onPress={pressHandler}
       onLongPress={openMenu}
-      right={() => (
-        <Menu
-          visible={visible}
-          onDismiss={closeMenu}
-          anchor={
-            <Text
-              variant="titleMedium"
-              style={{
-                fontSize: 16,
-                marginVertical: 6,
-                fontWeight: 'bold',
+      className="flex-row items-center justify-between px-6 py-3"
+      style={{
+        backgroundColor: visible ? '#ffffff16' : undefined,
+      }}>
+      {/* Left Section: Avatar + Title/Description */}
+      <View className="flex-1 flex-row items-center gap-3">
+        <Avatar
+          alt={title || 'Lista'}
+          className="size-[50px]"
+          style={{
+            backgroundColor: iconBackground || accentColor?.hex || color,
+          }}>
+          <AvatarFallback>
+            {visible ? (
+              <Icon as={IconCheck} size={24} className="text-white" />
+            ) : (
+              <Text className="text-lg font-bold text-white">
+                {title?.charAt(0)?.toUpperCase() || '?'}
+              </Text>
+            )}
+          </AvatarFallback>
+        </Avatar>
+
+        <View className="flex-1">
+          <Text variant="large" className="font-bold">
+            {title}
+          </Text>
+          <Text variant="muted" className="text-sm">
+            {boughtCount}/{totalCount} compradas
+          </Text>
+        </View>
+      </View>
+
+      {/* Right Section: Total Price + Menu */}
+      <View className="flex-row items-center gap-2">
+        <Text variant="large" className="font-bold">
+          {calculateTotal()}
+        </Text>
+
+        <DropdownMenu onOpenChange={setVisible}>
+          <DropdownMenuTrigger asChild>
+            <Pressable className="p-2">
+              <Icon as={IconEdit} size={20} />
+            </Pressable>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-48">
+            <DropdownMenuItem
+              onPress={() => {
+                editHandle(id, title, accentColor?.name || color, closeMenu);
+                closeMenu();
               }}>
-              {calculateTotal()}
-            </Text>
-          }>
-          <Menu.Item
-            onPress={() => editHandle(id, title, accentColor.name, closeMenu)}
-            leadingIcon="file-document-edit-outline"
-            title="Editar"
-          />
-          <Menu.Item
-            onPress={() => deleteHandle(id)}
-            leadingIcon="trash-can-outline"
-            title="Deletar"
-          />
-        </Menu>
-      )}
-    />
+              <Icon as={IconEdit} size={18} />
+              <Text>Editar</Text>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              variant="destructive"
+              onPress={() => {
+                deleteHandle(id);
+                closeMenu();
+              }}>
+              <Icon as={IconTrash} size={18} />
+              <Text>Deletar</Text>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </View>
+    </Pressable>
   );
 };

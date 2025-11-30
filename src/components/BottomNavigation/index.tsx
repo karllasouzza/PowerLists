@@ -1,42 +1,53 @@
-import * as React from 'react';
-import { BottomNavigation } from 'react-native-paper';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import HomeScreen from '../../features/home/home-screen';
-import Account from '../../features/account/account-screen';
+import AccountScreen from '../../features/account/account-screen';
+import Footer from '../Footer';
+import { useTheme } from '@/context/themes/use-themes';
+import { themes } from '@/context/themes/themeConfig';
 
-export default () => {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    {
-      key: 'lists',
-      title: 'Listas',
-      focusedIcon: 'file-document',
-      unfocusedIcon: 'file-document-outline',
-    },
-    {
-      key: 'groups',
-      title: 'Grupos',
-      focusedIcon: 'folder',
-      unfocusedIcon: 'folder-outline',
-    },
-    {
-      key: 'account',
-      title: 'Perfil',
-      focusedIcon: 'account',
-      unfocusedIcon: 'account-outline',
-    },
-  ]);
+export default function BottomNavigation({ navigation }: any) {
+  const [index, setIndex] = useState(0);
+  const { theme, colorScheme } = useTheme();
 
-  const renderScene = BottomNavigation.SceneMap({
-    lists: HomeScreen,
-    groups: HomeScreen,
-    account: Account,
-  });
+  // Helper to resolve theme colors
+  // @ts-ignore
+  const currentTheme = themes[theme][colorScheme];
+
+  const routes = [
+    { key: 'home', title: 'Inicio', component: HomeScreen },
+    { key: 'account', title: 'Conta', component: AccountScreen },
+  ];
+
+  const renderScene = () => {
+    const RouteComponent = routes[index].component;
+    return <RouteComponent navigation={navigation} />;
+  };
+
+  const handleTabChange = (newIndex: number) => {
+    setIndex(newIndex);
+  };
 
   return (
-    <BottomNavigation
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      renderScene={renderScene}
-    />
+    <View className="flex-1 bg-background">
+      <View className="flex-1">{renderScene()}</View>
+
+      <Footer
+        background={currentTheme['--color-background']}
+        iconColor={currentTheme['--color-foreground']} // Or muted foreground
+        onIconColor={currentTheme['--color-primary']}
+        onIconBackground={currentTheme['--color-secondary']} // Or primary container
+        mode={index === 1 ? 'account' : 'default'}
+        route={index === 0 ? 'Home' : 'Account'}
+        homeHandle={() => handleTabChange(0)}
+        accountHandle={() => handleTabChange(1)}
+        addHandle={() => {
+          // Logic for add button
+          // If on Home, maybe trigger something?
+          // For now, just log or do nothing as HomeScreen has its own FAB
+          console.log('Add button pressed');
+        }}
+      />
+    </View>
   );
-};
+}
