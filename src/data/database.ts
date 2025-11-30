@@ -25,12 +25,37 @@ const customSynced = configureSynced(syncedSupabase, {
   fieldDeleted: 'deleted',
 });
 
-// Get current user ID synchronously from cache or return empty
+/**
+ * ID do usuário atual (guest ou authenticated)
+ * Este valor é atualizado pelo auth store
+ */
 let cachedUserId = '';
 
-// Initialize user ID
+/**
+ * Atualiza o ID do usuário atual
+ * Deve ser chamado pelo auth store quando o usuário faz login/logout
+ *
+ * @param userId - ID do usuário (guest UUID ou Supabase ID)
+ */
+export const updateCachedUserId = (userId: string): void => {
+  cachedUserId = userId;
+};
+
+/**
+ * Retorna o ID do usuário atual
+ */
+export const getCachedUserId = (): string => {
+  return cachedUserId;
+};
+
+/**
+ * Inicializa o userId a partir do Supabase (se existir sessão)
+ * Caso contrário, mantém vazio para ser preenchido pelo guest user
+ */
 supabase.auth.getUser().then(({ data: { user } }) => {
-  cachedUserId = user?.id || '';
+  if (user?.id) {
+    cachedUserId = user.id;
+  }
 });
 
 export { cachedUserId, customSynced };
