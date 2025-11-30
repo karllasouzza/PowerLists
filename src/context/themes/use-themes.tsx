@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
-import { StatusBar, View } from 'react-native';
+import { View } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import * as SecureStore from 'expo-secure-store';
-import * as NavigationBar from 'expo-navigation-bar';
 
-import { ThemeProviderPropsT, ThemeContextT } from './types';
+import { ThemeProviderPropsT, ThemeContextT } from './use-themes.types';
+import { mmkvStorage } from '@/data/storage';
 import { themes } from './themeConfig';
+import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
 
 const ThemeContext = createContext<ThemeContextT | undefined>(undefined);
 
@@ -18,13 +18,9 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
   );
 
   useEffect(() => {
-    const loadStoredPreferences = async () => {
-      const storedTheme = await SecureStore.getItemAsync('theme', {
-        requireAuthentication: false,
-      });
-      const storedColorScheme = await SecureStore.getItemAsync('colorScheme', {
-        requireAuthentication: false,
-      });
+    const loadStoredPreferences = () => {
+      const storedTheme = mmkvStorage.getItem('theme');
+      const storedColorScheme = mmkvStorage.getItem('colorScheme');
 
       if (storedTheme && storedTheme in themes) {
         setTheme(storedTheme as keyof typeof themes);
@@ -32,7 +28,6 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
       if (storedColorScheme && (storedColorScheme === 'light' || storedColorScheme === 'dark')) {
         setColorScheme(storedColorScheme);
         setNativeWindColorScheme(storedColorScheme);
-        NavigationBar.setStyle(storedColorScheme);
       }
     };
 
@@ -48,55 +43,45 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     [colorScheme, customColorScheme]
   );
 
-  const handleSetColorSchemeAndSaveOnSecureStorage = useCallback(
-    async (scheme: 'light' | 'dark'): Promise<boolean> => {
+  const handleSetColorSchemeAndSaveOnStorage = useCallback(
+    (scheme: 'light' | 'dark'): boolean => {
       try {
         if (!['light', 'dark'].includes(scheme)) throw new Error('Invalid color scheme');
 
-        await SecureStore.setItemAsync('colorScheme', scheme);
+        mmkvStorage.setItem('colorScheme', scheme);
         setColorScheme(scheme);
         setNativeWindColorScheme(scheme);
         return true;
       } catch (error) {
-        console.error('Error saving color scheme to SecureStore:', error);
+        console.error('Error saving color scheme to storage:', error);
         return false;
       }
     },
     [setNativeWindColorScheme]
   );
 
-  const handleSetThemeAndSaveOnSecureStorage = useCallback(
-    async (theme: keyof typeof themes): Promise<boolean> => {
-      try {
-        if (!themes[theme]) throw new Error('Theme not found');
+  const handleSetThemeAndSaveOnStorage = useCallback((theme: keyof typeof themes): boolean => {
+    try {
+      if (!themes[theme]) throw new Error('Theme not found');
 
-        await SecureStore.setItemAsync('theme', theme, {
-          requireAuthentication: false,
-        });
+      mmkvStorage.setItem('theme', theme);
 
-        setTheme(theme);
-        return true;
-      } catch (error) {
-        console.error('Error saving theme to SecureStore:', error);
-        return false;
-      }
-    },
-    []
-  );
+      setTheme(theme);
+      return true;
+    } catch (error) {
+      console.error('Error saving theme to storage:', error);
+      return false;
+    }
+  }, []);
 
   const contextValue = useMemo(
     () => ({
       theme,
       colorScheme: scheme,
-      setTheme: handleSetThemeAndSaveOnSecureStorage,
-      setColorScheme: handleSetColorSchemeAndSaveOnSecureStorage,
+      setTheme: handleSetThemeAndSaveOnStorage,
+      setColorScheme: handleSetColorSchemeAndSaveOnStorage,
     }),
-    [
-      theme,
-      scheme,
-      handleSetThemeAndSaveOnSecureStorage,
-      handleSetColorSchemeAndSaveOnSecureStorage,
-    ]
+    [theme, scheme, handleSetThemeAndSaveOnStorage, handleSetColorSchemeAndSaveOnStorage]
   );
 
   const statusBarBackgroundColor = useMemo(() => {
@@ -107,10 +92,7 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <StatusBar
-        barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'}
-        backgroundColor={statusBarBackgroundColor}
-      />
+      <FocusAwareStatusBar color={statusBarBackgroundColor} />
       <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
         {children}
       </View>
