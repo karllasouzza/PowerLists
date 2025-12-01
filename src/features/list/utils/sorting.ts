@@ -12,8 +12,8 @@ import type { ListItem } from '../types';
  */
 export const sortItemsByDate = (items: ListItem[]): ListItem[] => {
   return [...items].sort((a, b) => {
-    const dateA = new Date(a.createdAt).getTime();
-    const dateB = new Date(b.createdAt).getTime();
+    const dateA = new Date(a.createdAt!).getTime();
+    const dateB = new Date(b.createdAt!).getTime();
     return dateA - dateB;
   });
 };

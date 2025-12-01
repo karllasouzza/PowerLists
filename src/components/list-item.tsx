@@ -59,11 +59,7 @@ export default function ListItem({
           size="icon"
           onPress={checkHandle}
           style={{ opacity: !status ? 0.5 : 1 }}>
-          <Icon
-            as={status ? IconSquareCheck : IconSquare}
-            size={35}
-            style={{ color: status ? checkColor : background }}
-          />
+          <Icon as={status ? IconSquareCheck : IconSquare} size={35} />
         </Button>
       </View>
 

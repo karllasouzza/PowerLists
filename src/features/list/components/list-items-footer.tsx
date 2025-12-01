@@ -36,7 +36,7 @@ export const ListItemsFooter = ({
       }}
       className="w-full flex-row items-center justify-between px-5 py-3">
       <Pressable onPress={onAddPress} className="rounded-md p-2">
-        <Icon as={IconPlus} size={32} style={{ color: accentColor }} />
+        <Icon as={IconPlus} size={32} />
       </Pressable>
 
       <Text variant="large" style={{ color: textColor }}>

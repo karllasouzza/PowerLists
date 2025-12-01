@@ -1,1 +1,1 @@
-export { default } from '@/features/loading/loading-screen';
+export { default } from '@/features/loading/page';

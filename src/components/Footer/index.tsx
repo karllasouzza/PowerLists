@@ -77,7 +77,6 @@ const Footer = ({
           color={onIconBackground}
           fill={onIconBackground} // Some icons might need fill, but Tabler usually uses stroke/color
           className="text-primary" // Fallback
-          style={{ color: onIconBackground }}
         />
       </Pressable>
 
@@ -150,12 +149,7 @@ const Footer = ({
           backgroundColor: background,
           borderColor: onIconBackground,
         }}>
-        <Icon
-          as={IconPlus}
-          size={35}
-          color={onIconBackground}
-          style={{ color: onIconBackground }}
-        />
+        <Icon as={IconPlus} size={35} color={onIconBackground} />
       </Pressable>
 
       {/* Account Button */}

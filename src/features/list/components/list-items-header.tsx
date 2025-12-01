@@ -34,7 +34,7 @@ export const ListItemsHeader = ({
       }}
       className="flex-row items-center px-5 pb-4">
       <Pressable onPress={onBack} className="mr-3 p-2">
-        <Icon as={IconArrowLeft} size={24} style={{ color: textColor }} />
+        <Icon as={IconArrowLeft} size={24} />
       </Pressable>
       <Text variant="h3" style={{ color: textColor }}>
         {title}

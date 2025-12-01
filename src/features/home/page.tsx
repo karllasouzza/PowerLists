@@ -11,9 +11,9 @@ import { useTheme } from '@/context/themes/use-themes';
 import { themes } from '@/context/themes/themeConfig';
 import { lists$ } from '@/data/actions/lists.actions';
 
-import { HomeScreenProps, FormData } from './types';
+import { HomeScreenProps } from './types';
 import { useHomeState } from './hooks/use-home-state';
-import { handleAddNewList, handleEditList, handleDeleteList } from './utils/list-operations';
+import { handleDeleteList } from './utils/list-operations';
 import { filterListsByQuery } from './utils/list-filters';
 import { transformListForDisplay } from './utils/list-transformer';
 import { HomeAppbar } from './components/home-appbar';
@@ -25,7 +25,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const refSearchbar = useRef<any>(null);
 
   const {
-    listEditId,
     setListEditId,
     mode,
     setMode,
@@ -79,20 +78,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   };
 
   const filteredLists = filterListsByQuery(lists, searchQuery);
-
-  const onAddNewList = async (data: FormData) => {
-    const { success } = await handleAddNewList(data);
-    if (success) {
-      returnOfMode();
-    }
-  };
-
-  const onEditList = async (data: FormData) => {
-    const { success } = await handleEditList(listEditId, data);
-    if (success) {
-      returnOfMode();
-    }
-  };
 
   const onDeleteList = async (id: string) => {
     await handleDeleteList(id);
@@ -164,24 +149,26 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         }}
       />
 
-      <NewListItem
-        type="Lists"
-        mode={mode}
-        open={mode === 'add' || mode === 'edit'}
-        onOpenChange={(open) => !open && returnOfMode()}
-        onSubmit={mode === 'add' ? onAddNewList : onEditList}
-        defaultValues={defaultValues}
-        colors={['primary', 'secondary', 'tertiary', 'error']}
-        icons={[
-          'cart',
-          'credit-card-chip',
-          'baby-carriage',
-          'bag-suitcase',
-          'ambulance',
-          'book',
-          'chef-hat',
-        ]}
-      />
+      {(mode === 'add' || mode === 'edit') && (
+        <NewListItem
+          type="Lists"
+          mode={mode}
+          open={true}
+          onOpenChange={(open) => !open && returnOfMode()}
+          editingItem={mode === 'edit' ? defaultValues : undefined}
+          onSuccess={() => returnOfMode()}
+          colors={['primary', 'secondary', 'tertiary', 'error']}
+          icons={[
+            'cart',
+            'credit-card-chip',
+            'baby-carriage',
+            'bag-suitcase',
+            'ambulance',
+            'book',
+            'chef-hat',
+          ]}
+        />
+      )}
     </View>
   );
 }
