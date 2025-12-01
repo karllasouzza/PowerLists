@@ -25,7 +25,7 @@ const customSynced = configureSynced(syncedSupabase, {
   fieldCreatedAt: 'created_at',
   fieldUpdatedAt: 'updated_at',
   // Optionally enable soft deletes
-  fieldDeleted: 'deleted',
+  fieldDeleted: 'deleted_at',
 });
 
 // Get current user ID synchronously from cache or return empty

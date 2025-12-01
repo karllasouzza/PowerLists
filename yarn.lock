@@ -4209,6 +4209,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-native-get-random-values@npm:^1":
+  version: 1.8.2
+  resolution: "@types/react-native-get-random-values@npm:1.8.2"
+  checksum: 10c0/66c0268151d0673bff88828d82d4087aeabbe29a8ffe433f50e2593cd04872fc890f0d2660203435d13412b10d866d24a3ab72981cf481e5676ccf88de12c235
+  languageName: node
+  linkType: hard
+
 "@types/react@npm:~19.1.10":
   version: 19.1.17
   resolution: "@types/react@npm:19.1.17"
@@ -7159,6 +7166,13 @@ __metadata:
   version: 3.1.3
   resolution: "exponential-backoff@npm:3.1.3"
   checksum: 10c0/77e3ae682b7b1f4972f563c6dbcd2b0d54ac679e62d5d32f3e5085feba20483cf28bd505543f520e287a56d4d55a28d7874299941faf637e779a1aa5994d1267
+  languageName: node
+  linkType: hard
+
+"fast-base64-decode@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "fast-base64-decode@npm:1.0.0"
+  checksum: 10c0/6d8feab513222a463d1cb58d24e04d2e04b0791ac6559861f99543daaa590e2636d040d611b40a50799bfb5c5304265d05e3658b5adf6b841a50ef6bf833d821
   languageName: node
   linkType: hard
 
@@ -10630,6 +10644,7 @@ __metadata:
     "@types/humps": "npm:^2"
     "@types/react": "npm:~19.1.10"
     "@types/react-dom": "npm:~19.1.7"
+    "@types/react-native-get-random-values": "npm:^1"
     babel-plugin-module-resolver: "npm:^5.0.2"
     button: "npm:^1.1.1"
     class-variance-authority: "npm:^0.7.1"
@@ -10663,6 +10678,7 @@ __metadata:
     react-native: "npm:0.81.5"
     react-native-dotenv: "npm:^3.4.11"
     react-native-gesture-handler: "npm:~2.28.0"
+    react-native-get-random-values: "npm:~1.11.0"
     react-native-mmkv: "npm:^4.0.1"
     react-native-nitro-modules: "npm:^0.31.10"
     react-native-reanimated: "npm:^4.1.5"
@@ -11043,6 +11059,17 @@ __metadata:
     react: "*"
     react-native: "*"
   checksum: 10c0/4240c8eedca69eb36b5d3e375b71867251cf8b87a755ba7066b3f73cfdbc80574042dbd4ff821041fd1539c4cd90dbf7ee34586f5a0ea6cc38052375b3169f2e
+  languageName: node
+  linkType: hard
+
+"react-native-get-random-values@npm:~1.11.0":
+  version: 1.11.0
+  resolution: "react-native-get-random-values@npm:1.11.0"
+  dependencies:
+    fast-base64-decode: "npm:^1.0.0"
+  peerDependencies:
+    react-native: ">=0.56"
+  checksum: 10c0/2ce71f1ab7f5b36d4a9dd59cc80b4aa75526f047c6680a7f1a388fa8b9a62efdacaf7b7de3be593c73e882773b2eee74916b00f7c8b158e40b46388998218586
   languageName: node
   linkType: hard
 

@@ -1,13 +1,12 @@
-import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 
-import { ThemeProviderPropsT, ThemeContextT } from './use-themes.types';
+import { ThemeProviderPropsT } from './use-themes.types';
 import { mmkvStorage } from '@/data/storage';
 import { themes } from './themeConfig';
 import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
-
-const ThemeContext = createContext<ThemeContextT | undefined>(undefined);
+import { ThemeContext } from './theme-context';
 
 const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderPropsT) => {
   const { colorScheme: systemColorScheme, setColorScheme: setNativeWindColorScheme } =
@@ -100,12 +99,5 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
   );
 };
 
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-};
-
+export { useTheme } from './theme-context';
 export default ThemeProvider;

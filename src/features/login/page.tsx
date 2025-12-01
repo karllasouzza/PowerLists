@@ -154,7 +154,7 @@ export default function LoginScreen({ navigation }: any) {
         <View className="flex-row items-center justify-center py-10">
           <Text variant="muted">Ainda não possui uma conta? </Text>
           <Button variant="link" onPress={() => navigation.navigate('CreateAccount')}>
-            Crie sua conta
+            <Text className="text-primary">Crie uma agora</Text>
           </Button>
         </View>
       </View>

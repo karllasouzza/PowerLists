@@ -1,5 +1,3 @@
-'use server';
-
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { configureSynced } from '@legendapp/state/sync';
 import { configureSyncedSupabase, syncedSupabase } from '@legendapp/state/sync-plugins/supabase';

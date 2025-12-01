@@ -146,7 +146,9 @@ export default function CreateAccountScreen({ navigation }: any) {
         <View className="flex-row items-center justify-center py-10">
           <Text variant="muted">Já possui uma conta? </Text>
           <Button variant="link" onPress={() => navigation.navigate('Login')}>
-            Faça o login
+            <Text variant="muted" className="font-bold">
+              Faça o login
+            </Text>
           </Button>
         </View>
       </View>
