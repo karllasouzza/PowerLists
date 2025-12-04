@@ -4,7 +4,7 @@ import HomeScreen from '../../features/home/page';
 import AccountScreen from '../../features/account/page';
 import Footer from '../Footer';
 import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/themeConfig';
+import { themes } from '@/context/themes/theme-config';
 
 export default function BottomNavigation({ navigation }: any) {
   const [index, setIndex] = useState(0);

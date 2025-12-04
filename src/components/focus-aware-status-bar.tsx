@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 
 import * as NavigationBar from 'expo-navigation-bar';
 import { useTheme } from '@/context/themes/theme-context';
-import { themes } from '@/context/themes/themeConfig';
+import { themes } from '@/context/themes/theme-config';
 
 interface FocusAwareStatusBarProps {
   color?: string;

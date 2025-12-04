@@ -16,7 +16,7 @@ import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { Icon } from '@/components/ui/icon';
 import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/themeConfig';
+import { themes } from '@/context/themes/theme-config';
 import {
   IconShoppingCart,
   IconCreditCard,

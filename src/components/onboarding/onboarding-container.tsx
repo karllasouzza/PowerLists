@@ -4,20 +4,19 @@ import Animated from 'react-native-reanimated';
 import { IconSquare, IconSquareCheck } from '@tabler/icons-react-native';
 import FocusAwareStatusBar from '../focus-aware-status-bar';
 import * as NavigationBar from 'expo-navigation-bar';
-import { SlideItem } from './SlideItem';
+import { OnboardingContainerItem } from './onboarding-container-item';
 import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
 import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/themeConfig';
+import { themes } from '@/context/themes/theme-config';
+import { SlidesProps } from './';
 
-interface SlidesProps {
-  current_slide: number;
-  nextSlide: () => void;
-  prevSlide: () => void;
-  completeOnboarding: () => void;
-}
-
-const Slides = ({ current_slide, nextSlide, prevSlide, completeOnboarding }: SlidesProps) => {
+export const OnboardingContainer = ({
+  current_slide,
+  nextSlide,
+  prevSlide,
+  completeOnboarding,
+}: SlidesProps) => {
   const { theme, colorScheme } = useTheme();
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList<any>>(null);
@@ -111,7 +110,7 @@ const Slides = ({ current_slide, nextSlide, prevSlide, completeOnboarding }: Sli
       <Animated.FlatList
         ref={flatListRef}
         data={slide_pages}
-        renderItem={({ item }) => <SlideItem item={item} />}
+        renderItem={({ item }) => <OnboardingContainerItem item={item} />}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -149,5 +148,3 @@ const Slides = ({ current_slide, nextSlide, prevSlide, completeOnboarding }: Sli
     </View>
   );
 };
-
-export default Slides;

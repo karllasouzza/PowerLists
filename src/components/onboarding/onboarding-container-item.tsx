@@ -1,23 +1,15 @@
 import React from 'react';
-import { Image, ImageSourcePropType, View, useWindowDimensions } from 'react-native';
+import { Image, View, useWindowDimensions } from 'react-native';
 import { Text } from '../ui/text';
+import { SlideItemProps } from './';
 
-interface SlideItemProps {
-  item: {
-    className?: string;
-    content: {
-      img: ImageSourcePropType;
-      title: string;
-      subtitle: string;
-    };
-  };
-}
-
-export const SlideItem = ({ item }: SlideItemProps) => {
+export const OnboardingContainerItem = ({ item }: SlideItemProps) => {
   const { width } = useWindowDimensions();
 
   return (
-    <View style={{ width }} className={`flex-1 items-center justify-center px-8 ${item.className}`}>
+    <View
+      style={{ width }}
+      className={`flex-1 items-center justify-center bg-red-400 px-8 ${item.className}`}>
       <Image
         source={item.content.img}
         style={{ width: width * 0.8, height: width * 0.8 }}
