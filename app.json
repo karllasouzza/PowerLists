@@ -8,6 +8,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "edgeToEdge": false,
     "splash": {
       "image": "./assets/splash-light.png",
       "resizeMode": "contain",
