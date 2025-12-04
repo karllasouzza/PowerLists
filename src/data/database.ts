@@ -3,6 +3,7 @@ import { configureSynced } from '@legendapp/state/sync';
 import { configureSyncedSupabase, syncedSupabase } from '@legendapp/state/sync-plugins/supabase';
 import { generateId } from './utils';
 import { supabase } from '@/lib/supabase';
+import { localUser$ } from './actions/user.actions';
 
 // Configure LegendApp Supabase sync
 configureSyncedSupabase({
@@ -24,36 +25,12 @@ const customSynced = configureSynced(syncedSupabase, {
 });
 
 /**
- * ID do usuário atual (guest ou authenticated)
- * Este valor é atualizado pelo auth store
+ * Retorna o ID do usuário atual do localUser$ observable
+ * Substitui o antigo cachedUserId
  */
-let cachedUserId = '';
-
-/**
- * Atualiza o ID do usuário atual
- * Deve ser chamado pelo auth store quando o usuário faz login/logout
- *
- * @param userId - ID do usuário (guest UUID ou Supabase ID)
- */
-export const updateCachedUserId = (userId: string): void => {
-  cachedUserId = userId;
+export const getCurrentUserId = (): string => {
+  const user = localUser$.get();
+  return user?.id || '';
 };
 
-/**
- * Retorna o ID do usuário atual
- */
-export const getCachedUserId = (): string => {
-  return cachedUserId;
-};
-
-/**
- * Inicializa o userId a partir do Supabase (se existir sessão)
- * Caso contrário, mantém vazio para ser preenchido pelo guest user
- */
-supabase.auth.getUser().then(({ data: { user } }) => {
-  if (user?.id) {
-    cachedUserId = user.id;
-  }
-});
-
-export { cachedUserId, customSynced };
+export { customSynced };

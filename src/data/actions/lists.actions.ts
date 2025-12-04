@@ -4,14 +4,14 @@ import { observable } from '@legendapp/state';
 import { generateId } from '../utils';
 import humps from 'humps';
 import type { ListType, CreateNewListProps, UpdateListProps } from '../types';
-import { cachedUserId, customSynced } from '../database';
+import { getCurrentUserId, customSynced } from '../database';
 
 // Create observable for lists with Supabase sync
 export const lists$ = observable(
   customSynced({
     collection: 'lists',
     select: (from: any) => from.select('*'),
-    filter: (select: any) => select.eq('profile_id', cachedUserId),
+    filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'lists', retrySync: true },
     changesSince: 'last-sync',
@@ -46,7 +46,8 @@ export const createNewList = async ({
   icon,
 }: Omit<CreateNewListProps, 'profileId'>): Promise<{ newList: ListType | null }> => {
   try {
-    if (!cachedUserId) throw new Error('User not authenticated');
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) throw new Error('User not authenticated');
     if (!title || !accentColor || !icon) throw new Error('Missing required fields');
 
     const id = generateId();
@@ -54,7 +55,7 @@ export const createNewList = async ({
     // Convert to snake_case for Supabase
     const payload = humps.decamelizeKeys({
       id,
-      profileId: cachedUserId,
+      profileId: currentUserId,
       title,
       accentColor,
       icon,
@@ -68,7 +69,7 @@ export const createNewList = async ({
     // Return camelCase version
     const newList: ListType = {
       id,
-      profileId: cachedUserId,
+      profileId: currentUserId,
       title,
       accentColor,
       icon,

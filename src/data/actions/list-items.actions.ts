@@ -3,7 +3,7 @@
 import { observable } from '@legendapp/state';
 import humps from 'humps';
 import { generateId } from '../utils';
-import { cachedUserId, customSynced } from '../database';
+import { getCurrentUserId, customSynced } from '../database';
 import type {
   ListItemType,
   CreateListItemProps,
@@ -20,7 +20,7 @@ export const listItems$ = observable(
   customSynced({
     collection: 'list_items',
     select: (from: any) => from.select('*'),
-    filter: (select: any) => select.eq('profile_id', cachedUserId),
+    filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'list_items', retrySync: true },
     changesSince: 'last-sync',
@@ -68,7 +68,8 @@ export const createNewListItem = async ({
   isChecked,
 }: CreateListItemProps): Promise<CreateNewListItemResult> => {
   try {
-    if (!cachedUserId) throw new Error('User not authenticated');
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) throw new Error('User not authenticated');
     if (!title || !amount || !listId) throw new Error('Missing required fields');
 
     const id = generateId();
@@ -77,7 +78,7 @@ export const createNewListItem = async ({
     // Convert to snake_case for Supabase
     const payload = humps.decamelizeKeys({
       id,
-      profileId: cachedUserId,
+      profileId: currentUserId,
       listId,
       title,
       price: price || 0,
