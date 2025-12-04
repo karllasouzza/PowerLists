@@ -1,11 +1,19 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AuthStore, User } from './auth.types';
+import type { AuthStore } from './auth.types';
+import { UserType, isGuestUser } from '@/data/types/user.type';
 import { supabase } from '@/lib/supabase';
 import { storage } from '@/data/storage';
-import { generateUUID } from '@/utils/generate-uuid';
 import { SyncService } from '@/services/sync/sync.service';
 import { showToast } from '@/services/toast';
+import {
+  getUser,
+  createUser,
+  updateUser,
+  loginUser,
+  syncUserWithSupabase,
+  createGuestUser,
+} from '@/data/actions/user.actions';
 
 /**
  * Adapter para usar MMKV com Zustand persist
@@ -24,34 +32,13 @@ const mmkvStorage = createJSONStorage(() => ({
 }));
 
 /**
- * Cria um novo usuário guest
- */
-const createGuestUser = (): User => ({
-  id: generateUUID(),
-  isGuest: true,
-  createdAt: new Date().toISOString(),
-});
-
-/**
- * Converte usuário do Supabase para formato interno
- */
-const convertSupabaseUser = (supabaseUser: any): User => ({
-  id: supabaseUser.id,
-  email: supabaseUser.email,
-  name: supabaseUser.user_metadata?.name ?? supabaseUser.user_metadata?.full_name,
-  avatarUrl: supabaseUser.user_metadata?.avatar_url,
-  isGuest: false,
-  createdAt: supabaseUser.created_at,
-});
-
-/**
  * Store Zustand para gerenciamento de autenticação
  *
  * Features:
- * - Criação automática de usuário guest
  * - Persistência no MMKV
  * - Sincronização com Supabase
  * - Migração de dados guest → authenticated
+ * - Usa funções centralizadas de user.actions.ts
  */
 export const useAuthStore = create<AuthStore>()(
   persist(
@@ -65,8 +52,9 @@ export const useAuthStore = create<AuthStore>()(
       /**
        * Inicializa o store
        * - Verifica se existe usuário no MMKV
-       * - Se não, cria um usuário guest
-       * - Verifica se existe sessão válida no Supabase
+       * - Se usuário for guest, mantém
+       * - Se usuário for não-guest, revalida sessão Supabase
+       * - Se não houver usuário, retorna null
        */
       initialize: async () => {
         try {
@@ -74,66 +62,62 @@ export const useAuthStore = create<AuthStore>()(
 
           const { user } = get();
 
-          // Se já tem usuário carregado, apenas verifica sessão
+          // Se já tem usuário carregado
           if (user) {
-            if (!user.isGuest) {
-              await get().checkSession();
-            }
-            // Sincroniza o userId com a camada de dados
-            const { updateCachedUserId } = await import('@/data/database');
-            updateCachedUserId(user.id);
-
-            set({ isInitialized: true, isLoading: false });
-            return;
-          }
-
-          // Tenta recuperar sessão do Supabase
-          const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-
-          if (sessionData.session && !sessionError) {
-            // Tem sessão válida, carrega usuário
-            const { data: userData, error: userError } = await supabase.auth.getUser();
-
-            if (userData.user && !userError) {
-              const authenticatedUser = convertSupabaseUser(userData.user);
-
-              // Sincroniza o userId com a camada de dados
-              const { updateCachedUserId } = await import('@/data/database');
-              updateCachedUserId(authenticatedUser.id);
-
+            // Se for GUEST: mantém guest (não verifica Supabase)
+            if (isGuestUser(user) && user.is_guest) {
+              const currentUser = await getUser();
               set({
-                user: authenticatedUser,
-                session: sessionData.session,
+                user: currentUser.user,
                 isInitialized: true,
                 isLoading: false,
               });
               return;
             }
+
+            // Se for NÃO-GUEST: revalida no Supabase
+            const { data: sessionData } = await supabase.auth.getSession();
+
+            if (sessionData.session) {
+              // Sessão válida: sincroniza dados do Supabase
+              const syncedUser = await syncUserWithSupabase();
+              if (syncedUser.user) {
+                set({
+                  user: syncedUser.user,
+                  session: sessionData.session,
+                  isInitialized: true,
+                  isLoading: false,
+                });
+                return;
+              }
+            }
+
+            // Sessão expirou: marca usuário atual como guest
+            const updatedUser = await updateUser({
+              id: user.id,
+              is_guest: true,
+            });
+            set({
+              user: updatedUser.user,
+              session: null,
+              isInitialized: true,
+              isLoading: false,
+            });
+            return;
           }
 
-          // Não tem sessão válida, cria usuário guest
-          const guestUser = createGuestUser();
-
-          // Sincroniza o userId guest com a camada de dados
-          const { updateCachedUserId } = await import('@/data/database');
-          updateCachedUserId(guestUser.id);
-
+          // Não tem usuário local: retorna null (não cria guest automaticamente)
           set({
-            user: guestUser,
+            user: null,
             session: null,
             isInitialized: true,
             isLoading: false,
           });
         } catch (error) {
           console.error('Erro ao inicializar autenticação:', error);
-          // Em caso de erro, cria usuário guest
-          const guestUser = createGuestUser();
-
-          const { updateCachedUserId } = await import('@/data/database');
-          updateCachedUserId(guestUser.id);
-
+          // Fallback: retorna null
           set({
-            user: guestUser,
+            user: null,
             session: null,
             isInitialized: true,
             isLoading: false,
@@ -143,37 +127,33 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Faz login com email e senha
+       * Usa loginUser() de user.actions.ts
        */
       signIn: async (email: string, password: string) => {
         try {
           set({ isLoading: true });
 
-          const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
+          const currentUser = get().user;
 
-          if (error) throw error;
-          if (!data.user || !data.session) {
-            throw new Error('Dados de autenticação inválidos');
+          // Faz login usando função centralizada
+          const result = await loginUser(email, password);
+
+          if (!result.user) {
+            throw new Error(result.error || 'Login failed');
           }
 
-          const currentUser = get().user;
-          const newUser = convertSupabaseUser(data.user);
-
-          // Atualiza o cachedUserId para sincronizar com LegendApp State
-          const { updateCachedUserId } = await import('@/data/database');
-          updateCachedUserId(newUser.id);
+          // Pega sessão do Supabase
+          const { data: sessionData } = await supabase.auth.getSession();
 
           // Se tinha usuário guest, oferece migração
-          if (currentUser?.isGuest) {
+          if (isGuestUser(currentUser) && currentUser.is_guest) {
             const syncService = new SyncService();
-            await syncService.promptDataMigration(currentUser.id, newUser.id);
+            await syncService.promptDataMigration(currentUser.id, result.user.id);
           }
 
           set({
-            user: newUser,
-            session: data.session,
+            user: result.user,
+            session: sessionData.session,
             isLoading: false,
           });
 
@@ -197,42 +177,33 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Cria nova conta
+       * Usa createUser() de user.actions.ts
        */
       signUp: async (name: string, email: string, password: string) => {
         try {
           set({ isLoading: true });
 
-          const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: {
-                name,
-              },
-            },
-          });
+          const currentUser = get().user;
 
-          if (error) throw error;
-          if (!data.user || !data.session) {
-            throw new Error('Dados de autenticação inválidos');
+          // Cria usuário usando função centralizada
+          const result = await createUser({ email, password, name });
+
+          if (!result.user) {
+            throw new Error(result.error || 'Signup failed');
           }
 
-          const currentUser = get().user;
-          const newUser = convertSupabaseUser(data.user);
-
-          // Atualiza o cachedUserId para sincronizar com LegendApp State
-          const { updateCachedUserId } = await import('@/data/database');
-          updateCachedUserId(newUser.id);
+          // Pega sessão do Supabase
+          const { data: sessionData } = await supabase.auth.getSession();
 
           // Se tinha usuário guest, oferece migração
-          if (currentUser?.isGuest) {
+          if (isGuestUser(currentUser) && currentUser.is_guest) {
             const syncService = new SyncService();
-            await syncService.promptDataMigration(currentUser.id, newUser.id);
+            await syncService.promptDataMigration(currentUser.id, result.user.id);
           }
 
           set({
-            user: newUser,
-            session: data.session,
+            user: result.user,
+            session: sessionData.session,
             isLoading: false,
           });
 
@@ -256,26 +227,35 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Faz logout
-       * Mantém dados locais, apenas remove sessão
+       * Marca usuário atual como guest (não cria novo)
        */
       signOut: async () => {
         try {
           set({ isLoading: true });
 
+          const currentUser = get().user;
+
           await supabase.auth.signOut();
 
-          // Cria novo usuário guest
-          const guestUser = createGuestUser();
+          // Marca usuário atual como guest (se existir)
+          if (currentUser) {
+            const updatedUser = await updateUser({
+              id: currentUser.id,
+              is_guest: true,
+            });
 
-          // Atualiza o cachedUserId para o novo guest
-          const { updateCachedUserId } = await import('@/data/database');
-          updateCachedUserId(guestUser.id);
-
-          set({
-            user: guestUser,
-            session: null,
-            isLoading: false,
-          });
+            set({
+              user: updatedUser.user,
+              session: null,
+              isLoading: false,
+            });
+          } else {
+            set({
+              user: null,
+              session: null,
+              isLoading: false,
+            });
+          }
 
           showToast({
             type: 'success',
@@ -328,29 +308,37 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Verifica se existe sessão válida no Supabase
+       * Usa syncUserWithSupabase() quando válida
        */
       checkSession: async () => {
         try {
-          const { data, error } = await supabase.auth.getSession();
-
-          if (error) throw error;
+          const { data } = await supabase.auth.getSession();
 
           if (data.session) {
             const { data: userData } = await supabase.auth.getUser();
 
             if (userData.user) {
-              set({
-                user: convertSupabaseUser(userData.user),
-                session: data.session,
-              });
+              const syncedUser = await syncUserWithSupabase();
+              if (syncedUser.user) {
+                set({
+                  user: syncedUser.user,
+                  session: data.session,
+                });
+              }
             }
           } else {
-            // Sessão expirou, volta para guest
-            const guestUser = createGuestUser();
-            set({
-              user: guestUser,
-              session: null,
-            });
+            // Sessão expirou: marca como guest (não cria novo)
+            const currentUser = get().user;
+            if (currentUser) {
+              const updatedUser = await updateUser({
+                id: currentUser.id,
+                is_guest: true,
+              });
+              set({
+                user: updatedUser.user,
+                session: null,
+              });
+            }
           }
         } catch (error) {
           console.error('Erro ao verificar sessão:', error);
@@ -359,17 +347,48 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Atualiza dados do usuário
+       * Usa updateUser() de user.actions.ts
        */
-      updateUser: (updates: Partial<User>) => {
+      updateUser: async (updates: Partial<UserType>) => {
         const currentUser = get().user;
         if (!currentUser) return;
 
-        set({
-          user: {
-            ...currentUser,
-            ...updates,
-          },
+        const result = await updateUser({
+          id: currentUser.id,
+          ...updates,
         });
+
+        if (result.user) {
+          set({ user: result.user });
+        }
+      },
+
+      /**
+       * Cria um usuário guest
+       * Função para ser chamada explicitamente pela UI
+       */
+      createGuest: async (name?: string) => {
+        try {
+          set({ isLoading: true });
+
+          const result = await createGuestUser(name);
+
+          if (!result.user) {
+            throw new Error(result.error || 'Failed to create guest user');
+          }
+
+          set({
+            user: result.user,
+            session: null,
+            isLoading: false,
+          });
+
+          return result.user;
+        } catch (error) {
+          set({ isLoading: false });
+          console.error('Error creating guest user:', error);
+          throw error;
+        }
       },
     }),
     {
