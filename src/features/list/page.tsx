@@ -14,7 +14,7 @@ import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
 import ListItem from '@/components/list-item';
 import NewListItem from '@/components/new-list-item';
 import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/themeConfig';
+import { themes } from '@/context/themes/theme-config';
 import {
   getListItemsByListId,
   toggleCheckListItem,

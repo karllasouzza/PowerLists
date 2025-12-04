@@ -1,4 +1,4 @@
-import { Redirect, Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { PortalHost } from '@rn-primitives/portal';
 import { verifyInstallation } from 'nativewind';
 import { Toaster } from 'sonner-native';
@@ -13,17 +13,35 @@ export default function RootLayout() {
   verifyInstallation();
   const { initialize, isLoading, user } = useAuthStore();
 
+  const segments = useSegments();
+  const router = useRouter();
+
   useEffect(() => {
-    initialize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const initilizeDatabase = async () => {
+      await initialize();
+    };
+
+    initilizeDatabase();
+  }, [initialize]);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const inTabsGroup = segments[0] === '(tabs)';
+
+    if (!user && inTabsGroup) {
+      // Redirect to the index page if the user is not authenticated and trying to access the tabs
+      router.replace('/');
+    } else if (user && !inTabsGroup) {
+      // Redirect to the home page if the user is authenticated and not in the tabs
+      router.replace('/(tabs)/index');
+    }
+  }, [user, isLoading, segments, router]);
 
   if (isLoading) {
     return <LoadingPage />;
   }
-  if (!isLoading && user) {
-    return <Redirect href="/(tabs)/index" />;
-  }
+
   return (
     <ThemeProvider name="default">
       <Stack>
