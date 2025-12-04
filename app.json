@@ -5,19 +5,25 @@
     "slug": "powerlists",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "edgeToEdge": false,
-    "splash": {
-      "image": "./assets/splash-light.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
     "experiments": {
       "tsconfigPaths": true
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#fff",
+          "image": "./assets/adaptive-icon.png",
+          "dark": {
+            "image": "./assets/adaptive-icon-dark.png",
+            "backgroundColor": "#000000"
+          },
+          "imageWidth": 200
+        }
+      ],
       [
         "expo-secure-store",
         {
@@ -36,17 +42,16 @@
       "expo-router",
       "expo-asset",
       [
-        "expo-navigation-bar",
-        {
-          "backgroundColor": "#0f172a",
-          "borderColor": "#1f2937",
-          "visibility": "visible",
-          "behavior": "inset-swipe",
-          "position": "relative"
-        }
+        "expo-build-properties"
       ],
       [
-        "expo-build-properties"
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": true
+          }
+        }
       ]
     ],
     "ios": {
@@ -61,6 +66,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "edgeToEdgeEnabled": true,
       "package": "com.karllasouzza.PowerLists",
       "permissions": [
         "android.permission.CAMERA"
@@ -71,14 +77,6 @@
       "bundler": "metro"
     },
     "extra": {
-      "router": {},
-      "expo-navigation-bar": {
-        "backgroundColor": "#0f172a",
-        "borderColor": "#1f2937",
-        "visibility": "visible",
-        "behavior": "inset-swipe",
-        "position": "relative"
-      },
       "eas": {
         "projectId": "1a24e7ab-b7e5-47d1-b3d4-78d8fa867693"
       }

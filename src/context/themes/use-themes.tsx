@@ -2,11 +2,11 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 
-import { ThemeProviderPropsT } from './use-themes.types';
 import { mmkvStorage } from '@/data/storage';
-import { themes } from './theme-config';
 import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
+import { themes } from './theme-config';
 import { ThemeContext } from './theme-context';
+import { ThemeProviderPropsT } from './use-themes.types';
 
 const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderPropsT) => {
   const { colorScheme: systemColorScheme, setColorScheme: setNativeWindColorScheme } =

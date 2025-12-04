@@ -1,13 +1,20 @@
+import React, { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { PortalHost } from '@rn-primitives/portal';
 import { verifyInstallation } from 'nativewind';
 import { Toaster } from 'sonner-native';
-import { useEffect } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
 
 import ThemeProvider from '@/context/themes/use-themes';
 import { useAuthStore } from '@/stores/auth';
 import '@/css/global.css';
-import LoadingPage from './loading';
+
+SplashScreen.setOptions({
+  duration: 1000,
+  fade: true,
+});
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   verifyInstallation();
@@ -17,16 +24,14 @@ export default function RootLayout() {
   const router = useRouter();
 
   useEffect(() => {
-    const initilizeDatabase = async () => {
+    const init = async () => {
       await initialize();
     };
 
-    initilizeDatabase();
+    init();
   }, [initialize]);
 
   useEffect(() => {
-    if (isLoading) return;
-
     const inTabsGroup = segments[0] === '(tabs)';
 
     if (!user && inTabsGroup) {
@@ -38,9 +43,11 @@ export default function RootLayout() {
     }
   }, [user, isLoading, segments, router]);
 
-  if (isLoading) {
-    return <LoadingPage />;
-  }
+  useEffect(() => {
+    if (isLoading) {
+      SplashScreen.hide();
+    }
+  }, [isLoading]);
 
   return (
     <ThemeProvider name="default">

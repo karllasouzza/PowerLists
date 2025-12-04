@@ -2,8 +2,6 @@ import React, { useRef, useEffect, useMemo, useCallback } from 'react';
 import { View, useWindowDimensions, FlatList } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { IconSquare, IconSquareCheck } from '@tabler/icons-react-native';
-import FocusAwareStatusBar from '../focus-aware-status-bar';
-import * as NavigationBar from 'expo-navigation-bar';
 import { OnboardingContainerItem } from './onboarding-container-item';
 import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
@@ -75,7 +73,6 @@ export const OnboardingContainer = ({
     if (colorVar) {
       const color = getThemeColor(colorVar);
       if (color) {
-        NavigationBar.setBackgroundColorAsync(color);
       }
     }
   }, [current_slide, slide_pages, getThemeColor]);
@@ -101,12 +98,8 @@ export const OnboardingContainer = ({
     }
   };
 
-  const currentStatusBarColor = getThemeColor(slide_pages[current_slide].statusBarColorVar);
-
   return (
     <View className="flex-1">
-      <FocusAwareStatusBar color={currentStatusBarColor} />
-
       <Animated.FlatList
         ref={flatListRef}
         data={slide_pages}
