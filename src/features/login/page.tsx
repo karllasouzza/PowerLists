@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { useAuthStore } from '@/stores/auth';
+import { isGuestUser } from '@/data/types/user.type';
 
 import { LoginSchema } from '.';
 import { LoginSchemaType } from './types';
@@ -142,7 +143,7 @@ export default function LoginScreen({ navigation }: any) {
           </Button>
 
           {/* Info card se for guest */}
-          {user?.isGuest && (
+          {isGuestUser(user) && user.is_guest && (
             <View className="mt-4 w-full rounded-lg border border-blue-500/20 bg-blue-500/10 p-4">
               <Text variant="small" className="text-center text-blue-600 dark:text-blue-400">
                 💡 Você está no modo guest. Faça login para backup em nuvem!

@@ -3,6 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import { IconUser, IconLogout } from '@tabler/icons-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/auth/auth-store';
+import { isGuestUser } from '@/data/types/user.type';
 import { Icon } from '@/components/ui/icon';
 
 export default function AccountScreen() {
@@ -15,7 +16,7 @@ export default function AccountScreen() {
           <Icon as={IconUser} size={30} color="white" />
         </View>
         <Text className="text-on-primary-container text-center text-3xl capitalize">
-          {user?.name || 'User'}
+          {isGuestUser(user) ? user.name : user?.user_metadata?.name || 'User'}
         </Text>
       </View>
 
