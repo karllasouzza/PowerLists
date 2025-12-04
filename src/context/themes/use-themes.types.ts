@@ -1,4 +1,4 @@
-import { themes } from './themeConfig';
+import { themes } from './theme-config';
 
 export interface ThemeProviderPropsT {
   children: React.ReactNode;

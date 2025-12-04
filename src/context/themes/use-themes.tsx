@@ -4,7 +4,7 @@ import { useColorScheme } from 'nativewind';
 
 import { ThemeProviderPropsT } from './use-themes.types';
 import { mmkvStorage } from '@/data/storage';
-import { themes } from './themeConfig';
+import { themes } from './theme-config';
 import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
 import { ThemeContext } from './theme-context';
 

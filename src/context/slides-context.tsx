@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import Slides from '../components/Slides';
+import { OnboardingContainer } from '../components/onboarding';
 import { storage } from '@/data/storage';
 
 const FIRST_ACCESS_KEY = 'app.first_access';
@@ -58,7 +58,7 @@ export const SlideProvider = ({ children }: SlideProviderProps) => {
   return (
     <SlideContext.Provider value={contextValue}>
       {isFirstAccess && currentSlide < 3 ? (
-        <Slides
+        <OnboardingContainer
           current_slide={currentSlide}
           nextSlide={nextSlide}
           prevSlide={prevSlide}
