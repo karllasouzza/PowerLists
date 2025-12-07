@@ -13,15 +13,9 @@
     },
     "plugins": [
       [
-        "expo-splash-screen",
+        "react-native-bootsplash",
         {
-          "backgroundColor": "#fff",
-          "image": "./assets/adaptive-icon.png",
-          "dark": {
-            "image": "./assets/adaptive-icon-dark.png",
-            "backgroundColor": "#000000"
-          },
-          "imageWidth": 200
+          "assetsDir": "assets/bootsplash"
         }
       ],
       [
@@ -62,11 +56,11 @@
       }
     },
     "android": {
+      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.karllasouzza.PowerLists",
       "permissions": [
         "android.permission.CAMERA"
