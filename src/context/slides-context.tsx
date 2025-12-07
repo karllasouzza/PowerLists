@@ -39,6 +39,10 @@ export const SlideProvider = ({ children }: SlideProviderProps) => {
     setCurrentSlide((prev) => prev - 1);
   };
 
+  const goToSlide = (slide: number) => {
+    setCurrentSlide(slide);
+  };
+
   const completeOnboarding = () => {
     // Marca que o usuário completou o onboarding
     storage.set(FIRST_ACCESS_KEY, true);
@@ -62,6 +66,7 @@ export const SlideProvider = ({ children }: SlideProviderProps) => {
           current_slide={currentSlide}
           nextSlide={nextSlide}
           prevSlide={prevSlide}
+          goToSlide={goToSlide}
           completeOnboarding={completeOnboarding}
         />
       ) : (

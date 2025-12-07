@@ -4,19 +4,19 @@ import { SystemBars } from 'react-native-edge-to-edge';
 import { useTheme } from '@/context/themes/theme-context';
 import { IFocusAwareBarsProps } from './focus-aware-bars.types';
 
-export const FocusAwareBars = ({ statusBar, navigationBar }: IFocusAwareBarsProps) => {
+export const FocusAwareBars = ({ color, style }: IFocusAwareBarsProps) => {
   const { colorScheme } = useTheme();
 
   useFocusEffect(() => {
     SystemBars.setStyle({
-      navigationBar: navigationBar?.style || colorScheme === 'light' ? 'dark' : 'light',
-      statusBar: statusBar?.style || colorScheme === 'light' ? 'dark' : 'light',
+      navigationBar: style || colorScheme === 'light' ? 'dark' : 'light',
+      statusBar: style || colorScheme === 'light' ? 'dark' : 'light',
     });
   });
 
   return (
     <>
-      <SystemBars style={statusBar?.style || colorScheme === 'light' ? 'dark' : 'light'} />
+      <SystemBars style={style || colorScheme === 'light' ? 'dark' : 'light'} />
     </>
   );
 };

@@ -1,29 +1,25 @@
 import React, { useRef, useEffect, useMemo } from 'react';
 import { View, useWindowDimensions, FlatList } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { IconSquare, IconSquareCheck } from '@tabler/icons-react-native';
 import { OnboardingContainerItem } from './onboarding-container-item';
-import { Button } from '../ui/button';
-import { Icon } from '../ui/icon';
 import { useTheme } from '@/context/themes/use-themes';
 import { SlidesProps } from './';
+import { OnboardingCheckButton } from './onboarding-check-button';
 
 export const OnboardingContainer = ({
   current_slide,
   nextSlide,
   prevSlide,
   completeOnboarding,
+  goToSlide,
 }: SlidesProps) => {
-  const { setNavigationBar, setStatusBar } = useTheme();
+  const { setBars } = useTheme();
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList<any>>(null);
 
   const slide_pages = useMemo(
     () => [
       {
-        className: 'bg-purple-200',
-        checkClassName: 'text-primary-foreground',
-        checkBgClassName: 'text-background',
         content: {
           img: require('../../../assets/Images/Slides/Illustration_1.png'),
           title: 'Planeje suas compras',
@@ -31,9 +27,6 @@ export const OnboardingContainer = ({
         },
       },
       {
-        className: 'bg-pink-200',
-        checkClassName: 'text-secondary-foreground',
-        checkBgClassName: 'text-background',
         content: {
           img: require('../../../assets/Images/Slides/Illustration_2.png'),
           title: 'Evite anotações físicas',
@@ -41,9 +34,6 @@ export const OnboardingContainer = ({
         },
       },
       {
-        className: 'bg-orange-200',
-        checkClassName: 'text-destructive-foreground',
-        checkBgClassName: 'text-background',
         content: {
           img: require('../../../assets/Images/Slides/Illustration_3.png'),
           title: 'Liste suas financias',
@@ -56,13 +46,12 @@ export const OnboardingContainer = ({
 
   // Update NavigationBar color when slide changes
   useEffect(() => {
-    const colorVar = slide_pages[current_slide]?.className;
+    const colorVar = `--color-onboarding-${current_slide + 1}`;
     if (colorVar) {
-      setNavigationBar({
+      console.log(colorVar);
+      setBars({
         color: colorVar,
-      });
-      setStatusBar({
-        color: colorVar,
+        style: 'dark',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -94,7 +83,7 @@ export const OnboardingContainer = ({
       <Animated.FlatList
         ref={flatListRef}
         data={slide_pages}
-        renderItem={({ item }) => <OnboardingContainerItem item={item} />}
+        renderItem={({ item, index }) => <OnboardingContainerItem item={item} index={index} />}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -103,30 +92,20 @@ export const OnboardingContainer = ({
         keyExtractor={(_, index) => index.toString()}
       />
 
-      <View className="absolute bottom-0 w-full flex-row justify-center gap-4">
+      <View className="absolute bottom-8 w-full flex-col items-center gap-4">
         {slide_pages
           .filter((_, index) => index <= current_slide)
           .map((slide, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              size="icon"
-              onPress={() => {
-                if (index < current_slide) {
-                  prevSlide();
-                } else if (index === slide_pages.length - 1) {
-                  // Último slide, completa o onboarding
-                  completeOnboarding();
-                } else {
-                  nextSlide();
-                }
-              }}>
-              <Icon
-                as={index < current_slide ? IconSquareCheck : IconSquare}
-                size={32}
-                className={index < current_slide ? slide.checkClassName : slide.checkBgClassName}
-              />
-            </Button>
+            <OnboardingCheckButton
+              key={`onboard-button-${index}`}
+              index={index}
+              current_slide={current_slide}
+              goToSlide={goToSlide}
+              nextSlide={nextSlide}
+              completeOnboarding={completeOnboarding}
+              slide_pages={slide_pages}
+              slide={slide}
+            />
           ))}
       </View>
     </View>
