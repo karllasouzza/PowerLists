@@ -1,59 +1,68 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 import { Image } from 'expo-image';
-import { IconCloud, IconFolder, IconUserPlus } from '@tabler/icons-react-native';
 
 import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
+import { useRouter } from 'expo-router';
+import { UserPlus, LogIn, Folder, HatGlasses } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
 
-export default function AuthScreen({ navigation }: any) {
+export default function AuthScreen() {
+  const router = useRouter();
+
+  const handleCreateAccount = () => {
+    router.navigate('/create-account');
+  };
+
+  const handleLogin = () => {
+    router.navigate('/login');
+  };
+
+  const handleGuest = () => {
+    router.navigate('/guest');
+  };
+
   return (
-    <View className="flex-1 bg-background">
-      <View className="h-[45vh] w-full items-center justify-center">
-        <Image
-          source={require('../../../assets/adaptive-icon.png')}
-          style={{ width: 200, height: 200 }}
-          contentFit="contain"
-        />
-        <Text variant="h2" className="mt-5 font-bold text-foreground">
-          Bem-vindo!
-        </Text>
-        <Text variant="p" className="mt-2 px-10 text-center text-foreground">
-          Guarde seus dados localmente ou opte por se conectar e armazenar suas informações na
-          nuvem.
-        </Text>
+    <View className="h-full w-full flex-1 flex-col items-center justify-between gap-2 overflow-hidden bg-background">
+      <View className="w-full items-center justify-center">
+        <View className="h-[300px] max-h-[300px] w-full items-center justify-center gap-2">
+          <Image
+            source={require('../../../assets/new-icon-concept.png')}
+            style={{ width: 250, height: 250 }}
+            contentFit="contain"
+          />
+        </View>
+        <View className="w-full items-center justify-center gap-2 p-8 py-4">
+          <Text className="text-4xl font-bold text-foreground">Bem-vindo!</Text>
+          <Text className="text-center text-lg font-normal text-foreground">
+            Guarde seus dados localmente ou opte por se conectar e armazenar suas informações na
+            nuvem.
+          </Text>
+        </View>
       </View>
 
-      <View className="h-[55vh] w-full items-center justify-start gap-4 bg-background pt-10">
-        <Button
-          variant="default"
-          className="h-12 w-[80%]"
-          onPress={() => navigation.navigate('CreateAccount')}>
-          <IconUserPlus className="mr-2" size={20} />
-          <Text variant="large" className="font-bold">
-            Criar conta
-          </Text>
-        </Button>
+      <View className="w-full flex-col items-center justify-center gap-6 px-4 py-8">
+        <View className="w-full items-center justify-center gap-4 p-2">
+          <Button variant="default" className="h-12 w-full" onPress={handleCreateAccount}>
+            <Text className="text-base font-bold text-primary-foreground">Começe agora!</Text>
+          </Button>
+          <Button variant="secondary" className="h-12 w-full" onPress={handleLogin}>
+            <Text className="font-bold text-secondary-foreground">Já tem uma conta?</Text>
+          </Button>
+        </View>
 
-        <Button
-          variant="secondary"
-          className="h-12 w-[80%]"
-          onPress={() => navigation.navigate('Login')}>
-          <IconCloud className="mr-2" size={20} />
-          <Text variant="large" className="font-bold">
-            Entrar
-          </Text>
-        </Button>
+        <View className="w-full items-center justify-end gap-4 bg-background">
+          <View className="w-full flex-row items-center justify-center gap-4 bg-background px-4">
+            <View className="h-[1px] w-full bg-border" />
+            <Text className="font-bold text-primary">Ou</Text>
+            <View className="h-[1px] w-full bg-border" />
+          </View>
 
-        <Button
-          variant="outline"
-          className="h-12 w-[80%]"
-          onPress={() => navigation.navigate('Login')}>
-          <IconFolder className="mr-2" size={20} />
-          <Text variant="large" className="font-bold">
-            Usar sem conta
-          </Text>
-        </Button>
+          <Button variant="ghost" className="h-12 w-full" onPress={handleGuest}>
+            <Icon as={HatGlasses} className="text-primary" size={20} />
+            <Text className="font-bold text-primary">Continuar com conta local</Text>
+          </Button>
+        </View>
       </View>
     </View>
   );
