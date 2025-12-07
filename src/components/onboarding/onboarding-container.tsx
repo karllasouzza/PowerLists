@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { View, useWindowDimensions, FlatList } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { IconSquare, IconSquareCheck } from '@tabler/icons-react-native';
@@ -6,7 +6,6 @@ import { OnboardingContainerItem } from './onboarding-container-item';
 import { Button } from '../ui/button';
 import { Icon } from '../ui/icon';
 import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/theme-config';
 import { SlidesProps } from './';
 
 export const OnboardingContainer = ({
@@ -15,15 +14,14 @@ export const OnboardingContainer = ({
   prevSlide,
   completeOnboarding,
 }: SlidesProps) => {
-  const { theme, colorScheme } = useTheme();
+  const { setNavigationBar, setStatusBar } = useTheme();
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList<any>>(null);
 
   const slide_pages = useMemo(
     () => [
       {
-        className: 'bg-primary',
-        statusBarColorVar: '--color-primary',
+        className: 'bg-purple-200',
         checkClassName: 'text-primary-foreground',
         checkBgClassName: 'text-background',
         content: {
@@ -33,8 +31,7 @@ export const OnboardingContainer = ({
         },
       },
       {
-        className: 'bg-secondary',
-        statusBarColorVar: '--color-secondary',
+        className: 'bg-pink-200',
         checkClassName: 'text-secondary-foreground',
         checkBgClassName: 'text-background',
         content: {
@@ -44,8 +41,7 @@ export const OnboardingContainer = ({
         },
       },
       {
-        className: 'bg-destructive',
-        statusBarColorVar: '--color-destructive',
+        className: 'bg-orange-200',
         checkClassName: 'text-destructive-foreground',
         checkBgClassName: 'text-background',
         content: {
@@ -58,24 +54,19 @@ export const OnboardingContainer = ({
     []
   );
 
-  // Helper to resolve theme color variable to value
-  const getThemeColor = useCallback(
-    (variable: string) => {
-      // @ts-ignore
-      return themes[theme][colorScheme][variable];
-    },
-    [theme, colorScheme]
-  );
-
   // Update NavigationBar color when slide changes
   useEffect(() => {
-    const colorVar = slide_pages[current_slide]?.statusBarColorVar;
+    const colorVar = slide_pages[current_slide]?.className;
     if (colorVar) {
-      const color = getThemeColor(colorVar);
-      if (color) {
-      }
+      setNavigationBar({
+        color: colorVar,
+      });
+      setStatusBar({
+        color: colorVar,
+      });
     }
-  }, [current_slide, slide_pages, getThemeColor]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current_slide, slide_pages]);
 
   // Sync FlatList with current_slide prop
   useEffect(() => {
@@ -99,7 +90,7 @@ export const OnboardingContainer = ({
   };
 
   return (
-    <View className="flex-1">
+    <View className="h-full w-full flex-1">
       <Animated.FlatList
         ref={flatListRef}
         data={slide_pages}
@@ -112,7 +103,7 @@ export const OnboardingContainer = ({
         keyExtractor={(_, index) => index.toString()}
       />
 
-      <View className="absolute bottom-10 w-full flex-row justify-center gap-4">
+      <View className="absolute bottom-0 w-full flex-row justify-center gap-4">
         {slide_pages
           .filter((_, index) => index <= current_slide)
           .map((slide, index) => (
