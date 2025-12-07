@@ -3,10 +3,11 @@ import { View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 
 import { mmkvStorage } from '@/data/storage';
-import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
 import { themes } from './theme-config';
 import { ThemeContext } from './theme-context';
 import { ThemeProviderPropsT } from './use-themes.types';
+import { FocusAwareBars, IFocusAwareBarsProps } from '@/components/focus-aware-bars';
+import { getTailwindColor, getThemeColorSafe, resolveColor } from '@/utils/tailwind-color.utils';
 
 const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderPropsT) => {
   const { colorScheme: systemColorScheme, setColorScheme: setNativeWindColorScheme } =
@@ -15,6 +16,10 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
     customColorScheme || (systemColorScheme as 'light' | 'dark') || 'light'
   );
+  const [navigationBar, setNavigationBar] = useState<IFocusAwareBarsProps['navigationBar'] | null>(
+    null
+  );
+  const [statusBar, setStatusbar] = useState<IFocusAwareBarsProps['statusBar'] | null>(null);
 
   useEffect(() => {
     const loadStoredPreferences = () => {
@@ -73,25 +78,101 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     }
   }, []);
 
+  const handleSetStatusBar = useCallback(
+    (statusBar: IFocusAwareBarsProps['statusBar']): boolean => {
+      try {
+        if (!statusBar?.color) {
+          throw new Error('Status bar color is required');
+        }
+
+        const color = resolveColor(statusBar.color, themes[theme][scheme]);
+        const style = statusBar.style || (scheme === 'light' ? 'dark' : 'light');
+
+        setStatusbar({
+          color,
+          style,
+        });
+        return true;
+      } catch (error) {
+        console.error('Error setting status bar:', error);
+        return false;
+      }
+    },
+    [scheme, theme]
+  );
+
+  const handleSetNavigationBar = useCallback(
+    (navigationBar: IFocusAwareBarsProps['navigationBar']): boolean => {
+      try {
+        if (!navigationBar?.color) {
+          throw new Error('Navigation bar color is required');
+        }
+
+        const color = resolveColor(navigationBar.color, themes[theme][scheme]);
+        const style = navigationBar.style || (scheme === 'light' ? 'dark' : 'light');
+
+        setNavigationBar({
+          color,
+          style,
+        });
+        return true;
+      } catch (error) {
+        console.error('Error setting navigation bar:', error);
+        return false;
+      }
+    },
+    [scheme, theme]
+  );
+
   const contextValue = useMemo(
     () => ({
       theme,
       colorScheme: scheme,
       setTheme: handleSetThemeAndSaveOnStorage,
       setColorScheme: handleSetColorSchemeAndSaveOnStorage,
+      setStatusBar: handleSetStatusBar,
+      setNavigationBar: handleSetNavigationBar,
     }),
-    [theme, scheme, handleSetThemeAndSaveOnStorage, handleSetColorSchemeAndSaveOnStorage]
+    [
+      theme,
+      scheme,
+      handleSetStatusBar,
+      handleSetNavigationBar,
+      handleSetColorSchemeAndSaveOnStorage,
+      handleSetThemeAndSaveOnStorage,
+    ]
   );
 
-  const statusBarBackgroundColor = useMemo(() => {
+  const defaultBarsProps = useMemo((): IFocusAwareBarsProps => {
     const themeVars = themes[theme][scheme];
-    // Extrai a cor do background das variáveis CSS
-    return themeVars['--color-background'] || (scheme === 'dark' ? '#0a0a0a' : '#ffffff');
+
+    const backgroundColorFallback =
+      scheme === 'dark' ? getTailwindColor('black') : getTailwindColor('white');
+
+    const backgroundColor = getThemeColorSafe(
+      themeVars,
+      '--color-background',
+      backgroundColorFallback
+    );
+
+    return {
+      statusBar: {
+        color: backgroundColor,
+        style: scheme === 'dark' ? 'light' : 'dark',
+      },
+      navigationBar: {
+        color: backgroundColor,
+        style: scheme === 'dark' ? 'light' : 'dark',
+      },
+    };
   }, [theme, scheme]);
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <FocusAwareStatusBar color={statusBarBackgroundColor} />
+      <FocusAwareBars
+        statusBar={statusBar || defaultBarsProps.statusBar}
+        navigationBar={navigationBar || defaultBarsProps.navigationBar}
+      />
       <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
         {children}
       </View>
