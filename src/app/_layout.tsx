@@ -3,21 +3,17 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { PortalHost } from '@rn-primitives/portal';
 import { verifyInstallation } from 'nativewind';
 import { Toaster } from 'sonner-native';
-import * as SplashScreen from 'expo-splash-screen';
+import BootSplash from 'react-native-bootsplash';
 
 import ThemeProvider from '@/context/themes/use-themes';
 import { useAuthStore } from '@/stores/auth';
 import '@/css/global.css';
-
-SplashScreen.setOptions({
-  duration: 1000,
-  fade: true,
-});
-// Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
+import { AnimatedBootSplash } from '@/components/animated-boot-splash';
 
 export default function RootLayout() {
   verifyInstallation();
+  const [visible, setVisible] = React.useState(true);
+
   const { initialize, isLoading, user } = useAuthStore();
 
   const segments = useSegments();
@@ -28,7 +24,10 @@ export default function RootLayout() {
       await initialize();
     };
 
-    init();
+    init().finally(async () => {
+      setVisible(false);
+      await BootSplash.hide({ fade: true });
+    });
   }, [initialize]);
 
   useEffect(() => {
@@ -43,11 +42,9 @@ export default function RootLayout() {
     }
   }, [user, isLoading, segments, router]);
 
-  useEffect(() => {
-    if (isLoading) {
-      SplashScreen.hide();
-    }
-  }, [isLoading]);
+  if (isLoading && visible) {
+    return <AnimatedBootSplash onAnimationEnd={() => setVisible(false)} />;
+  }
 
   return (
     <ThemeProvider name="default">
