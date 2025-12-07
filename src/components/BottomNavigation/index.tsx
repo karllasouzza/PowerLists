@@ -41,12 +41,7 @@ export default function BottomNavigation({ navigation }: any) {
         route={index === 0 ? 'Home' : 'Account'}
         homeHandle={() => handleTabChange(0)}
         accountHandle={() => handleTabChange(1)}
-        addHandle={() => {
-          // Logic for add button
-          // If on Home, maybe trigger something?
-          // For now, just log or do nothing as HomeScreen has its own FAB
-          console.log('Add button pressed');
-        }}
+        addHandle={() => {}}
       />
     </View>
   );

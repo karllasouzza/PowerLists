@@ -48,7 +48,6 @@ export const OnboardingContainer = ({
   useEffect(() => {
     const colorVar = `--color-onboarding-${current_slide + 1}`;
     if (colorVar) {
-      console.log(colorVar);
       setBars({
         color: colorVar,
         style: 'dark',

@@ -135,8 +135,6 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     };
   }, [theme, scheme]);
 
-  console.log(bars?.color || defaultBarsProps.color);
-
   return (
     <ThemeContext.Provider value={contextValue}>
       <View
