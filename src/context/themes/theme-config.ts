@@ -4,7 +4,7 @@ export const themes = {
   default: {
     light: vars({
       '--color-primary': 'rgb(0, 0, 0)',
-      '--color-secondary': 'rgb(255, 255, 255)',
+      '--color-secondary': 'rgb(245, 245, 245)',
       '--color-background': 'rgb(255, 255, 255)',
       '--color-foreground': 'rgb(10, 10, 10)',
       '--color-card': 'rgb(255, 255, 255)',
@@ -12,7 +12,7 @@ export const themes = {
       '--color-popover': 'rgb(255, 255, 255)',
       '--color-popover-foreground': 'rgb(10, 10, 10)',
       '--color-primary-foreground': 'rgb(250, 250, 250)',
-      '--color-secondary-foreground': 'rgb(10, 10, 10)',
+      '--color-secondary-foreground': 'rgb(64, 64, 64)',
       '--color-muted': 'rgb(245, 245, 245)',
       '--color-muted-foreground': 'rgb(115, 115, 115)',
       '--color-accent': 'rgb(245, 245, 245)',
@@ -25,7 +25,7 @@ export const themes = {
     }),
     dark: vars({
       '--color-primary': 'rgb(255, 255, 255)',
-      '--color-secondary': 'rgb(10, 10, 10)',
+      '--color-secondary': 'rgb(38, 38, 38)',
       '--color-background': 'rgb(10, 10, 10)',
       '--color-foreground': 'rgb(250, 250, 250)',
       '--color-card': 'rgb(23, 23, 23)',
@@ -33,7 +33,7 @@ export const themes = {
       '--color-popover': 'rgb(38, 38, 38)',
       '--color-popover-foreground': 'rgb(250, 250, 250)',
       '--color-primary-foreground': 'rgb(23, 23, 23)',
-      '--color-secondary-foreground': 'rgb(250, 250, 250)',
+      '--color-secondary-foreground': 'rgb(212, 212, 212)',
       '--color-muted': 'rgb(38, 38, 38)',
       '--color-muted-foreground': 'rgb(161, 161, 161)',
       '--color-accent': 'rgb(64, 64, 64)',
