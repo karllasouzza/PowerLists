@@ -108,14 +108,10 @@ export type ThemeVars = Record<string, string>;
  * ```
  */
 export const getThemeColor = (themeVars: ThemeVars, varName: string): string => {
-  if (!(varName in themeVars)) {
-    throw new Error(`Theme variable '${varName}' not found in theme object`);
-  }
-
-  const color = themeVars[varName];
+  const color = themeVars?.[varName];
 
   if (!color || typeof color !== 'string') {
-    throw new Error(`Invalid color value for theme variable '${varName}'`);
+    throw new Error(`Theme variable '${varName}' not found in theme object`);
   }
 
   return color;
@@ -142,6 +138,7 @@ export const getThemeColorSafe = (
   try {
     return getThemeColor(themeVars, varName);
   } catch {
+    // Silently return fallback when theme variable is not found
     return fallback;
   }
 };
@@ -183,7 +180,7 @@ export const resolveColor = (
       if (!themeVars) {
         throw new Error('Theme variables object is required for CSS variable colors');
       }
-      return getThemeColor(themeVars, colorInput);
+      return getThemeColorSafe(themeVars, colorInput, fallback);
     }
 
     // Se começa com '#' ou 'rgb', é uma cor direta

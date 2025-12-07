@@ -12,6 +12,5 @@ export interface ThemeContextT {
   colorScheme: 'light' | 'dark';
   setTheme: (theme: keyof typeof themes) => void;
   setColorScheme: (scheme: 'light' | 'dark') => void;
-  setStatusBar: (statusBar: IFocusAwareBarsProps['statusBar']) => boolean;
-  setNavigationBar: (navigationBar: IFocusAwareBarsProps['navigationBar']) => boolean;
+  setBars: (bars: IFocusAwareBarsProps) => boolean;
 }

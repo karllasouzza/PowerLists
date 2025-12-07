@@ -40,6 +40,18 @@ export const theme = {
         DEFAULT: 'var(--color-card)',
         foreground: 'var(--color-card-foreground)',
       },
+      'onboarding-1': {
+        DEFAULT: 'var(--color-onboarding-1)',
+        foreground: 'var(--color-onboarding-1-foreground)',
+      },
+      'onboarding-2': {
+        DEFAULT: 'var(--color-onboarding-2)',
+        foreground: 'var(--color-onboarding-2-foreground)',
+      },
+      'onboarding-3': {
+        DEFAULT: 'var(--color-onboarding-3)',
+        foreground: 'var(--color-onboarding-3-foreground)',
+      },
     },
     borderRadius: {
       lg: 'var(--radius)',

@@ -3,11 +3,12 @@ import { View } from 'react-native';
 import { useColorScheme } from 'nativewind';
 
 import { mmkvStorage } from '@/data/storage';
-import { themes } from './theme-config';
+import { themes, rawColors } from './theme-config';
 import { ThemeContext } from './theme-context';
 import { ThemeProviderPropsT } from './use-themes.types';
 import { FocusAwareBars, IFocusAwareBarsProps } from '@/components/focus-aware-bars';
 import { getTailwindColor, getThemeColorSafe, resolveColor } from '@/utils/tailwind-color.utils';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderPropsT) => {
   const { colorScheme: systemColorScheme, setColorScheme: setNativeWindColorScheme } =
@@ -16,10 +17,7 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>(
     customColorScheme || (systemColorScheme as 'light' | 'dark') || 'light'
   );
-  const [navigationBar, setNavigationBar] = useState<IFocusAwareBarsProps['navigationBar'] | null>(
-    null
-  );
-  const [statusBar, setStatusbar] = useState<IFocusAwareBarsProps['statusBar'] | null>(null);
+  const [bars, setBars] = useState<IFocusAwareBarsProps | null>(null);
 
   useEffect(() => {
     const loadStoredPreferences = () => {
@@ -78,40 +76,18 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     }
   }, []);
 
-  const handleSetStatusBar = useCallback(
-    (statusBar: IFocusAwareBarsProps['statusBar']): boolean => {
-      try {
-        if (!statusBar?.color) {
-          throw new Error('Status bar color is required');
-        }
-
-        const color = resolveColor(statusBar.color, themes[theme][scheme]);
-        const style = statusBar.style || (scheme === 'light' ? 'dark' : 'light');
-
-        setStatusbar({
-          color,
-          style,
-        });
-        return true;
-      } catch (error) {
-        console.error('Error setting status bar:', error);
-        return false;
-      }
-    },
-    [scheme, theme]
-  );
-
-  const handleSetNavigationBar = useCallback(
-    (navigationBar: IFocusAwareBarsProps['navigationBar']): boolean => {
+  const handleSetBars = useCallback(
+    (navigationBar: IFocusAwareBarsProps): boolean => {
       try {
         if (!navigationBar?.color) {
           throw new Error('Navigation bar color is required');
         }
 
-        const color = resolveColor(navigationBar.color, themes[theme][scheme]);
+        const color = resolveColor(navigationBar.color, rawColors[theme][scheme]);
+
         const style = navigationBar.style || (scheme === 'light' ? 'dark' : 'light');
 
-        setNavigationBar({
+        setBars({
           color,
           style,
         });
@@ -130,21 +106,19 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
       colorScheme: scheme,
       setTheme: handleSetThemeAndSaveOnStorage,
       setColorScheme: handleSetColorSchemeAndSaveOnStorage,
-      setStatusBar: handleSetStatusBar,
-      setNavigationBar: handleSetNavigationBar,
+      setBars: handleSetBars,
     }),
     [
       theme,
       scheme,
-      handleSetStatusBar,
-      handleSetNavigationBar,
+      handleSetBars,
       handleSetColorSchemeAndSaveOnStorage,
       handleSetThemeAndSaveOnStorage,
     ]
   );
 
   const defaultBarsProps = useMemo((): IFocusAwareBarsProps => {
-    const themeVars = themes[theme][scheme];
+    const themeVars = rawColors[theme][scheme];
 
     const backgroundColorFallback =
       scheme === 'dark' ? getTailwindColor('black') : getTailwindColor('white');
@@ -156,25 +130,26 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     );
 
     return {
-      statusBar: {
-        color: backgroundColor,
-        style: scheme === 'dark' ? 'light' : 'dark',
-      },
-      navigationBar: {
-        color: backgroundColor,
-        style: scheme === 'dark' ? 'light' : 'dark',
-      },
+      color: backgroundColor,
+      style: scheme === 'dark' ? 'light' : 'dark',
     };
   }, [theme, scheme]);
 
+  console.log(bars?.color || defaultBarsProps.color);
+
   return (
     <ThemeContext.Provider value={contextValue}>
-      <FocusAwareBars
-        statusBar={statusBar || defaultBarsProps.statusBar}
-        navigationBar={navigationBar || defaultBarsProps.navigationBar}
-      />
-      <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
-        {children}
+      <View
+        className="h-full w-full"
+        style={{
+          backgroundColor: bars?.color || defaultBarsProps.color,
+        }}>
+        <FocusAwareBars style={bars?.style || defaultBarsProps.style} />
+        <SafeAreaView>
+          <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
+            {children}
+          </View>
+        </SafeAreaView>
       </View>
     </ThemeContext.Provider>
   );
