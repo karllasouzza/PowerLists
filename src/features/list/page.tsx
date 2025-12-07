@@ -10,7 +10,6 @@ import { View, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
 import ListItem from '@/components/list-item';
 import NewListItem from '@/components/new-list-item';
 import { useTheme } from '@/context/themes/use-themes';
@@ -165,8 +164,6 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
 
   return (
     <View className="flex-1 bg-background">
-      <FocusAwareStatusBar color={backgroundColor} />
-
       <ListItemsHeader
         title={list.title}
         backgroundColor={backgroundColor}

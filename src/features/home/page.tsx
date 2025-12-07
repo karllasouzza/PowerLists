@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useObserve } from '@legendapp/state/react';
 import humps from 'humps';
-import FocusAwareStatusBar from '@/components/focus-aware-status-bar';
 import { CardList } from '@/components/card-list';
 import NewListItem from '@/components/new-list-item';
 import { useTheme } from '@/context/themes/use-themes';
@@ -124,8 +123,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <View className="flex-1 items-center bg-background">
-      <FocusAwareStatusBar color="#fff" />
-
       <HomeAppbar
         top={top}
         onSearch={onSearch}
