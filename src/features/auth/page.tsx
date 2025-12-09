@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
+import { HatGlasses } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'expo-router';
-import { UserPlus, LogIn, Folder, HatGlasses } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 
 export default function AuthScreen() {
@@ -54,7 +54,7 @@ export default function AuthScreen() {
         <View className="w-full items-center justify-end gap-4 bg-background">
           <View className="w-full flex-row items-center justify-center gap-4 bg-background px-4">
             <View className="h-[1px] w-full bg-border" />
-            <Text className="font-bold text-primary">Ou</Text>
+            <Text className="font-bold uppercase text-muted-foreground">ou</Text>
             <View className="h-[1px] w-full bg-border" />
           </View>
 

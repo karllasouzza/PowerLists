@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, View } from 'react-native';
+import { View } from 'react-native';
 import { IconEye, IconEyeClosed, IconLoader2, IconUserPlus } from '@tabler/icons-react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,8 +12,14 @@ import { useAuthStore } from '@/stores/auth';
 
 import { CreateAccountSchema } from '.';
 import { CreateAccountSchemaType } from './types';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { Image } from 'expo-image';
+import { Icon } from '@/components/ui/icon';
+import { HatGlasses } from 'lucide-react-native';
+import { Label } from '@/components/ui/label';
 
-export default function CreateAccountScreen({ navigation }: any) {
+export default function CreateAccountScreen() {
+  const router = useRouter();
   const [isSecureTextEntry, setIsSecureTextEntry] = useState(true);
 
   const { signUp, isLoading } = useAuthStore();
@@ -25,7 +31,6 @@ export default function CreateAccountScreen({ navigation }: any) {
   } = useForm<CreateAccountSchemaType>({
     resolver: zodResolver(CreateAccountSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
     },
@@ -33,102 +38,98 @@ export default function CreateAccountScreen({ navigation }: any) {
 
   const onSubmit = async (data: CreateAccountSchemaType) => {
     try {
-      await signUp(data.name, data.email, data.password);
+      await signUp(data.email, data.password);
       router.push('/(tabs)');
     } catch (error) {
       console.error('Erro ao criar conta:', error);
     }
   };
 
+  const handleLogin = () => {
+    router.navigate('/login');
+  };
+
+  const handleGuest = () => {
+    router.navigate('/guest');
+  };
+
   return (
-    <KeyboardAvoidingView contentContainerStyle={{ flexGrow: 1 }} className="bg-background">
-      <View className="flex-1 bg-background pt-0">
-        <View className="w-[80%] flex-grow items-center justify-center gap-4 self-center">
-          <Text variant="h2" className="text-center font-bold text-foreground">
-            Seja bem vindo!
-          </Text>
-          <Text variant="p" className="text-center text-foreground">
-            Cadastre seu nome, seu email e sua senha para poder usar os recursos de salvamento
-            online.
-          </Text>
+    <KeyboardAwareScrollView
+      className="flex-1 bg-background"
+      bottomOffset={62}
+      contentContainerClassName="flex-grow justify-between">
+      <View className="flex w-full items-center justify-center gap-6 p-6">
+        <View className="w-full max-w-md items-center justify-center gap-2">
+          <Image
+            source={require('../../../assets/new-icon-concept.png')}
+            style={{ width: 150, height: 150 }}
+            contentFit="contain"
+          />
         </View>
+        <View className="w-full max-w-md items-center justify-center gap-2">
+          <Text className="text-3xl font-bold text-foreground">Crie sua conta!</Text>
+        </View>
+      </View>
 
-        <View className="w-[90%] flex-grow items-center gap-4 pt-10">
-          <Controller
-            control={control}
-            name="name"
-            render={({ field, ...props }) => (
-              <View className="w-full">
-                <Input
-                  placeholder="Seu nome"
-                  autoComplete="name"
-                  autoCapitalize="words"
-                  value={field.value}
-                  onChangeText={field.onChange}
-                  {...props}
-                />
-                {errors.name && (
-                  <Text variant="small" className="mt-1 text-destructive">
-                    {errors.name.message}
-                  </Text>
-                )}
-              </View>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="email"
-            render={({ field, ...props }) => (
-              <View className="w-full">
-                <Input
-                  placeholder="seu@email.com"
-                  autoComplete="email"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  value={field.value}
-                  onChangeText={field.onChange}
-                  {...props}
-                />
-                {errors.email && (
-                  <Text variant="small" className="mt-1 text-destructive">
-                    {errors.email.message}
-                  </Text>
-                )}
-              </View>
-            )}
-          />
-
-          <Controller
-            control={control}
-            name="password"
-            render={({ field, ...props }) => (
-              <View className="w-full">
-                <View className="flex-row items-center gap-2">
+      <View className="w-full flex-1 flex-col items-center gap-6 px-8 py-4">
+        <View className="w-full flex-1 flex-col items-center justify-center gap-6">
+          <View className="w-full flex-col gap-4">
+            <Controller
+              control={control}
+              name="email"
+              render={({ field, ...props }) => (
+                <View className="w-full flex-col gap-2">
+                  <Label htmlFor="email">*Email:</Label>
                   <Input
-                    placeholder="********"
-                    autoComplete="off"
-                    secureTextEntry={isSecureTextEntry}
+                    id="email"
+                    placeholder="seu@email.com"
+                    autoComplete="email"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
                     value={field.value}
                     onChangeText={field.onChange}
-                    className="flex-1"
                     {...props}
                   />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onPress={() => setIsSecureTextEntry(!isSecureTextEntry)}>
-                    {isSecureTextEntry ? <IconEye size={20} /> : <IconEyeClosed size={20} />}
-                  </Button>
+                  {errors.email && (
+                    <Text variant="small" className="mt-1 text-destructive">
+                      {errors.email.message}
+                    </Text>
+                  )}
                 </View>
-                {errors.password && (
-                  <Text variant="small" className="mt-1 text-destructive">
-                    {errors.password.message}
-                  </Text>
-                )}
-              </View>
-            )}
-          />
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="password"
+              render={({ field, ...props }) => (
+                <View className="w-full flex-col gap-2">
+                  <Label htmlFor="password">*Senha:</Label>
+                  <View className="flex-row items-center gap-2">
+                    <Input
+                      autoComplete="off"
+                      secureTextEntry={isSecureTextEntry}
+                      value={field.value}
+                      onChangeText={field.onChange}
+                      className="flex-1"
+                      {...props}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onPress={() => setIsSecureTextEntry(!isSecureTextEntry)}>
+                      <Icon as={isSecureTextEntry ? IconEye : IconEyeClosed} size={20} />
+                    </Button>
+                  </View>
+                  {errors.password && (
+                    <Text variant="small" className="mt-1 text-destructive">
+                      {errors.password.message}
+                    </Text>
+                  )}
+                </View>
+              )}
+            />
+          </View>
 
           <Button
             variant="default"
@@ -143,15 +144,24 @@ export default function CreateAccountScreen({ navigation }: any) {
           </Button>
         </View>
 
-        <View className="flex-row items-center justify-center py-10">
+        <View className="flex-row items-center justify-center">
           <Text variant="muted">Já possui uma conta? </Text>
-          <Button variant="link" onPress={() => navigation.navigate('Login')}>
+          <Button variant="link" onPress={handleLogin}>
             <Text variant="muted" className="font-bold">
               Faça o login
             </Text>
           </Button>
         </View>
+
+        <View className="w-full flex-row items-center justify-center gap-4 px-4">
+          <View className="h-[1px] w-full bg-border" />
+          <Button variant="link" className="w-full" onPress={handleGuest}>
+            <Icon as={HatGlasses} size={20} />
+            <Text className="font-bold">Continuar com conta local</Text>
+          </Button>
+          <View className="h-[1px] w-full bg-border" />
+        </View>
       </View>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 }
