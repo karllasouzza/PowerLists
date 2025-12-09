@@ -64,7 +64,8 @@
       "package": "com.karllasouzza.PowerLists",
       "permissions": [
         "android.permission.CAMERA"
-      ]
+      ],
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/icon.png",
