@@ -55,28 +55,10 @@ export const getUser = async (): Promise<UserOperationResult> => {
  * NÃO faz login - apenas cria a conta
  */
 export const createUser = async ({
-  isGuest,
   email,
   password,
-  name,
 }: CreateUserParams): Promise<UserOperationResult> => {
   try {
-    // Criar usuário guest
-    if (isGuest) {
-      const id = generateId();
-      if (!id) throw new Error('Failed to generate ID');
-
-      const newUserGuest: UserGuestType = {
-        id,
-        name,
-        is_guest: true,
-        created_at: new Date().toISOString(),
-      };
-
-      localUser$.set(newUserGuest);
-      return { user: newUserGuest };
-    }
-
     // Criar usuário autenticado (signup no Supabase)
     if (!email || !password) {
       throw new Error('Email and password are required for authenticated user');
@@ -85,9 +67,6 @@ export const createUser = async ({
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { name },
-      },
     });
 
     if (error) throw error;
@@ -293,37 +272,21 @@ export const syncUserWithSupabase = async (): Promise<UserOperationResult> => {
  * Função separada para criação explícita pela UI
  */
 export const createGuestUser = async (name?: string): Promise<UserOperationResult> => {
-  return createUser({ isGuest: true, name });
-};
+  try {
+    const id = generateId();
+    if (!id) throw new Error('Failed to generate ID');
 
-// ============================================================================
-// LEGACY FUNCTIONS - Manter temporariamente para compatibilidade
-// ============================================================================
+    const newUserGuest: UserGuestType = {
+      id,
+      name,
+      is_guest: true,
+      created_at: new Date().toISOString(),
+    };
 
-/**
- * @deprecated Use createGuestUser() instead
- */
-export const createUserGuest = async ({
-  isGuest,
-  email,
-  password,
-}: {
-  isGuest?: boolean;
-  email?: string;
-  password?: string;
-}): Promise<{ newUser: UserType }> => {
-  const result = await createUser({ isGuest, email, password });
-  return { newUser: result.user };
-};
-
-/**
- * @deprecated Use updateUser() instead
- */
-export const updateUserGuest = async ({
-  id,
-}: {
-  id: string;
-}): Promise<{ updatedUser: UserType }> => {
-  const result = await updateUser({ id });
-  return { updatedUser: result.user };
+    localUser$.set(newUserGuest);
+    return { user: newUserGuest };
+  } catch (error) {
+    console.error('Error creating guest user:', error);
+    return { user: null };
+  }
 };

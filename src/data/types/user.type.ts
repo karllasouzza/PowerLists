@@ -14,10 +14,8 @@ export interface UserGuestType {
 
 // Parâmetros para createUser unificado
 export interface CreateUserParams {
-  isGuest?: boolean;
   email?: string;
   password?: string;
-  name?: string;
 }
 
 // Parâmetros para updateUser

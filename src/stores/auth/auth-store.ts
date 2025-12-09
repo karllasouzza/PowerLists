@@ -179,14 +179,14 @@ export const useAuthStore = create<AuthStore>()(
        * Cria nova conta
        * Usa createUser() de user.actions.ts
        */
-      signUp: async (name: string, email: string, password: string) => {
+      signUp: async (email: string, password: string) => {
         try {
           set({ isLoading: true });
 
           const currentUser = get().user;
 
           // Cria usuário usando função centralizada
-          const result = await createUser({ email, password, name });
+          const result = await createUser({ email, password });
 
           if (!result.user) {
             throw new Error(result.error || 'Signup failed');
