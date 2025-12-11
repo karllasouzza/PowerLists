@@ -5,9 +5,10 @@ import { observable } from '@legendapp/state';
 import { supabase } from '@/lib/supabase';
 import { generateId } from '../utils';
 import humps from 'humps';
-import type { ListType, CreateNewListProps, UpdateListProps } from '../types';
+import type { ProfileType, CreateProfileType, UpdateProfileType } from '../types/profile.type';
 import { configureSynced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
+import { getCurrentUserId } from '../database';
 
 // Configure LegendApp Supabase sync
 configureSyncedSupabase({
@@ -24,134 +25,151 @@ const customSynced = configureSynced(syncedSupabase, {
   changesSince: 'last-sync',
   fieldCreatedAt: 'created_at',
   fieldUpdatedAt: 'updated_at',
-  // Optionally enable soft deletes
-  fieldDeleted: 'deleted_at',
 });
 
-// Get current user ID synchronously from cache or return empty
-let cachedUserId = '';
-
-// Initialize user ID
-supabase.auth.getUser().then(({ data: { user } }) => {
-  cachedUserId = user?.id || '';
-});
-
-// Create observable for lists with Supabase sync
-export const lists$ = observable(
+// Create observable for profiles with Supabase sync
+export const profiles$ = observable(
   customSynced({
-    collection: 'lists',
+    collection: 'profiles',
     select: (from: any) => from.select('*'),
-    filter: (select: any) => select.eq('profile_id', cachedUserId),
+    filter: (select: any) => select.eq('user_id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
-    persist: { name: 'lists', retrySync: true },
+    persist: { name: 'profiles', retrySync: true },
     changesSince: 'last-sync',
   })
 );
 
 // Initialize sync by getting the observable
-lists$.get();
+profiles$.get();
 
 /**
- * Get all lists for the current user
+ * Get the profile for the current user
  */
-export const getAllLists = async (): Promise<{ results: ListType[] | null }> => {
+export const getProfile = async (): Promise<{ profile: ProfileType | null }> => {
   try {
-    const listsData = lists$.get();
-    const listsArray = Object.values(listsData || {});
-    // Convert snake_case to camelCase
-    const camelizedLists = humps.camelizeKeys(listsArray) as ListType[];
-    return { results: camelizedLists };
+    const profilesData = profiles$.get();
+    const profilesArray = Object.values(profilesData || {});
+
+    if (profilesArray.length === 0) {
+      return { profile: null };
+    }
+
+    // Since user_id has a unique constraint, there should only be one profile per user
+    const profile = humps.camelizeKeys(profilesArray[0]) as ProfileType;
+    return { profile };
   } catch (error) {
-    console.error('Error getting lists:', error);
-    return { results: null };
+    console.error('Error getting profile:', error);
+    return { profile: null };
   }
 };
 
 /**
- * Create a new list
+ * Create a new profile for the current user
  */
-export const createNewList = async ({
-  title,
-  accentColor,
-  icon,
-}: Omit<CreateNewListProps, 'profileId'>): Promise<{ newList: ListType | null }> => {
+export const createProfile = async ({
+  name,
+  avatarUrl,
+  bio,
+}: CreateProfileType): Promise<{ profile: ProfileType | null }> => {
   try {
-    if (!cachedUserId) throw new Error('User not authenticated');
-    if (!title || !accentColor || !icon) throw new Error('Missing required fields');
+    const currentUserId = getCurrentUserId();
+    if (!currentUserId) throw new Error('User not authenticated');
+    if (!name) throw new Error('Name is required');
 
     const id = generateId();
 
     // Convert to snake_case for Supabase
     const payload = humps.decamelizeKeys({
       id,
-      profileId: cachedUserId,
-      title,
-      accentColor,
-      icon,
+      userId: getCurrentUserId(),
+      name,
+      avatarUrl: avatarUrl || null,
+      bio: bio || null,
       createdAt: new Date().toISOString(),
     });
-    if (!payload) throw new Error('Failed to create list');
+
+    if (!payload) throw new Error('Failed to create profile');
 
     // Add to observable - this will trigger sync to Supabase
-    lists$[id].set(payload as any);
+    profiles$[id].set(payload as any);
 
     // Return camelCase version
-    const newList: ListType = {
+    const newProfile: ProfileType = {
       id,
-      profileId: cachedUserId,
-      title,
-      accentColor,
-      icon,
+      userId: currentUserId,
+      name,
+      avatarUrl: avatarUrl || '',
+      bio: bio || '',
       createdAt: new Date().toISOString(),
     };
 
-    return { newList };
+    return { profile: newProfile };
   } catch (error) {
-    console.error('Error creating list:', error);
-    return { newList: null };
+    console.error('Error creating profile:', error);
+    return { profile: null };
   }
 };
 
 /**
- * Update an existing list
+ * Update the profile for the current user
  */
-export const updateList = async ({
-  id,
-  title,
-  accentColor,
-  icon,
-}: Omit<UpdateListProps, 'profileId' | 'createdAt'>): Promise<{ editList: ListType | null }> => {
+export const updateProfile = async ({
+  name,
+  avatarUrl,
+  bio,
+}: UpdateProfileType): Promise<{ profile: ProfileType | null }> => {
   try {
-    if (!id || !title || !accentColor || !icon) throw new Error('Missing required fields');
+    if (!name) throw new Error('Name is required');
+
+    // Get the current profile to find its ID
+    const { profile: currentProfile } = await getProfile();
+    if (!currentProfile?.id) {
+      throw new Error('Profile not found');
+    }
+
+    const profileId = currentProfile.id;
 
     // Update in observable using snake_case - this will trigger sync to Supabase
-    lists$[id].title.set(title);
-    lists$[id].accent_color.set(accentColor);
-    lists$[id].icon.set(icon);
+    profiles$[profileId].name.set(name);
 
-    const updatedListRaw = lists$[id].get();
-    const updatedList = humps.camelizeKeys(updatedListRaw) as ListType;
+    if (avatarUrl !== undefined) {
+      profiles$[profileId].avatar_url.set(avatarUrl || null);
+    }
 
-    return { editList: updatedList };
+    if (bio !== undefined) {
+      profiles$[profileId].bio.set(bio || null);
+    }
+
+    // Set updated_at timestamp
+    profiles$[profileId].updated_at.set(new Date().toISOString());
+
+    const updatedProfileRaw = profiles$[profileId].get();
+    const updatedProfile = humps.camelizeKeys(updatedProfileRaw) as ProfileType;
+
+    return { profile: updatedProfile };
   } catch (error) {
-    console.error('Error updating list:', error);
-    return { editList: null };
+    console.error('Error updating profile:', error);
+    return { profile: null };
   }
 };
 
 /**
- * Delete a list
+ * Delete the profile for the current user
  */
-export const deleteList = async ({ id }: { id: string }): Promise<boolean> => {
+export const deleteProfile = async (): Promise<boolean> => {
   try {
-    if (!id) throw new Error('Missing required fields');
+    // Get the current profile to find its ID
+    const { profile: currentProfile } = await getProfile();
+    if (!currentProfile?.id) {
+      throw new Error('Profile not found');
+    }
 
     // Delete from observable - this will trigger sync to Supabase
-    lists$[id].delete();
+    profiles$[currentProfile.id].delete();
 
     return true;
   } catch (error) {
-    console.error('Error deleting list:', error);
+    console.error('Error deleting profile:', error);
     return false;
   }
 };

@@ -137,16 +137,10 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <View
-        className="h-full w-full"
-        style={{
-          backgroundColor: bars?.color || defaultBarsProps.color,
-        }}>
-        <FocusAwareBars style={bars?.style || defaultBarsProps.style} />
+      <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
+        <FocusAwareBars style={bars?.style || defaultBarsProps.style} colorScheme={scheme} />
         <SafeAreaView>
-          <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
-            {children}
-          </View>
+          <View className="h-full w-full">{children}</View>
         </SafeAreaView>
       </View>
     </ThemeContext.Provider>

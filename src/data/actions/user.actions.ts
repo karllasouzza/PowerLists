@@ -1,5 +1,3 @@
-'use server';
-
 import { observable } from '@legendapp/state';
 import { supabase } from '@/lib/supabase';
 import { generateId } from '../utils';
@@ -10,6 +8,7 @@ import type {
   UpdateUserParams,
   UserOperationResult,
 } from '../types/user.type';
+import { AuthError } from '@supabase/supabase-js';
 
 /**
  * Observable para usuário local (fonte única de verdade)
@@ -83,7 +82,10 @@ export const createUser = async ({
     return { user: newUser };
   } catch (error) {
     console.error('Error creating user:', error);
-    return { user: null, error: error instanceof Error ? error.message : 'Unknown error' };
+    return {
+      user: null,
+      error: error instanceof Error || error instanceof AuthError ? error.message : 'Unknown error',
+    };
   }
 };
 
@@ -213,6 +215,8 @@ export const loginUser = async (email: string, password: string): Promise<UserOp
       password,
     });
 
+    console.log(error?.message);
+
     if (error) throw error;
     if (!data.user) throw new Error('Login failed');
 
@@ -288,5 +292,17 @@ export const createGuestUser = async (name?: string): Promise<UserOperationResul
   } catch (error) {
     console.error('Error creating guest user:', error);
     return { user: null };
+  }
+};
+
+export const logOutUser = async () => {
+  try {
+    await supabase.auth.signOut();
+    localUser$.set(null);
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error logging out user:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error' };
   }
 };
