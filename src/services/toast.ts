@@ -1,6 +1,6 @@
 import { toast } from 'sonner-native';
 
-interface ToastOptions {
+export interface IToastOptionsType {
   type: 'success' | 'error' | 'info' | 'warning';
   title: string;
   subtitle?: string;
@@ -21,7 +21,7 @@ interface ToastOptions {
  * });
  * ```
  */
-export const showToast = ({ type, title, subtitle, duration }: ToastOptions): void => {
+export const showToast = ({ type, title, subtitle, duration }: IToastOptionsType): void => {
   const description = subtitle;
 
   switch (type) {

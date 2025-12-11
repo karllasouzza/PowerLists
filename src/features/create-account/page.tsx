@@ -79,7 +79,7 @@ export default function CreateAccountScreen() {
               name="email"
               render={({ field, ...props }) => (
                 <View className="w-full flex-col gap-2">
-                  <Label htmlFor="email">*Email:</Label>
+                  <Label htmlFor="email">*Email</Label>
                   <Input
                     id="email"
                     placeholder="seu@email.com"
@@ -104,7 +104,7 @@ export default function CreateAccountScreen() {
               name="password"
               render={({ field, ...props }) => (
                 <View className="w-full flex-col gap-2">
-                  <Label htmlFor="password">*Senha:</Label>
+                  <Label htmlFor="password">*Senha</Label>
                   <View className="flex-row items-center gap-2">
                     <Input
                       autoComplete="off"
@@ -136,8 +136,14 @@ export default function CreateAccountScreen() {
             className="w-full"
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}>
-            {isLoading && <IconLoader2 className="mr-2 animate-spin" size={20} />}
-            <IconUserPlus className="mr-2" size={20} />
+            {isLoading && (
+              <Icon
+                as={IconLoader2}
+                className="mr-2 animate-spin text-primary-foreground"
+                size={20}
+              />
+            )}
+            <IconUserPlus className="mr-2 text-primary-foreground" size={20} />
             <Text variant="large" className="font-bold">
               Criar Conta
             </Text>
@@ -155,9 +161,9 @@ export default function CreateAccountScreen() {
 
         <View className="w-full flex-row items-center justify-center gap-4 px-4">
           <View className="h-[1px] w-full bg-border" />
-          <Button variant="link" className="w-full" onPress={handleGuest}>
-            <Icon as={HatGlasses} size={20} />
-            <Text className="font-bold">Continuar com conta local</Text>
+          <Button variant="link" className="w-max p-0" onPress={handleGuest}>
+            <Icon as={HatGlasses} className="text-secondary-foreground" size={20} />
+            <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
           </Button>
           <View className="h-[1px] w-full bg-border" />
         </View>

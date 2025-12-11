@@ -13,6 +13,7 @@ import {
   loginUser,
   syncUserWithSupabase,
   createGuestUser,
+  softDeleteUser,
 } from '@/data/actions/user.actions';
 
 /**
@@ -162,7 +163,9 @@ export const useAuthStore = create<AuthStore>()(
             title: 'Sucesso!',
             subtitle: 'Login realizado com sucesso',
           });
+          return true;
         } catch (error) {
+          console.log(error);
           set({ isLoading: false });
 
           showToast({
@@ -171,7 +174,7 @@ export const useAuthStore = create<AuthStore>()(
             subtitle: error instanceof Error ? error.message : 'Email ou senha inválido!',
           });
 
-          throw error;
+          return false;
         }
       },
 
@@ -237,12 +240,8 @@ export const useAuthStore = create<AuthStore>()(
 
           await supabase.auth.signOut();
 
-          // Marca usuário atual como guest (se existir)
           if (currentUser) {
-            const updatedUser = await updateUser({
-              id: currentUser.id,
-              is_guest: true,
-            });
+            const updatedUser = await softDeleteUser(currentUser.id);
 
             set({
               user: updatedUser.user,
@@ -278,7 +277,7 @@ export const useAuthStore = create<AuthStore>()(
       /**
        * Envia email de recuperação de senha
        */
-      resetPassword: async (email: string) => {
+      sendResetPasswordByEmail: async (email: string) => {
         try {
           set({ isLoading: true });
 
@@ -286,15 +285,14 @@ export const useAuthStore = create<AuthStore>()(
 
           if (error) throw error;
 
-          set({ isLoading: false });
-
           showToast({
             type: 'success',
             title: 'Sucesso!',
             subtitle: 'Email de recuperação enviado!',
           });
+          return true;
         } catch (error) {
-          set({ isLoading: false });
+          console.error(error);
 
           showToast({
             type: 'error',
@@ -302,7 +300,41 @@ export const useAuthStore = create<AuthStore>()(
             subtitle: 'Tente novamente mais tarde!',
           });
 
-          throw error;
+          return false;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      /**
+       * Update user password
+       */
+      resetPassword: async (password: string) => {
+        try {
+          set({ isLoading: true });
+
+          const { error } = await supabase.auth.updateUser({ password });
+
+          if (error) throw error;
+
+          showToast({
+            type: 'success',
+            title: 'Sucesso!',
+            subtitle: 'Senha atualizada!',
+          });
+          return true;
+        } catch (error) {
+          console.error(error);
+
+          showToast({
+            type: 'error',
+            title: 'Erro ao atualizar senha!',
+            subtitle: 'Tente novamente mais tarde!',
+          });
+
+          return false;
+        } finally {
+          set({ isLoading: false });
         }
       },
 

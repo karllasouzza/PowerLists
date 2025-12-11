@@ -38,7 +38,8 @@ export default function LoginScreen() {
 
   const onSubmit = async (data: LoginSchemaType) => {
     try {
-      await signIn(data.email, data.password);
+      const success = await signIn(data.email, data.password);
+      if (!success) throw new Error('Erro no login');
       router.replace('/(tabs)');
     } catch (error) {
       console.error('Erro no login:', error);
@@ -51,6 +52,10 @@ export default function LoginScreen() {
 
   const handleGuest = () => {
     router.navigate('/guest');
+  };
+
+  const handleRecoveryPassword = () => {
+    router.navigate('/request-password-recovery');
   };
 
   return (
@@ -72,14 +77,14 @@ export default function LoginScreen() {
       </View>
 
       <View className="w-full flex-1 flex-col items-center gap-6 px-8 py-4">
-        <View className="w-full flex-1 flex-col items-center justify-center gap-6">
-          <View className="w-full flex-col gap-4">
+        <View className="w-full flex-1 flex-col items-center justify-center gap-12">
+          <View className="w-full flex-col gap-8">
             <Controller
               control={control}
               name="email"
               render={({ field, ...props }) => (
-                <View className="w-full flex-col gap-2">
-                  <Label htmlFor="email">*Email:</Label>
+                <View className="w-full flex-col gap-4">
+                  <Label htmlFor="email">*Email</Label>
                   <Input
                     id="email"
                     placeholder="seu@email.com"
@@ -104,7 +109,17 @@ export default function LoginScreen() {
               name="password"
               render={({ field, ...props }) => (
                 <View className="w-full flex-col gap-2">
-                  <Label htmlFor="password">*Senha:</Label>
+                  <View className="flex-row items-center justify-between">
+                    <Label htmlFor="password">*Senha</Label>
+                    <Button
+                      variant="link"
+                      className="p-0! h-max w-max"
+                      onPress={handleRecoveryPassword}>
+                      <Text variant="small" className="p-0! text-primary">
+                        Esqueceu sua senha?
+                      </Text>
+                    </Button>
+                  </View>
                   <View className="flex-row items-center gap-2">
                     <Input
                       autoComplete="off"
@@ -136,8 +151,14 @@ export default function LoginScreen() {
             className="w-full"
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}>
-            {isLoading && <IconLoader2 className="mr-2 animate-spin" size={20} />}
-            <Icon as={LogIn} className="mr-2" size={20} />
+            {isLoading && (
+              <Icon
+                as={IconLoader2}
+                className="mr-2 animate-spin text-primary-foreground"
+                size={20}
+              />
+            )}
+            <Icon as={LogIn} className="mr-2 text-primary-foreground" size={20} />
             <Text variant="large" className="font-bold">
               Entrar
             </Text>
@@ -155,9 +176,9 @@ export default function LoginScreen() {
 
         <View className="w-full flex-row items-center justify-center gap-4 px-4">
           <View className="h-[1px] w-full bg-border" />
-          <Button variant="link" className="w-full" onPress={handleGuest}>
-            <Icon as={HatGlasses} size={20} />
-            <Text className="font-bold">Continuar com conta local</Text>
+          <Button variant="link" className="w-max p-0" onPress={handleGuest}>
+            <Icon as={HatGlasses} className="text-secondary-foreground" size={20} />
+            <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
           </Button>
           <View className="h-[1px] w-full bg-border" />
         </View>

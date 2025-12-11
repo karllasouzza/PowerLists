@@ -59,8 +59,8 @@ export default function AuthScreen() {
           </View>
 
           <Button variant="ghost" className="h-12 w-full" onPress={handleGuest}>
-            <Icon as={HatGlasses} className="text-primary" size={20} />
-            <Text className="font-bold text-primary">Continuar com conta local</Text>
+            <Icon as={HatGlasses} className="text-secondary-foreground" size={20} />
+            <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
           </Button>
         </View>
       </View>
