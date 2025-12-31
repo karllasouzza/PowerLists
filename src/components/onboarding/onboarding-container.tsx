@@ -13,7 +13,7 @@ export const OnboardingContainer = ({
   completeOnboarding,
   goToSlide,
 }: SlidesProps) => {
-  const { setBars } = useTheme();
+  const { setBars, color } = useTheme();
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList<any>>(null);
 
@@ -78,7 +78,7 @@ export const OnboardingContainer = ({
   };
 
   return (
-    <View className="h-full w-full flex-1">
+    <View className="h-full w-full flex-1" style={{ backgroundColor: color }}>
       <Animated.FlatList
         ref={flatListRef}
         data={slide_pages}

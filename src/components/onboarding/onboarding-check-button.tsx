@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
-import { IOnboardingCheckButtonProps } from './onboarding.types';
+import { IOnboardingCheckButtonProps } from './types';
 import { Text } from '../ui/text';
 
 export const OnboardingCheckButton = ({
