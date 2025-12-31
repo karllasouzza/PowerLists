@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 import { MigrationResult } from '@/stores/auth';
-import { lists$ } from '@/data/actions/lists.actions';
-import { showToast } from '../toast';
+import { lists$ } from '@/data/actions/lists';
+import { showToast } from './toast';
 
 /**
  * Serviço responsável pela migração de dados entre usuários

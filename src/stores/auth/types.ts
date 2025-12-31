@@ -1,4 +1,4 @@
-import { UserType } from '@/data/types/user.type';
+import { UserType } from '@/data/types/user';
 import type { Session } from '@supabase/supabase-js';
 
 export interface AuthState {

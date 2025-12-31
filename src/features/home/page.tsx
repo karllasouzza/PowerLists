@@ -8,7 +8,7 @@ import { CardList } from '@/components/card-list';
 import NewListItem from '@/components/new-list-item';
 import { useTheme } from '@/context/themes/use-themes';
 import { themes } from '@/context/themes/theme-config';
-import { lists$ } from '@/data/actions/lists.actions';
+import { lists$ } from '@/data/actions/lists';
 
 import { HomeScreenProps } from './types';
 import { useHomeState } from './hooks/use-home-state';

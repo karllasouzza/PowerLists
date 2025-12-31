@@ -1,1 +1,1 @@
-export * from './login.shems';
+export * from './shema';

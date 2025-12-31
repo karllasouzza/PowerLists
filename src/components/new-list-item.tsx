@@ -26,7 +26,7 @@ import {
   IconBook,
   IconChefHat,
 } from '@tabler/icons-react-native';
-import { createNewListItem, updateListItem } from '@/data/actions/list-items.actions';
+import { createNewListItem, updateListItem } from '@/data/actions/list-items';
 
 // Schema de validação para Items
 const itemFormSchema = z.object({

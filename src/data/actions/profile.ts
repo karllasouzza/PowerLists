@@ -5,7 +5,7 @@ import { observable } from '@legendapp/state';
 import { supabase } from '@/lib/supabase';
 import { generateId } from '../utils';
 import humps from 'humps';
-import type { ProfileType, CreateProfileType, UpdateProfileType } from '../types/profile.type';
+import type { ProfileType, CreateProfileType, UpdateProfileType } from '../types/profile';
 import { configureSynced } from '@legendapp/state/sync';
 import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 import { getCurrentUserId } from '../database';

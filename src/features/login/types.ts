@@ -1,4 +1,4 @@
 import { z } from 'zod/mini';
-import { LoginSchema } from '../utils';
+import { LoginSchema } from './utils';
 
 export type LoginSchemaType = z.infer<typeof LoginSchema>;

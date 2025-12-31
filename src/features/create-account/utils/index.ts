@@ -1,1 +1,1 @@
-export * from './create-account.schema';
+export * from './schema';

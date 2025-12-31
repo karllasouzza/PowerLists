@@ -1,4 +1,4 @@
-import type { Database as DatabaseGenerated } from './database.types';
+import type { Database as DatabaseGenerated } from './database';
 import type { MergeDeep } from 'type-fest';
 
 // Define custom types that match the database schema (snake_case)

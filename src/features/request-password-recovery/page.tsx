@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View } from 'react-native';
 import { IconLoader2 } from '@tabler/icons-react-native';
 import { useForm, Controller } from 'react-hook-form';
@@ -7,25 +7,39 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail } from 'lucide-react-native';
 
+import { useCountdown } from '@/hooks/use-countdown';
+import { useAuthStore } from '@/stores/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useAuthStore } from '@/stores/auth';
-
 import { Icon } from '@/components/ui/icon';
 import { Label } from '@/components/ui/label';
+
 import { RequestPasswordRecoverySchema } from '.';
 import { RequestPasswordRecoverySchemaType } from './types';
 import { errorsCase } from './utils';
 
+type LatestShipments = {
+  date: Date;
+  email: string;
+  success: boolean;
+};
+
 export default function PasswordRecoveryScreen() {
   const { sendResetPasswordByEmail, isLoading } = useAuthStore();
 
-  const [latestShipments, setLatestShipments] = React.useState<
-    { date: Date; email: string; success: boolean }[]
-  >([]);
+  const [latestShipments, setLatestShipments] = React.useState<LatestShipments[]>([]);
 
-  const SEND_EMAIL_DELAY = 120 * 1000;
+  const SEND_EMAIL_DELAY = 60 * 1000;
+
+  const lastShipment = latestShipments.at(-1);
+  const targetDate = useMemo(
+    () => (lastShipment ? new Date(lastShipment.date.getTime() + SEND_EMAIL_DELAY) : null),
+    [lastShipment]
+  );
+
+  const { formattedTime, timeLeft } = useCountdown(targetDate);
+  const isBlocked = timeLeft > 0;
 
   const {
     control,
@@ -49,9 +63,10 @@ export default function PasswordRecoveryScreen() {
         throw new Error('five-emails-per-hour');
       if (
         latestShipments.length &&
-        latestShipments[latestShipments.length - 1].date > new Date() &&
         latestShipments[latestShipments.length - 1].email === data.email &&
-        latestShipments[latestShipments.length - 1].success
+        latestShipments[latestShipments.length - 1].success &&
+        latestShipments[latestShipments.length - 1].date.getTime() + SEND_EMAIL_DELAY >
+          new Date().getTime()
       )
         throw new Error('one-email-per-minute');
 
@@ -92,49 +107,6 @@ export default function PasswordRecoveryScreen() {
       </View>
 
       <View className="w-full flex-1 flex-col items-center gap-6 px-8 py-4">
-        {latestShipments.at(-1)?.success && (
-          <View className="w-full flex-1 flex-col items-center justify-center gap-12">
-            <View className="w-full flex-col gap-8">
-              <Controller
-                control={control}
-                name="email"
-                render={({ field, ...props }) => (
-                  <View className="w-full flex-col gap-4">
-                    <Label htmlFor="email">*Email</Label>
-                    <Input
-                      id="email"
-                      placeholder="seu@email.com"
-                      autoComplete="email"
-                      keyboardType="email-address"
-                      autoCapitalize="none"
-                      value={field.value}
-                      readOnly={true}
-                      {...props}
-                    />
-                  </View>
-                )}
-              />
-            </View>
-
-            <Button
-              variant="default"
-              className="w-full"
-              onPress={handleSubmit(onSubmit)}
-              disabled={isLoading}>
-              {isLoading && (
-                <Icon
-                  as={IconLoader2}
-                  className="mr-2 animate-spin text-primary-foreground"
-                  size={20}
-                />
-              )}
-              <Icon as={Mail} className="mr-2 text-primary-foreground" size={20} />
-              <Text variant="large" className="font-bold">
-                Reenviar email de recuperação
-              </Text>
-            </Button>
-          </View>
-        )}
         <View className="w-full flex-1 flex-col items-center justify-center gap-12">
           <View className="w-full flex-col gap-8">
             <Controller
@@ -151,6 +123,7 @@ export default function PasswordRecoveryScreen() {
                     autoCapitalize="none"
                     value={field.value}
                     onChangeText={field.onChange}
+                    readOnly={isLoading || isBlocked}
                     {...props}
                   />
                   {errors.email && (
@@ -167,7 +140,7 @@ export default function PasswordRecoveryScreen() {
             variant="default"
             className="w-full"
             onPress={handleSubmit(onSubmit)}
-            disabled={isLoading}>
+            disabled={isLoading || isBlocked}>
             {isLoading && (
               <Icon
                 as={IconLoader2}
@@ -177,7 +150,11 @@ export default function PasswordRecoveryScreen() {
             )}
             <Icon as={Mail} className="mr-2 text-primary-foreground" size={20} />
             <Text variant="large" className="font-bold">
-              Enviar email de recuperação
+              {isBlocked
+                ? `Aguarde ${formattedTime} para reenviar`
+                : lastShipment
+                  ? 'Reenviar email de recuperação'
+                  : 'Enviar email de recuperação'}
             </Text>
           </Button>
         </View>

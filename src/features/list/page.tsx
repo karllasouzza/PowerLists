@@ -18,7 +18,7 @@ import {
   getListItemsByListId,
   toggleCheckListItem,
   deleteListItem,
-} from '@/data/actions/list-items.actions';
+} from '@/data/actions/list-items';
 
 import { ListItemsHeader, ListItemsFooter } from './components';
 import { calculateTotal, formatCurrency, separateItemsByStatus } from './utils';

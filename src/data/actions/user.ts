@@ -7,7 +7,7 @@ import type {
   CreateUserParams,
   UpdateUserParams,
   UserOperationResult,
-} from '../types/user.type';
+} from '../types/user';
 import { AuthError } from '@supabase/supabase-js';
 
 /**

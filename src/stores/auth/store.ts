@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AuthStore } from './auth.types';
-import { UserType, isGuestUser } from '@/data/types/user.type';
+import type { AuthStore } from './types';
+import { UserType, isGuestUser } from '@/data/types/user';
 import { supabase } from '@/lib/supabase';
-import { storage } from '@/data/storage';
-import { SyncService } from '@/services/sync/sync.service';
+import { mmkvStorage } from '@/data/storage';
+import { SyncService } from '@/services/sync';
 import { showToast } from '@/services/toast';
 import {
   getUser,
@@ -14,23 +14,13 @@ import {
   syncUserWithSupabase,
   createGuestUser,
   softDeleteUser,
-} from '@/data/actions/user.actions';
+} from '@/data/actions/user';
+import * as Linking from 'expo-linking';
 
 /**
  * Adapter para usar MMKV com Zustand persist
  */
-const mmkvStorage = createJSONStorage(() => ({
-  getItem: (name: string) => {
-    const value = storage.getString(name);
-    return value ?? null;
-  },
-  setItem: (name: string, value: string) => {
-    storage.set(name, value);
-  },
-  removeItem: (name: string) => {
-    storage.remove(name);
-  },
-}));
+const JSONStorageAdapterWithMMKV = createJSONStorage(() => mmkvStorage);
 
 /**
  * Store Zustand para gerenciamento de autenticação
@@ -128,7 +118,6 @@ export const useAuthStore = create<AuthStore>()(
 
       /**
        * Faz login com email e senha
-       * Usa loginUser() de user.actions.ts
        */
       signIn: async (email: string, password: string) => {
         try {
@@ -281,7 +270,11 @@ export const useAuthStore = create<AuthStore>()(
         try {
           set({ isLoading: true });
 
-          const { error } = await supabase.auth.resetPasswordForEmail(email);
+          const redirectUrl = Linking.createURL('password-recovery');
+
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl,
+          });
 
           if (error) throw error;
 
@@ -425,7 +418,7 @@ export const useAuthStore = create<AuthStore>()(
     }),
     {
       name: 'auth-storage',
-      storage: mmkvStorage,
+      storage: JSONStorageAdapterWithMMKV,
       partialize: (state) => ({
         user: state.user,
         session: state.session,

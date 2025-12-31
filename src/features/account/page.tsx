@@ -1,16 +1,15 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { IconUser, IconLogout } from '@tabler/icons-react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useAuthStore } from '@/stores/auth/auth-store';
-import { isGuestUser } from '@/data/types/user.type';
+import { useAuthStore } from '@/stores/auth/store';
+import { isGuestUser } from '@/data/types/user';
 import { Icon } from '@/components/ui/icon';
 
 export default function AccountScreen() {
   const { signOut, user } = useAuthStore();
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
+    <View className="flex-1 bg-background">
       <View className="bg-primary-container h-[28vh] flex-col justify-around pt-2.5">
         <View className="h-25 w-25 mx-auto items-center justify-center rounded-full bg-primary">
           <Icon as={IconUser} size={30} color="white" />
@@ -28,6 +27,6 @@ export default function AccountScreen() {
           <Text className="text-on-primary-container text-3xl capitalize">Sair</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

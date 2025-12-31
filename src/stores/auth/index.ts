@@ -1,2 +1,2 @@
-export * from './auth-store';
-export * from './auth.types';
+export * from './store';
+export * from './types';

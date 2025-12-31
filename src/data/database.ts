@@ -3,7 +3,7 @@ import { configureSynced } from '@legendapp/state/sync';
 import { configureSyncedSupabase, syncedSupabase } from '@legendapp/state/sync-plugins/supabase';
 import { generateId } from './utils';
 import { supabase } from '@/lib/supabase';
-import { localUser$ } from './actions/user.actions';
+import { localUser$ } from './actions/user';
 
 // Configure LegendApp Supabase sync
 configureSyncedSupabase({

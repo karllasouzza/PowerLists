@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from './types/database.types';
+import type { Database } from './types/database';
 import { mmkvStorage } from '@/data/storage';
 
 const SUPABASE_URL = process.env.SUPABASE_URL;

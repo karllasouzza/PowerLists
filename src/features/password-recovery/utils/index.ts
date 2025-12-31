@@ -1,1 +1,1 @@
-export * from './password-recovery.schema';
+export * from './schema';
