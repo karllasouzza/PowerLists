@@ -8,8 +8,9 @@ export interface ThemeProviderPropsT {
 }
 
 export interface ThemeContextT {
-  theme: keyof typeof themes;
+  color: string;
   colorScheme: 'light' | 'dark';
+  theme: keyof typeof themes;
   setTheme: (theme: keyof typeof themes) => void;
   setColorScheme: (scheme: 'light' | 'dark') => void;
   setBars: (bars: IFocusAwareBarsProps) => boolean;

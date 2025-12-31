@@ -5,9 +5,9 @@ import { useColorScheme } from 'nativewind';
 import { mmkvStorage } from '@/data/storage';
 import { themes, rawColors } from './theme-config';
 import { ThemeContext } from './theme-context';
-import { ThemeProviderPropsT } from './use-themes.types';
+import { ThemeProviderPropsT } from './types';
 import { FocusAwareBars, IFocusAwareBarsProps } from '@/components/focus-aware-bars';
-import { getTailwindColor, getThemeColorSafe, resolveColor } from '@/utils/tailwind-color.utils';
+import { getTailwindColor, getThemeColorSafe, resolveColor } from '@/utils/tailwind-color';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderPropsT) => {
@@ -77,15 +77,16 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
   }, []);
 
   const handleSetBars = useCallback(
-    (navigationBar: IFocusAwareBarsProps): boolean => {
+    (bars: IFocusAwareBarsProps): boolean => {
       try {
-        if (!navigationBar?.color) {
+        if (!bars?.color) {
           throw new Error('Navigation bar color is required');
         }
 
-        const color = resolveColor(navigationBar.color, rawColors[theme][scheme]);
+        const color = resolveColor(bars.color, rawColors[theme][scheme]);
+        console.log(color);
 
-        const style = navigationBar.style || (scheme === 'light' ? 'dark' : 'light');
+        const style = bars.style || (scheme === 'light' ? 'dark' : 'light');
 
         setBars({
           color,
@@ -104,6 +105,7 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     () => ({
       theme,
       colorScheme: scheme,
+      color: bars?.color || '',
       setTheme: handleSetThemeAndSaveOnStorage,
       setColorScheme: handleSetColorSchemeAndSaveOnStorage,
       setBars: handleSetBars,
@@ -111,6 +113,7 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
     [
       theme,
       scheme,
+      bars,
       handleSetBars,
       handleSetColorSchemeAndSaveOnStorage,
       handleSetThemeAndSaveOnStorage,
@@ -137,7 +140,9 @@ const ThemeProvider = ({ children, name, customColorScheme }: ThemeProviderProps
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <View className="h-full w-full bg-background" style={themes[theme][scheme]}>
+      <View
+        className="h-full w-full bg-background"
+        style={{ ...themes[theme][scheme], backgroundColor: bars?.color }}>
         <FocusAwareBars style={bars?.style || defaultBarsProps.style} colorScheme={scheme} />
         <SafeAreaView>
           <View className="h-full w-full">{children}</View>
