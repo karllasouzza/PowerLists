@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "PowerLists",
-    "scheme": "powerlists",
-    "slug": "powerlists",
+    "scheme": "com.karllasouzza.powerLists",
+    "slug": "com.karllasouzza.powerLists",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/adaptive-icon.png",
@@ -61,7 +61,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.karllasouzza.PowerLists",
+      "package": "com.karllasouzza.powerLists",
       "permissions": [
         "android.permission.CAMERA"
       ],
