@@ -8,36 +8,24 @@ import type {
   UpdateUserParams,
   UserOperationResult,
 } from '../types/user';
-import { AuthError } from '@supabase/supabase-js';
+import { AuthError, AuthUser } from '@supabase/supabase-js';
 
-/**
- * Observable para usuário local (fonte única de verdade)
- * Sincronizado com MMKV e Supabase
- */
 export const localUser$ = observable<UserType>(null);
 
-// Initialize observable
 localUser$.get();
 
-/**
- * Obtém o usuário atual
- * Prioridade: localUser$ → Supabase → null
- */
 export const getUser = async (): Promise<UserOperationResult> => {
   try {
-    // 1. Verifica localUser$ primeiro
-    const userData = localUser$.get();
-    if (userData) {
-      return { user: userData };
+    const localUserData = localUser$.get();
+    if (localUserData) {
+      return { user: localUserData };
     }
 
-    // 2. Se não tem local, verifica Supabase
     const {
       data: { user: supabaseUser },
     } = await supabase.auth.getUser();
 
     if (supabaseUser) {
-      // Sincroniza com local
       localUser$.set(supabaseUser);
       return { user: supabaseUser };
     }
@@ -49,16 +37,11 @@ export const getUser = async (): Promise<UserOperationResult> => {
   }
 };
 
-/**
- * Cria um novo usuário (guest ou autenticado via signup)
- * NÃO faz login - apenas cria a conta
- */
 export const createUser = async ({
   email,
   password,
 }: CreateUserParams): Promise<UserOperationResult> => {
   try {
-    // Criar usuário autenticado (signup no Supabase)
     if (!email || !password) {
       throw new Error('Email and password are required for authenticated user');
     }
@@ -71,7 +54,6 @@ export const createUser = async ({
     if (error) throw error;
     if (!data.user) throw new Error('User not created');
 
-    // Salva usuário do Supabase localmente
     const newUser = {
       ...data.user,
       is_guest: false,
@@ -89,19 +71,19 @@ export const createUser = async ({
   }
 };
 
-/**
- * Atualiza um usuário existente
- * Atualiza local sempre, e Supabase se não for guest
- */
-export const updateUser = async (params: UpdateUserParams): Promise<UserOperationResult> => {
+export const updateUser = async ({
+  id,
+  ...updates
+}: UpdateUserParams): Promise<UserOperationResult> => {
   try {
-    const { id, ...updates } = params;
+    if (!id) throw new Error('User ID is required');
+    if (!updates) throw new Error('Updates are required');
 
-    // Pega usuário atual
     const currentUserData = localUser$.get();
-    if (!currentUserData) throw new Error('No user to update');
+    if (!currentUserData) {
+      return { user: null };
+    }
 
-    // Atualiza localmente
     const updatedUser = {
       ...currentUserData,
       ...updates,
@@ -109,7 +91,6 @@ export const updateUser = async (params: UpdateUserParams): Promise<UserOperatio
 
     localUser$.set(updatedUser);
 
-    // Se não for guest, atualiza no Supabase também
     if (!updatedUser.is_guest && updates.email) {
       const { error } = await supabase.auth.updateUser({
         email: updates.email,
@@ -117,7 +98,6 @@ export const updateUser = async (params: UpdateUserParams): Promise<UserOperatio
 
       if (error) {
         console.error('Error updating user in Supabase:', error);
-        // Não falha - mantém atualização local
       }
     }
 
@@ -128,12 +108,10 @@ export const updateUser = async (params: UpdateUserParams): Promise<UserOperatio
   }
 };
 
-/**
- * Soft delete - marca usuário como deletado
- * Preenche deleted_at tanto local quanto Supabase
- */
 export const softDeleteUser = async (id: string): Promise<UserOperationResult> => {
   try {
+    if (!id) throw new Error('User ID is required');
+
     const currentUser = localUser$.get();
     if (!currentUser || currentUser.id !== id) {
       throw new Error('User not found or ID mismatch');
@@ -141,7 +119,6 @@ export const softDeleteUser = async (id: string): Promise<UserOperationResult> =
 
     const deletedAt = new Date().toISOString();
 
-    // Atualiza localmente
     const updatedUser = {
       ...currentUser,
       deleted_at: deletedAt,
@@ -149,8 +126,6 @@ export const softDeleteUser = async (id: string): Promise<UserOperationResult> =
 
     localUser$.set(updatedUser);
 
-    // Se não for guest, marca como deletado no Supabase também
-    // Type guard: verifica se tem propriedade is_guest
     const isGuest = 'is_guest' in currentUser && currentUser.is_guest;
 
     if (!isGuest) {
@@ -170,27 +145,24 @@ export const softDeleteUser = async (id: string): Promise<UserOperationResult> =
   }
 };
 
-/**
- * Hard delete - remove usuário permanentemente
- */
 export const hardDeleteUser = async (id: string): Promise<{ success: boolean; error?: string }> => {
   try {
+    if (!id) throw new Error('User ID is required');
+
     const currentUser = localUser$.get();
     if (!currentUser || currentUser.id !== id) {
       throw new Error('User not found or ID mismatch');
     }
-
-    // Type guard: verifica se tem propriedade is_guest
     const isGuest = 'is_guest' in currentUser && currentUser.is_guest;
 
-    // Se não for guest, deleta do Supabase
     if (!isGuest) {
-      // Nota: Supabase não permite delete de usuário via client SDK
-      // Isso deve ser feito via Admin API ou Database Function
-      console.warn('Hard delete for authenticated users must be done via Admin API');
+      const { error } = await supabase.functions.invoke('user-self-deletion');
+
+      if (error) {
+        console.error('Error hard deleting user in Supabase:', error);
+      }
     }
 
-    // Remove localmente
     localUser$.set(null);
 
     return { success: true };
@@ -200,28 +172,20 @@ export const hardDeleteUser = async (id: string): Promise<{ success: boolean; er
   }
 };
 
-/**
- * Realiza login no Supabase e sincroniza usuário local
- */
 export const loginUser = async (email: string, password: string): Promise<UserOperationResult> => {
   try {
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
 
-    // Faz login no Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
-    console.log(error?.message);
-
     if (error) throw error;
     if (!data.user) throw new Error('Login failed');
 
-    // Sincroniza com usuário local
-    const syncedUser = await syncUserWithSupabase();
+    const syncedUser = await syncUserWithSupabase({ user: data.user });
 
     return syncedUser;
   } catch (error) {
@@ -230,22 +194,27 @@ export const loginUser = async (email: string, password: string): Promise<UserOp
   }
 };
 
-/**
- * Sincroniza usuário local com dados do Supabase
- * NÃO faz login - apenas pega dados do usuário já autenticado
- */
-export const syncUserWithSupabase = async (): Promise<UserOperationResult> => {
+export const syncUserWithSupabase = async ({
+  user,
+}: {
+  user?: AuthUser;
+}): Promise<UserOperationResult> => {
   try {
-    // Pega dados do usuário autenticado do Supabase
-    const {
-      data: { user: supabaseUser },
-    } = await supabase.auth.getUser();
+    let supabaseUser = user;
+
+    if (!user) {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        throw new Error('No authenticated user in Supabase');
+      }
+
+      supabaseUser = data.user;
+    }
 
     if (!supabaseUser) {
       throw new Error('No authenticated user in Supabase');
     }
 
-    // Atualiza usuário local com dados do Supabase
     const syncedUser = await updateUser({
       id: supabaseUser.id,
       email: supabaseUser.email,
@@ -253,7 +222,6 @@ export const syncUserWithSupabase = async (): Promise<UserOperationResult> => {
       synchronized_at: new Date().toISOString(),
     });
 
-    // Se updateUser retornou null, usa dados do Supabase diretamente
     if (!syncedUser.user) {
       const userWithSync = {
         ...supabaseUser,
@@ -271,10 +239,6 @@ export const syncUserWithSupabase = async (): Promise<UserOperationResult> => {
   }
 };
 
-/**
- * Cria um usuário guest
- * Função separada para criação explícita pela UI
- */
 export const createGuestUser = async (name?: string): Promise<UserOperationResult> => {
   try {
     const id = generateId();

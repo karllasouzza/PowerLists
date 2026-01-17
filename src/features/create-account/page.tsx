@@ -38,10 +38,10 @@ export default function CreateAccountScreen() {
 
   const onSubmit = async (data: CreateAccountSchemaType) => {
     try {
-      await signUp(data.email, data.password);
+      await signUp({ email: data.email, password: data.password });
       router.push('/(tabs)');
     } catch (error) {
-      console.error('Erro ao criar conta:', error);
+      console.error('Error on signUp:', error);
     }
   };
 

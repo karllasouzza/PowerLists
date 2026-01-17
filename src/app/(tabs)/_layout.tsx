@@ -1,21 +1,13 @@
 import React, { useEffect } from 'react';
-import { Tabs, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { NativeTabs, Icon, Label, Badge, VectorIcon } from 'expo-router/unstable-native-tabs';
 
-import { useAuthStore } from '@/stores/auth';
 import { getProfile } from '@/data/actions/profile';
 import '@/css/global.css';
+import { HomeIcon, SettingsIcon, UserIcon } from 'lucide-react-native';
 
 export default function RootLayout() {
-  const { user } = useAuthStore();
-
   const router = useRouter();
-
-  useEffect(() => {
-    if (!user) {
-      // Redirect to the index page if the user is not authenticated and trying to access the tabs
-      router.replace('/');
-    }
-  }, [user, router]);
 
   useEffect(() => {
     const init = async () => {
@@ -28,9 +20,22 @@ export default function RootLayout() {
   }, [router]);
 
   return (
-    <Tabs>
-      <Tabs.Screen name="index" options={{ headerShown: false }} />
-      <Tabs.Screen name="account" options={{ headerShown: false }} />
-    </Tabs>
+    <NativeTabs>
+      <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.TabBar backgroundColor="white" />
+        <Icon src={<HomeIcon className="text-foreground" size={24} />} />
+        <Label>Home</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="account">
+        <NativeTabs.Trigger.TabBar backgroundColor="white" />
+        <Icon src={<UserIcon className="text-foreground" size={24} />} />
+        <Label>Account</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="settings">
+        <NativeTabs.Trigger.TabBar backgroundColor="white" />
+        <Icon src={<SettingsIcon className="text-foreground" size={24} />} />
+        <Label>Settings</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

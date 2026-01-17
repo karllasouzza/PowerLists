@@ -70,7 +70,7 @@ export default function PasswordRecoveryScreen() {
       )
         throw new Error('one-email-per-minute');
 
-      const sucess = await sendResetPasswordByEmail(data.email);
+      const sucess = await sendResetPasswordByEmail({ email: data.email });
       if (!sucess) throw new Error('email-not-found');
 
       setLatestShipments((prev) => [
@@ -78,7 +78,7 @@ export default function PasswordRecoveryScreen() {
         { date: new Date(), email: data.email, success: sucess },
       ]);
     } catch (error) {
-      console.log('Error on password recovery:', error);
+      console.error('Error on password recovery:', error);
 
       if (error instanceof Error) {
         errorsCase(error.message);

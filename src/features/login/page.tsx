@@ -37,13 +37,10 @@ export default function LoginScreen() {
   });
 
   const onSubmit = async (data: LoginSchemaType) => {
-    try {
-      const success = await signIn(data.email, data.password);
-      if (!success) throw new Error('Erro no login');
-      router.replace('/(tabs)');
-    } catch (error) {
-      console.error('Erro no login:', error);
-    }
+    const success = await signIn({ email: data.email, password: data.password });
+    if (!success) return;
+
+    router.replace('/(tabs)');
   };
 
   const handleCreateAccount = () => {

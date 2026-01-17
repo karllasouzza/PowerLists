@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { AuthStore } from './types';
-import { UserType, isGuestUser } from '@/data/types/user';
+import * as Linking from 'expo-linking';
+
 import { supabase } from '@/lib/supabase';
+import { isGuestUser } from '@/data/types/user';
 import { mmkvStorage } from '@/data/storage';
 import { SyncService } from '@/services/sync';
 import { showToast } from '@/services/toast';
@@ -15,47 +16,26 @@ import {
   createGuestUser,
   softDeleteUser,
 } from '@/data/actions/user';
-import * as Linking from 'expo-linking';
 
-/**
- * Adapter para usar MMKV com Zustand persist
- */
+import type { AuthStore } from './types';
+
 const JSONStorageAdapterWithMMKV = createJSONStorage(() => mmkvStorage);
 
-/**
- * Store Zustand para gerenciamento de autenticação
- *
- * Features:
- * - Persistência no MMKV
- * - Sincronização com Supabase
- * - Migração de dados guest → authenticated
- * - Usa funções centralizadas de user.actions.ts
- */
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({
-      // Estado inicial
       user: null,
       session: null,
       isInitialized: false,
       isLoading: false,
 
-      /**
-       * Inicializa o store
-       * - Verifica se existe usuário no MMKV
-       * - Se usuário for guest, mantém
-       * - Se usuário for não-guest, revalida sessão Supabase
-       * - Se não houver usuário, retorna null
-       */
       initialize: async () => {
         try {
           set({ isLoading: true });
 
           const { user } = get();
 
-          // Se já tem usuário carregado
           if (user) {
-            // Se for GUEST: mantém guest (não verifica Supabase)
             if (isGuestUser(user) && user.is_guest) {
               const currentUser = await getUser();
               set({
@@ -66,12 +46,10 @@ export const useAuthStore = create<AuthStore>()(
               return;
             }
 
-            // Se for NÃO-GUEST: revalida no Supabase
             const { data: sessionData } = await supabase.auth.getSession();
 
             if (sessionData.session) {
-              // Sessão válida: sincroniza dados do Supabase
-              const syncedUser = await syncUserWithSupabase();
+              const syncedUser = await syncUserWithSupabase({});
               if (syncedUser.user) {
                 set({
                   user: syncedUser.user,
@@ -83,7 +61,6 @@ export const useAuthStore = create<AuthStore>()(
               }
             }
 
-            // Sessão expirou: marca usuário atual como guest
             const updatedUser = await updateUser({
               id: user.id,
               is_guest: true,
@@ -97,7 +74,6 @@ export const useAuthStore = create<AuthStore>()(
             return;
           }
 
-          // Não tem usuário local: retorna null (não cria guest automaticamente)
           set({
             user: null,
             session: null,
@@ -116,26 +92,25 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      /**
-       * Faz login com email e senha
-       */
-      signIn: async (email: string, password: string) => {
+      signIn: async ({ email, password }) => {
         try {
+          if (!email || !password) {
+            throw new Error('Email and password are required');
+          }
+
           set({ isLoading: true });
 
           const currentUser = get().user;
 
-          // Faz login usando função centralizada
           const result = await loginUser(email, password);
 
-          if (!result.user) {
-            throw new Error(result.error || 'Login failed');
-          }
+          if (result.error) throw new Error(result.error);
+          if (!result.user) throw new Error('Login failed');
 
-          // Pega sessão do Supabase
-          const { data: sessionData } = await supabase.auth.getSession();
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
 
-          // Se tinha usuário guest, oferece migração
           if (isGuestUser(currentUser) && currentUser.is_guest) {
             const syncService = new SyncService();
             await syncService.promptDataMigration(currentUser.id, result.user.id);
@@ -143,7 +118,7 @@ export const useAuthStore = create<AuthStore>()(
 
           set({
             user: result.user,
-            session: sessionData.session,
+            session,
             isLoading: false,
           });
 
@@ -154,7 +129,7 @@ export const useAuthStore = create<AuthStore>()(
           });
           return true;
         } catch (error) {
-          console.log(error);
+          console.error('Error on signIn:', error);
           set({ isLoading: false });
 
           showToast({
@@ -167,11 +142,7 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      /**
-       * Cria nova conta
-       * Usa createUser() de user.actions.ts
-       */
-      signUp: async (email: string, password: string) => {
+      signUp: async ({ email, password }) => {
         try {
           set({ isLoading: true });
 
@@ -217,10 +188,6 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      /**
-       * Faz logout
-       * Marca usuário atual como guest (não cria novo)
-       */
       signOut: async () => {
         try {
           set({ isLoading: true });
@@ -235,13 +202,11 @@ export const useAuthStore = create<AuthStore>()(
             set({
               user: updatedUser.user,
               session: null,
-              isLoading: false,
             });
           } else {
             set({
               user: null,
               session: null,
-              isLoading: false,
             });
           }
 
@@ -250,23 +215,22 @@ export const useAuthStore = create<AuthStore>()(
             title: 'Sucesso!',
             subtitle: 'Sessão encerrada!',
           });
+          return true;
         } catch (error) {
-          set({ isLoading: false });
-
+          console.error('Error on signOut:', error);
           showToast({
             type: 'error',
             title: 'Erro ao desconectar!',
             subtitle: 'Tente novamente mais tarde!',
           });
 
-          throw error;
+          return false;
+        } finally {
+          set({ isLoading: false });
         }
       },
 
-      /**
-       * Envia email de recuperação de senha
-       */
-      sendResetPasswordByEmail: async (email: string) => {
+      sendResetPasswordByEmail: async ({ email }) => {
         try {
           set({ isLoading: true });
 
@@ -285,7 +249,7 @@ export const useAuthStore = create<AuthStore>()(
           });
           return true;
         } catch (error) {
-          console.error(error);
+          console.error('Error sending reset password email:', error);
 
           showToast({
             type: 'error',
@@ -299,10 +263,7 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      /**
-       * Update user password
-       */
-      resetPassword: async (password: string) => {
+      resetPassword: async ({ password }) => {
         try {
           set({ isLoading: true });
 
@@ -331,19 +292,17 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      /**
-       * Verifica se existe sessão válida no Supabase
-       * Usa syncUserWithSupabase() quando válida
-       */
       checkSession: async () => {
         try {
           const { data } = await supabase.auth.getSession();
 
           if (data.session) {
-            const { data: userData } = await supabase.auth.getUser();
+            const {
+              data: { user },
+            } = await supabase.auth.getUser();
 
-            if (userData.user) {
-              const syncedUser = await syncUserWithSupabase();
+            if (user) {
+              const syncedUser = await syncUserWithSupabase({ user });
               if (syncedUser.user) {
                 set({
                   user: syncedUser.user,
@@ -352,7 +311,6 @@ export const useAuthStore = create<AuthStore>()(
               }
             }
           } else {
-            // Sessão expirou: marca como guest (não cria novo)
             const currentUser = get().user;
             if (currentUser) {
               const updatedUser = await updateUser({
@@ -366,15 +324,11 @@ export const useAuthStore = create<AuthStore>()(
             }
           }
         } catch (error) {
-          console.error('Erro ao verificar sessão:', error);
+          console.error('Error checking session:', error);
         }
       },
 
-      /**
-       * Atualiza dados do usuário
-       * Usa updateUser() de user.actions.ts
-       */
-      updateUser: async (updates: Partial<UserType>) => {
+      updateUser: async ({ updates }) => {
         const currentUser = get().user;
         if (!currentUser) return;
 
@@ -388,11 +342,7 @@ export const useAuthStore = create<AuthStore>()(
         }
       },
 
-      /**
-       * Cria um usuário guest
-       * Função para ser chamada explicitamente pela UI
-       */
-      createGuest: async (name?: string) => {
+      createGuest: async ({ name }) => {
         try {
           set({ isLoading: true });
 

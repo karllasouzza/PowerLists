@@ -45,10 +45,10 @@ export default function PasswordRecoveryScreen() {
       if (data.newPassword !== data.newPasswordConfirmation)
         throw new Error('passwords do not match');
 
-      await resetPassword(data.newPassword);
+      await resetPassword({ password: data.newPassword });
       router.back();
     } catch (error) {
-      console.log('Error on password recovery:', error);
+      console.error('Error on password recovery:', error);
     }
   };
 
