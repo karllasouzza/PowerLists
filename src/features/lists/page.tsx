@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useCallback } from 'react';
 import { View, ScrollView, BackHandler } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useObserve } from '@legendapp/state/react';
 import humps from 'humps';
@@ -37,16 +36,13 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     returnOfMode,
   } = useHomeState();
 
-  // Observa mudanças no observable lists$
   const listsData = useObserve(lists$);
 
-  // Converte o objeto observable para array e camelCase
   const lists = useMemo(() => {
     const listsArray = Object.values(listsData || {});
     return humps.camelizeKeys(listsArray) as any[];
   }, [listsData]);
 
-  // Back handler para Android
   useFocusEffect(
     useCallback(() => {
       const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -121,7 +117,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   };
 
   return (
-    <View className="flex h-full w-full flex-1 items-center bg-red-200">
+    <View className="flex h-full w-full flex-1 items-center bg-background">
       <HomeAppbar
         onSearch={onSearch}
         searchQuery={searchQuery}
