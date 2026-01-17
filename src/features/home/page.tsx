@@ -19,7 +19,6 @@ import { HomeAppbar } from './components/home-appbar';
 import { HomeFab } from './components/home-fab';
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-  const { top } = useSafeAreaInsets();
   const { theme, colorScheme } = useTheme();
   const refSearchbar = useRef<any>(null);
 
@@ -122,9 +121,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   };
 
   return (
-    <View className="flex-1 items-center bg-background">
+    <View className="flex h-full w-full flex-1 items-center bg-red-200">
       <HomeAppbar
-        top={top}
         onSearch={onSearch}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}

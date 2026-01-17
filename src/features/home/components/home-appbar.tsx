@@ -4,9 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { IconSearch, IconArrowLeft } from '@tabler/icons-react-native';
+import { cn } from '@/lib/utils';
 
 interface HomeAppbarProps {
-  top: number;
   onSearch: boolean;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -15,7 +15,6 @@ interface HomeAppbarProps {
 }
 
 export const HomeAppbar: React.FC<HomeAppbarProps> = ({
-  top,
   onSearch,
   searchQuery,
   setSearchQuery,
@@ -24,11 +23,10 @@ export const HomeAppbar: React.FC<HomeAppbarProps> = ({
 }) => {
   return (
     <View
-      style={{
-        paddingTop: top,
-        height: (onSearch ? 110 : 90) + top,
-      }}
-      className="w-full justify-end bg-background px-5 pb-2 shadow-sm">
+      className={cn(
+        'shadow-s w-full justify-end bg-background px-5 pb-2',
+        !onSearch ? 'max-h-20' : 'max-h-110'
+      )}>
       {onSearch ? (
         <View className="flex-row items-center gap-2">
           <Pressable onPress={() => setOnSearch(false)}>
