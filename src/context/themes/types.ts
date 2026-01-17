@@ -1,17 +1,14 @@
-import { IFocusAwareBarsProps } from '@/components/focus-aware-bars';
 import { themes } from './theme-config';
 
-export interface ThemeProviderPropsT {
+export interface ThemeProviderProps {
   children: React.ReactNode;
-  name?: keyof typeof themes;
-  customColorScheme?: 'light' | 'dark';
 }
 
 export interface ThemeContextT {
-  color: string;
-  colorScheme: 'light' | 'dark';
   theme: keyof typeof themes;
-  setTheme: (theme: keyof typeof themes) => void;
-  setColorScheme: (scheme: 'light' | 'dark') => void;
-  setBars: (bars: IFocusAwareBarsProps) => boolean;
+  colorScheme: 'light' | 'dark';
+  backgroundColor: string;
+  setTheme: (theme: keyof typeof themes | 'default') => boolean;
+  setColorScheme: (scheme: 'light' | 'dark' | 'system') => boolean;
+  setBackgroundColor: (color: string | 'default') => boolean;
 }

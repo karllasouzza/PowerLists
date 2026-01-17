@@ -13,7 +13,7 @@ export const OnboardingContainer = ({
   completeOnboarding,
   goToSlide,
 }: SlidesProps) => {
-  const { setBars, color } = useTheme();
+  const { backgroundColor, setBackgroundColor } = useTheme();
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList<any>>(null);
 
@@ -48,10 +48,7 @@ export const OnboardingContainer = ({
   useEffect(() => {
     const colorVar = `--color-onboarding-${current_slide + 1}`;
     if (colorVar) {
-      setBars({
-        color: colorVar,
-        style: 'dark',
-      });
+      setBackgroundColor(colorVar);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current_slide, slide_pages]);
@@ -78,7 +75,7 @@ export const OnboardingContainer = ({
   };
 
   return (
-    <View className="h-full w-full flex-1" style={{ backgroundColor: color }}>
+    <View className="h-full w-full flex-1" style={{ backgroundColor: backgroundColor }}>
       <Animated.FlatList
         ref={flatListRef}
         data={slide_pages}
