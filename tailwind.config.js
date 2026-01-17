@@ -52,6 +52,12 @@ export const theme = {
         DEFAULT: 'var(--color-onboarding-3)',
         foreground: 'var(--color-onboarding-3-foreground)',
       },
+      'bottom-bar': {
+        DEFAULT: 'var(--color-bottom-bar)',
+        foreground: 'var(--color-bottom-bar-foreground)',
+        accent: 'var(--color-bottom-bar-accent)',
+        'accent-foreground': 'var(--color-bottom-bar-accent-foreground)',
+      },
     },
     borderRadius: {
       lg: 'var(--radius)',

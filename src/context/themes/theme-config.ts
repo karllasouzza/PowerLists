@@ -38,6 +38,10 @@ export const rawColors = {
       '--color-onboarding-2-foreground': 'rgb(0, 0, 0)',
       '--color-onboarding-3': 'rgb(254, 215, 170)',
       '--color-onboarding-3-foreground': 'rgb(0, 0, 0)',
+      '--color-bottom-bar': 'rgba(255, 255, 255, 0.8)',
+      '--color-bottom-bar-foreground': 'rgb(0, 0, 0)',
+      '--color-bottom-bar-accent': 'rgb(255, 255, 255)',
+      '--color-bottom-bar-accent-foreground': 'rgb(0, 0, 0)',
     },
     dark: {
       '--color-primary': 'rgb(255, 255, 255)',
@@ -65,6 +69,10 @@ export const rawColors = {
       '--color-onboarding-2-foreground': 'rgb(255, 255, 255)',
       '--color-onboarding-3': 'rgb(124, 45, 18)',
       '--color-onboarding-3-foreground': 'rgb(255, 255, 255)',
+      '--color-bottom-bar': 'rgba(30, 30, 30, 0.8)',
+      '--color-bottom-bar-foreground': 'rgb(255, 255, 255)',
+      '--color-bottom-bar-accent': 'rgb(50, 50, 50)',
+      '--color-bottom-bar-accent-foreground': 'rgb(255, 255, 255)',
     },
   },
   purple: {
@@ -94,6 +102,10 @@ export const rawColors = {
       '--color-onboarding-2-foreground': 'rgb(0, 0, 0)',
       '--color-onboarding-3': 'rgb(254, 215, 170)',
       '--color-onboarding-3-foreground': 'rgb(0, 0, 0)',
+      '--color-bottom-bar': 'rgba(239, 219, 255, 0.8)',
+      '--color-bottom-bar-foreground': 'rgb(126, 55, 199)',
+      '--color-bottom-bar-accent': 'rgb(255, 255, 255)',
+      '--color-bottom-bar-accent-foreground': 'rgb(126, 55, 199)',
     },
     dark: {
       '--color-primary': 'rgb(219, 184, 255)',
@@ -121,6 +133,10 @@ export const rawColors = {
       '--color-onboarding-2-foreground': 'rgb(255, 255, 255)',
       '--color-onboarding-3': 'rgb(254, 215, 170)',
       '--color-onboarding-3-foreground': 'rgb(255, 255, 255)',
+      '--color-bottom-bar': 'rgba(72, 0, 130, 0.8)',
+      '--color-bottom-bar-foreground': 'rgb(219, 184, 255)',
+      '--color-bottom-bar-accent': 'rgb(101, 18, 174)',
+      '--color-bottom-bar-accent-foreground': 'rgb(239, 219, 255)',
     },
   },
 } as const;
