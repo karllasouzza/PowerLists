@@ -1,53 +1,37 @@
-'use server';
-
-import { configureSyncedSupabase, syncedSupabase } from '@legendapp/state/sync-plugins/supabase';
-import { observable } from '@legendapp/state';
-import { supabase } from '@/lib/supabase';
+import { observable, Observable } from '@legendapp/state';
 import { generateId } from '../utils';
 import humps from 'humps';
 import type { ProfileType, CreateProfileType, UpdateProfileType } from '../types/profile';
-import { configureSynced } from '@legendapp/state/sync';
-import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
-import { getCurrentUserId } from '../database';
+import { customSynced, getCurrentUserId } from '../database';
 
-// Configure LegendApp Supabase sync
-configureSyncedSupabase({
-  generateId,
-});
+// Lazy-initialized observable for profiles with Supabase sync
+let profiles$: Observable<Record<string, any>> | null = null;
 
-// Create a configured sync function
-const customSynced = configureSynced(syncedSupabase, {
-  persist: {
-    plugin: ObservablePersistMMKV,
-  },
-  generateId,
-  supabase,
-  changesSince: 'last-sync',
-  fieldCreatedAt: 'created_at',
-  fieldUpdatedAt: 'updated_at',
-});
-
-// Create observable for profiles with Supabase sync
-export const profiles$ = observable(
-  customSynced({
-    collection: 'profiles',
-    select: (from: any) => from.select('*'),
-    filter: (select: any) => select.eq('user_id', getCurrentUserId()),
-    actions: ['read', 'create', 'update', 'delete'],
-    persist: { name: 'profiles', retrySync: true },
-    changesSince: 'last-sync',
-  })
-);
-
-// Initialize sync by getting the observable
-profiles$.get();
+export const getProfiles$ = (): Observable<Record<string, any>> => {
+  if (!profiles$) {
+    profiles$ = observable(
+      customSynced({
+        collection: 'profiles',
+        select: (from: any) => from.select('*'),
+        filter: (select: any) => select.eq('user_id', getCurrentUserId()),
+        actions: ['read', 'create', 'update', 'delete'],
+        persist: { name: 'profiles', retrySync: true },
+        changesSince: 'last-sync',
+        fieldDeleted: 'deleted_at',
+        fieldCreatedAt: 'created_at',
+        fieldUpdatedAt: 'updated_at',
+      })
+    );
+  }
+  return profiles$;
+};
 
 /**
  * Get the profile for the current user
  */
 export const getProfile = async (): Promise<{ profile: ProfileType | null }> => {
   try {
-    const profilesData = profiles$.get();
+    const profilesData = getProfiles$().get();
     const profilesArray = Object.values(profilesData || {});
 
     if (profilesArray.length === 0) {
@@ -91,7 +75,7 @@ export const createProfile = async ({
     if (!payload) throw new Error('Failed to create profile');
 
     // Add to observable - this will trigger sync to Supabase
-    profiles$[id].set(payload as any);
+    getProfiles$()[id].set(payload as any);
 
     // Return camelCase version
     const newProfile: ProfileType = {
@@ -130,20 +114,20 @@ export const updateProfile = async ({
     const profileId = currentProfile.id;
 
     // Update in observable using snake_case - this will trigger sync to Supabase
-    profiles$[profileId].name.set(name);
+    getProfiles$()[profileId].name.set(name);
 
     if (avatarUrl !== undefined) {
-      profiles$[profileId].avatar_url.set(avatarUrl || null);
+      getProfiles$()[profileId].avatar_url.set(avatarUrl || null);
     }
 
     if (bio !== undefined) {
-      profiles$[profileId].bio.set(bio || null);
+      getProfiles$()[profileId].bio.set(bio || null);
     }
 
     // Set updated_at timestamp
-    profiles$[profileId].updated_at.set(new Date().toISOString());
+    getProfiles$()[profileId].updated_at.set(new Date().toISOString());
 
-    const updatedProfileRaw = profiles$[profileId].get();
+    const updatedProfileRaw = getProfiles$()[profileId].get();
     const updatedProfile = humps.camelizeKeys(updatedProfileRaw) as ProfileType;
 
     return { profile: updatedProfile };
@@ -165,7 +149,7 @@ export const deleteProfile = async (): Promise<boolean> => {
     }
 
     // Delete from observable - this will trigger sync to Supabase
-    profiles$[currentProfile.id].delete();
+    getProfiles$()[currentProfile.id].delete();
 
     return true;
   } catch (error) {

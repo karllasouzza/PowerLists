@@ -1,6 +1,4 @@
-'use server';
-
-import { observable } from '@legendapp/state';
+import { observable, Observable } from '@legendapp/state';
 import humps from 'humps';
 import { generateId } from '../utils';
 import { getCurrentUserId, customSynced } from '../database';
@@ -15,20 +13,27 @@ import type {
   GetListItemsByListIdResult,
 } from '../types';
 
-// Create observable for list items with Supabase sync
-export const listItems$ = observable(
-  customSynced({
-    collection: 'list_items',
-    select: (from: any) => from.select('*'),
-    filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
-    actions: ['read', 'create', 'update', 'delete'],
-    persist: { name: 'list_items', retrySync: true },
-    changesSince: 'last-sync',
-  })
-);
+// Lazy-initialized observable for list items with Supabase sync
+let listItems$: Observable<Record<string, any>> | null = null;
 
-// Initialize sync by getting the observable
-listItems$.get();
+export const getListItems$ = (): Observable<Record<string, any>> => {
+  if (!listItems$) {
+    listItems$ = observable(
+      customSynced({
+        collection: 'list_items',
+        select: (from: any) => from.select('*'),
+        filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
+        actions: ['read', 'create', 'update', 'delete'],
+        persist: { name: 'list_items', retrySync: true },
+        changesSince: 'last-sync',
+        fieldDeleted: 'deleted_at',
+        fieldCreatedAt: 'created_at',
+        fieldUpdatedAt: 'updated_at',
+      })
+    );
+  }
+  return listItems$;
+};
 
 /**
  * Get all items for a specific list
@@ -39,7 +44,7 @@ export const getListItemsByListId = async ({
   try {
     if (!listId) throw new Error('Missing required fields');
 
-    const itemsData = listItems$.get();
+    const itemsData = getListItems$().get();
     const allItems = Object.values(itemsData || {});
     if (!allItems) throw new Error('Items not found');
 
@@ -89,7 +94,7 @@ export const createNewListItem = async ({
     if (!payload) throw new Error('Failed to convert to snake_case');
 
     // Add to observable - this will trigger sync to Supabase
-    listItems$[id].set(payload as ListItemType);
+    getListItems$()[id].set(payload as ListItemType);
 
     return true;
   } catch (error) {
@@ -109,7 +114,7 @@ export const toggleCheckListItem = async ({
     if (!id || typeof isChecked !== 'boolean') throw new Error('Missing required fields');
 
     // Update in observable using snake_case - this will trigger sync to Supabase
-    listItems$[id].is_checked.set(isChecked);
+    getListItems$()[id].is_checked.set(isChecked);
 
     return true;
   } catch (error) {
@@ -131,7 +136,7 @@ export const updateListItem = async ({
   try {
     if (!id || typeof isChecked !== 'boolean') throw new Error('Missing required fields');
 
-    const updatedListItemRaw = listItems$[id].get();
+    const updatedListItemRaw = getListItems$()[id].get();
     if (!updatedListItemRaw) throw new Error('Item not found');
 
     const updatedListItem = humps.decamelizeKeys({
@@ -143,7 +148,7 @@ export const updateListItem = async ({
     if (!updatedListItem) throw new Error('Failed to convert to snake_case');
 
     // Update in observable
-    listItems$[id].set(updatedListItem);
+    getListItems$()[id].set(updatedListItem);
 
     return true;
   } catch (error) {
@@ -160,7 +165,7 @@ export const deleteListItem = async ({ itemId }: DeleteListItemProps): Promise<b
     if (!itemId) throw new Error('Missing required fields');
 
     // Delete from observable - this will trigger sync to Supabase
-    listItems$[itemId].delete();
+    getListItems$()[itemId].delete();
 
     return true;
   } catch (error) {

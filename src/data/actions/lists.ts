@@ -1,32 +1,37 @@
-'use server';
-
-import { observable } from '@legendapp/state';
+import { observable, Observable } from '@legendapp/state';
 import { generateId } from '../utils';
 import humps from 'humps';
 import type { ListType, CreateNewListProps, UpdateListProps } from '../types';
 import { getCurrentUserId, customSynced } from '../database';
 
-// Create observable for lists with Supabase sync
-export const lists$ = observable(
-  customSynced({
-    collection: 'lists',
-    select: (from: any) => from.select('*'),
-    filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
-    actions: ['read', 'create', 'update', 'delete'],
-    persist: { name: 'lists', retrySync: true },
-    changesSince: 'last-sync',
-  })
-);
+// Lazy-initialized observable for lists with Supabase sync
+let lists$: Observable<Record<string, any>> | null = null;
 
-// Initialize sync by getting the observable
-lists$.get();
+export const getLists$ = (): Observable<Record<string, any>> => {
+  if (!lists$) {
+    lists$ = observable(
+      customSynced({
+        collection: 'lists',
+        select: (from: any) => from.select('*'),
+        filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
+        actions: ['read', 'create', 'update', 'delete'],
+        persist: { name: 'lists', retrySync: true },
+        changesSince: 'last-sync',
+        fieldDeleted: 'deleted_at',
+        fieldCreatedAt: 'created_at',
+        fieldUpdatedAt: 'updated_at',
+      })
+    );
+  }
+  return lists$;
+};
 
 /**
  * Get all lists for the current user
  */
 export const getAllLists = async (): Promise<{ results: ListType[] | null }> => {
   try {
-    const listsData = lists$.get();
+    const listsData = getLists$().get();
     const listsArray = Object.values(listsData || {});
     // Convert snake_case to camelCase
     const camelizedLists = humps.camelizeKeys(listsArray) as ListType[];
@@ -64,7 +69,7 @@ export const createNewList = async ({
     if (!payload) throw new Error('Failed to create list');
 
     // Add to observable - this will trigger sync to Supabase
-    lists$[id].set(payload as any);
+    getLists$()[id].set(payload as any);
 
     // Return camelCase version
     const newList: ListType = {
@@ -96,11 +101,11 @@ export const updateList = async ({
     if (!id || !title || !accentColor || !icon) throw new Error('Missing required fields');
 
     // Update in observable using snake_case - this will trigger sync to Supabase
-    lists$[id].title.set(title);
-    lists$[id].accent_color.set(accentColor);
-    lists$[id].icon.set(icon);
+    getLists$()[id].title.set(title);
+    getLists$()[id].accent_color.set(accentColor);
+    getLists$()[id].icon.set(icon);
 
-    const updatedListRaw = lists$[id].get();
+    const updatedListRaw = getLists$()[id].get();
     const updatedList = humps.camelizeKeys(updatedListRaw) as ListType;
 
     return { editList: updatedList };
@@ -118,7 +123,7 @@ export const deleteList = async ({ id }: { id: string }): Promise<boolean> => {
     if (!id) throw new Error('Missing required fields');
 
     // Delete from observable - this will trigger sync to Supabase
-    lists$[id].delete();
+    getLists$()[id].delete();
 
     return true;
   } catch (error) {
