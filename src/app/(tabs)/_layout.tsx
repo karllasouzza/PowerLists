@@ -16,12 +16,23 @@ import {
 } from '@tabler/icons-react-native';
 
 const SCREENS = [
-  { name: 'index', label: 'Inicio', icon: { default: IconHome, filled: IconHomeFilled } },
-  { name: 'account', label: 'Conta', icon: { default: IconUser, filled: IconUserFilled } },
+  {
+    name: 'index',
+    label: 'Inicio',
+    icon: { default: IconHome, filled: IconHomeFilled },
+    options: {},
+  },
+  {
+    name: 'account',
+    label: 'Conta',
+    icon: { default: IconUser, filled: IconUserFilled },
+    options: {},
+  },
   {
     name: 'settings',
     label: 'Configurações',
     icon: { default: IconSettings, filled: IconSettingsFilled },
+    options: {},
   },
 ];
 
@@ -68,6 +79,7 @@ export default function RootLayout() {
               name={screen.name}
               options={{
                 animation: screenAnimation,
+                ...screen.options,
               }}
             />
           );
