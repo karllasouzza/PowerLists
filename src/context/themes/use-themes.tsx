@@ -15,37 +15,22 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   const [customTheme, setCustomTheme] = useState<keyof typeof themes | null>(null);
   const [customColorScheme, setCustomColorScheme] = useState<'light' | 'dark' | null>(null);
+  const [backgroundColor, setBackgroundColor] = useState<string>('--color-background');
 
   const safeColorScheme = useMemo(
     () => customColorScheme || systemColorScheme || 'light',
     [customColorScheme, systemColorScheme]
   );
-
-  const DefaultBackgroundColor = useMemo((): string => {
-    const themeVars = rawColors[customTheme || 'default'][safeColorScheme];
-
-    const backgroundColorFallback =
-      customColorScheme === 'dark' ? getTailwindColor('black') : getTailwindColor('white');
-
-    const backgroundColor = getThemeColorSafe(
-      themeVars,
-      '--color-background',
-      backgroundColorFallback
-    );
-
-    return backgroundColor;
-  }, [customTheme, customColorScheme, safeColorScheme]);
-  const [backgroundColor, setBackgroundColor] = useState<string>(DefaultBackgroundColor);
+  const safeThemeName = useMemo(() => customTheme || 'default', [customTheme]);
 
   useEffect(() => {
     const loadStoredCustomColorScheme = () => {
       const storedColorScheme = mmkvStorage.getItem('customColorScheme');
       if (storedColorScheme && ['light', 'dark'].includes(storedColorScheme)) {
         setCustomColorScheme(storedColorScheme as 'light' | 'dark');
-        setSystemColorScheme(storedColorScheme as 'light' | 'dark');
       } else {
         setCustomColorScheme(null);
-        setSystemColorScheme(systemColorScheme as 'light' | 'dark');
+        setSystemColorScheme('system');
       }
     };
 
@@ -63,7 +48,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       if (storedCustomBackgroundColor) {
         setBackgroundColor(storedCustomBackgroundColor);
       } else {
-        setBackgroundColor(DefaultBackgroundColor);
+        setBackgroundColor('--color-background');
       }
     };
 
@@ -72,7 +57,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     loadStoredCustomBackgroundColor();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [systemColorScheme]);
+  }, []);
 
   const handleSetColorScheme = useCallback(
     (scheme: 'light' | 'dark' | 'system'): boolean => {
@@ -96,7 +81,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     [setCustomColorScheme]
   );
 
-  const handleSetTheme = useCallback((theme: keyof typeof themes): boolean => {
+  const handleSetThemeName = useCallback((theme: keyof typeof themes): boolean => {
     try {
       if (!themes[theme]) throw new Error('Theme not found');
 
@@ -115,68 +100,74 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     }
   }, []);
 
-  const handleSetBackgroundColor = useCallback(
-    (color: string | 'default'): boolean => {
-      try {
-        if (!color) throw new Error('Background color is required');
+  const handleSetBackgroundColor = useCallback((color: string | 'default'): boolean => {
+    try {
+      if (!color) throw new Error('Background color is required');
 
-        if (color === 'default') {
-          mmkvStorage.removeItem('customBackgroundColor');
-          setBackgroundColor(DefaultBackgroundColor);
-        } else {
-          setBackgroundColor(color);
-          mmkvStorage.setItem('customBackgroundColor', color);
-        }
-
-        return true;
-      } catch (error) {
-        console.error('Error saving background color to storage:', error);
-        return false;
+      if (color === 'default') {
+        setBackgroundColor('--color-background');
+      } else {
+        setBackgroundColor(color);
       }
-    },
-    [DefaultBackgroundColor]
-  );
+
+      return true;
+    } catch (error) {
+      console.error('Error saving background color to storage:', error);
+      return false;
+    }
+  }, []);
+
+  const backgroundColorConverted = useMemo(() => {
+    const themeVars = rawColors[safeThemeName][safeColorScheme];
+
+    const backgroundColorFallback =
+      customColorScheme === 'dark' ? getTailwindColor('black') : getTailwindColor('white');
+
+    const colorVar = backgroundColor || '--color-background';
+
+    return getThemeColorSafe({
+      themeVars,
+      varName: colorVar,
+      fallback: backgroundColorFallback,
+    });
+  }, [safeThemeName, safeColorScheme, backgroundColor, customColorScheme]);
 
   const contextValue = useMemo(
     () => ({
       theme: customTheme || 'default',
       colorScheme: safeColorScheme,
-      backgroundColor,
-      setTheme: handleSetTheme,
+      backgroundColor: backgroundColorConverted,
+      setTheme: handleSetThemeName,
       setColorScheme: handleSetColorScheme,
       setBackgroundColor: handleSetBackgroundColor,
     }),
     [
       customTheme,
       safeColorScheme,
-      backgroundColor,
-      handleSetTheme,
+      backgroundColorConverted,
+      handleSetThemeName,
       handleSetColorScheme,
       handleSetBackgroundColor,
     ]
   );
 
-  const theme = useMemo(
-    () => themes[customTheme || 'default'][safeColorScheme],
-    [customTheme, safeColorScheme]
+  const themeVars = useMemo(
+    () => themes[safeThemeName][safeColorScheme],
+    [safeThemeName, safeColorScheme]
   );
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <View
-        className="h-full w-full"
-        style={{ backgroundColor: backgroundColor || DefaultBackgroundColor }}>
-        <FocusAwareBars colorScheme={safeColorScheme} />
-        <SafeAreaView
-          style={{
-            flex: 1,
-            backgroundColor: backgroundColor || DefaultBackgroundColor,
-          }}>
-          <View className="h-full w-full" style={theme}>
-            {children}
-          </View>
-        </SafeAreaView>
-      </View>
+      <FocusAwareBars colorScheme={safeColorScheme} />
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: backgroundColorConverted,
+        }}>
+        <View className="h-full w-full" style={themeVars}>
+          {children}
+        </View>
+      </SafeAreaView>
     </ThemeContext.Provider>
   );
 };
