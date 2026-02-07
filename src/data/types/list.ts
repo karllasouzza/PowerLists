@@ -1,24 +1,30 @@
-export interface ListType {
+import { ListItem } from '@/features/list_items';
+
+export interface List {
   id: string;
-  profileId: string;
   title: string;
   accentColor: string;
   icon: string;
-  createdAt: Date | string;
-  updatedAt?: Date | string;
-  deletedAt?: Date | string;
+  background?: string;
+  color?: string;
+  iconBackground?: string;
+  profileId: string;
+  listItems?: Pick<ListItem, 'isChecked' | 'amount' | 'price'>[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+  deleted?: boolean | null;
 }
 
-export type CreateNewListProps = Omit<ListType, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>;
+export type CreateNewListProps = Omit<List, 'id' | 'createdAt' | 'updatedAt' | 'deleted'>;
 
 export type CreateNewListResult = {
-  newList: ListType | null;
+  newList: List | null;
 };
 
-export type UpdateListProps = Omit<ListType, 'profileId' | 'createdAt'>;
+export type UpdateListProps = Omit<List, 'profileId' | 'createdAt'>;
 
 export type UpdateListResult = {
-  editList: ListType | null;
+  editList: List | null;
 };
 
 export type GetAllListsProps = {
@@ -26,7 +32,7 @@ export type GetAllListsProps = {
 };
 
 export type GetAllListsResults = {
-  results: ListType[] | null;
+  results: List[] | null;
 };
 
 export type DeleteListProps = {

@@ -1,13 +1,14 @@
-export interface ListItemType {
+export interface ListItem {
   id: string;
   profileId: string;
   listId: string;
-  title: string;
-  price?: number;
-  amount: number;
+  title: string | null;
+  price: number | null;
+  amount: number | null;
   isChecked: boolean;
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  deleted?: boolean | null;
 }
 
 export type GetListItemsByListIdProps = {
@@ -15,17 +16,14 @@ export type GetListItemsByListIdProps = {
 };
 
 export type GetListItemsByListIdResult = {
-  results: ListItemType[] | null;
+  results: ListItem[] | null;
 };
 
-export type CreateListItemProps = Omit<
-  ListItemType,
-  'id' | 'createdAt' | 'updatedAt' | 'deletedAt'
->;
+export type CreateListItemProps = Omit<ListItem, 'id' | 'createdAt' | 'updatedAt' | 'deleted'>;
 
 export type CreateNewListItemResult = boolean;
 
-export type UpdateListItemProps = Omit<ListItemType, 'profileId' | 'listId' | 'createdAt'>;
+export type UpdateListItemProps = Omit<ListItem, 'profileId' | 'listId' | 'createdAt'>;
 
 export type UpdateListItemResult = boolean;
 
