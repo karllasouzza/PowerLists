@@ -25,8 +25,10 @@ import {
   IconAmbulance,
   IconBook,
   IconChefHat,
+  icons,
 } from '@tabler/icons-react-native';
-import { createNewListItem, updateListItem } from '@/data/actions/list-items';
+import { createNewListItem, updateListItem } from '@/data/states/list-items';
+import colors from 'tailwindcss/colors';
 
 // Schema de validação para Items
 const itemFormSchema = z.object({
@@ -62,10 +64,8 @@ interface NewListItemProps {
   mode: 'add' | 'edit';
   type: 'Lists' | 'Items';
   listId?: string;
-  editingItem?: any;
+  currentItem?: any;
   onSuccess?: () => void;
-  colors?: string[];
-  icons?: string[];
 }
 
 export default function NewListItem({
@@ -74,10 +74,8 @@ export default function NewListItem({
   mode,
   type,
   listId,
-  editingItem,
+  currentItem,
   onSuccess,
-  colors,
-  icons,
 }: NewListItemProps) {
   const { theme, colorScheme } = useTheme();
   // @ts-ignore
@@ -112,16 +110,16 @@ export default function NewListItem({
   const selectedColor = watch('color');
   const selectedIcon = watch('icon');
 
-  // Reset form when opening or editingItem changes
+  // Reset form when opening or currentItem changes
   useEffect(() => {
     if (open) {
-      if (editingItem) {
+      if (currentItem) {
         reset({
-          title: editingItem.title || '',
-          price: editingItem.price ? String(editingItem.price) : '',
-          amount: editingItem.amount ? String(editingItem.amount) : '1',
-          color: editingItem.accentColor || 'primary',
-          icon: editingItem.icon || 'cart',
+          title: currentItem.title || '',
+          price: currentItem.price ? String(currentItem.price) : '',
+          amount: currentItem.amount ? String(currentItem.amount) : '1',
+          color: currentItem.accentColor || 'primary',
+          icon: currentItem.icon || 'cart',
         });
       } else {
         reset(
@@ -139,7 +137,7 @@ export default function NewListItem({
         );
       }
     }
-  }, [open, editingItem, reset, type]);
+  }, [open, currentItem, reset, type]);
 
   /**
    * Converte string de preço para número
@@ -183,13 +181,13 @@ export default function NewListItem({
           onSuccess?.();
           onOpenChange(false);
         }
-      } else if (mode === 'edit' && editingItem) {
+      } else if (mode === 'edit' && currentItem) {
         const success = await updateListItem({
-          id: editingItem.id,
+          id: currentItem.id,
           title: itemData.title,
           price: parsePrice(itemData.price || '0'),
           amount: parseAmount(itemData.amount || '1'),
-          isChecked: editingItem.isChecked || false,
+          isChecked: currentItem.isChecked || false,
         });
 
         if (success) {

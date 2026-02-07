@@ -127,14 +127,16 @@ export const getThemeColor = (themeVars: ThemeVars, varName: string): string => 
  *
  * @example
  * ```typescript
- * const color = getThemeColorSafe(themeVars, '--color-background', 'rgb(255, 255, 255)');
- * ```
  */
-export const getThemeColorSafe = (
-  themeVars: ThemeVars,
-  varName: string,
-  fallback = 'rgb(0, 0, 0)'
-): string => {
+export const getThemeColorSafe = ({
+  themeVars,
+  varName,
+  fallback = 'rgb(0, 0, 0)',
+}: {
+  themeVars: ThemeVars;
+  varName: string;
+  fallback?: string;
+}): string => {
   try {
     return getThemeColor(themeVars, varName);
   } catch {
@@ -180,7 +182,7 @@ export const resolveColor = (
       if (!themeVars) {
         throw new Error('Theme variables object is required for CSS variable colors');
       }
-      return getThemeColorSafe(themeVars, colorInput, fallback);
+      return getThemeColorSafe({ themeVars, varName: colorInput, fallback });
     }
 
     // Se começa com '#' ou 'rgb', é uma cor direta

@@ -10,24 +10,23 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { IconCheck, IconEdit, IconTrash } from '@tabler/icons-react-native';
+import { List } from '@/data/types';
 
-// Define props interface
 interface CardListProps {
-  list: any; // TODO: Use proper ListType from unified types, but need to handle the extended properties like color, background etc.
+  list: List;
   pressHandler: () => void;
   deleteHandle: (id: string) => void;
   editHandle: (id: string, title: string, color: string, closeMenu: () => void) => void;
 }
 
 export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardListProps) => {
-  const { id, title, List_item, color, accentColor, iconBackground } = list;
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
 
-  const items = List_item || [];
-  const boughtCount = items.filter((item: any) => item?.status === true).length;
+  const items = list.listItems || [];
+  const boughtCount = items.filter((item: any) => item?.isChecked === true).length;
   const totalCount = items.length;
 
   const calculateTotal = () => {
@@ -51,17 +50,17 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
       {/* Left Section: Avatar + Title/Description */}
       <View className="flex-1 flex-row items-center gap-3">
         <Avatar
-          alt={title || 'Lista'}
+          alt={list.title || 'Lista'}
           className="size-[50px]"
           style={{
-            backgroundColor: iconBackground || accentColor?.hex || color,
+            backgroundColor: list.accentColor || '#000',
           }}>
           <AvatarFallback>
             {visible ? (
               <Icon as={IconCheck} size={24} className="text-white" />
             ) : (
               <Text className="text-lg font-bold text-white">
-                {title?.charAt(0)?.toUpperCase() || '?'}
+                {list.title?.charAt(0)?.toUpperCase() || '?'}
               </Text>
             )}
           </AvatarFallback>
@@ -69,7 +68,7 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
 
         <View className="flex-1">
           <Text variant="large" className="font-bold">
-            {title}
+            {list.title}
           </Text>
           <Text variant="muted" className="text-sm">
             {boughtCount}/{totalCount} compradas
@@ -93,7 +92,7 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem
               onPress={() => {
-                editHandle(id, title, accentColor?.name || color, closeMenu);
+                editHandle(list.id, list.title, list.accentColor || '#000', closeMenu);
                 closeMenu();
               }}>
               <Icon as={IconEdit} size={18} />
@@ -103,7 +102,7 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
             <DropdownMenuItem
               variant="destructive"
               onPress={() => {
-                deleteHandle(id);
+                deleteHandle(list.id);
                 closeMenu();
               }}>
               <Icon as={IconTrash} size={18} />
