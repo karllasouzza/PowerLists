@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react';
+'use client';
+
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 
-import { getProfile } from '@/data/actions/profile';
 import '@/css/global.css';
 import { View } from 'react-native';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -37,17 +38,29 @@ const SCREENS = [
 ];
 
 export default function RootLayout() {
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const init = async () => {
-      const { profile } = await getProfile();
-      if (!profile) {
-        router.replace('/account');
-      }
+      setIsLoading(true);
+
+      // const [isProfilePersistLoaded, isListsPersistLoaded, isListItemsPersistLoaded] =
+      //   await Promise.all([
+      //     when(syncedProfiles$.isPersistLoaded),
+      //     when(syncedLists$.isPersistLoaded),
+      //     when(syncedListItems$.isPersistLoaded),
+      //   ]);
+
+      // console.log('Profiles persist loaded:', isProfilePersistLoaded);
+      // console.log('Lists persist loaded:', isListsPersistLoaded);
+      // console.log('List items persist loaded:', isListItemsPersistLoaded);
+
+      setIsLoading(false);
+      return;
     };
+
     init();
-  }, [router]);
+  }, []);
 
   const segments = useSegments();
   const currentSegment = useMemo(
@@ -68,6 +81,8 @@ export default function RootLayout() {
 
   const screenAnimation: StackAnimationTypes =
     navigationDirection === 'right' ? 'slide_from_right' : 'slide_from_left';
+
+  if (isLoading) return <View className="flex-1 bg-background" />;
 
   return (
     <View className="relative flex h-full w-full flex-1">

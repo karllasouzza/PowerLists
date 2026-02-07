@@ -7,10 +7,10 @@ import BootSplash from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { useAuthStore } from '@/stores/auth';
 import ThemeProvider from '@/context/themes/use-themes';
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
 import '@/css/global.css';
+import { useAuthStore } from '@/hooks/use-auth';
 
 export default function RootLayout() {
   verifyInstallation();
