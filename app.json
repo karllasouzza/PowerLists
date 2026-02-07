@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "PowerLists",
-    "scheme": "com.karllasouzza.powerLists",
-    "slug": "com.karllasouzza.powerLists",
+    "scheme": "com.karllasouzza.powerlists",
+    "slug": "powerlists",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/adaptive-icon.png",
@@ -56,12 +56,29 @@
       }
     },
     "android": {
+      "package": "com.karllasouzza.powerlists",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "powerlists.com",
+              "pathPrefix": "/password-recovery"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.karllasouzza.powerLists",
       "permissions": [
         "android.permission.CAMERA"
       ],
