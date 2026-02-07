@@ -8,7 +8,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail } from 'lucide-react-native';
 
 import { useCountdown } from '@/hooks/use-countdown';
-import { useAuthStore } from '@/stores/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
@@ -18,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { RequestPasswordRecoverySchema } from '.';
 import { RequestPasswordRecoverySchemaType } from './types';
 import { errorsCase } from './utils';
+import { useAuthStore } from '@/hooks/use-auth';
 
 type LatestShipments = {
   date: Date;

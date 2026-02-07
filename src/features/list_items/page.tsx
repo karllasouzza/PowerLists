@@ -1,67 +1,44 @@
-/**
- * Tela de visualização e gerenciamento de items de uma lista
- *
- * Este componente é "burro" (presentational) - toda a lógica de negócio
- * está encapsulada nos data actions e utilitários.
- */
-
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, ScrollView } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { observer, useValue } from '@legendapp/state/react';
 
-import ListItem from '@/components/list-item';
-import NewListItem from '@/components/new-list-item';
+import ListItemComponent from '@/components/list-item';
+// import NewListItem from '@/components/new-list-item';
 import { useTheme } from '@/context/themes/use-themes';
 import { themes } from '@/context/themes/theme-config';
-import {
-  getListItemsByListId,
-  toggleCheckListItem,
-  deleteListItem,
-} from '@/data/actions/list-items';
+import { toggleCheckListItem, deleteListItem, listItems$ } from '@/data/states/list-items';
 
 import { ListItemsHeader, ListItemsFooter } from './components';
 import { calculateTotal, formatCurrency, separateItemsByStatus } from './utils';
-import type { ListItemsScreenProps, ListItem as ListItemType } from './types';
+import type { ListItem as ListItem } from './types';
+import { lists$ } from '@/data/states/lists';
+import { List } from '@/data/types';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 
-/**
- * Tela principal de gerenciamento de items de lista
- */
-export default function ListItemsScreen({ navigation, route }: ListItemsScreenProps) {
+const ListItemsScreen = observer(() => {
+  const router = useRouter();
+  const { id: listId } = useLocalSearchParams<{ id: string }>();
   const { theme, colorScheme } = useTheme();
-  const list = route.params?.list;
-  const { top, bottom } = useSafeAreaInsets();
 
-  const [items, setItems] = useState<ListItemType[]>([]);
+  const lists = useValue(lists$ || {});
+  const listsFormated = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
+  const currentList = listsFormated.find((list) => list.id === listId);
+
+  const listItemsRaw = useValue(listItems$.get());
+  const listItemsFormated = convertFromSupabaseFormat(
+    Object.values(listItemsRaw || {})
+  ) as ListItem[];
+
+  console.log('listItemsRaw', listItemsFormated);
+
+  const [items, setItems] = useState<ListItem[]>(() => {
+    const allItems = listItemsFormated.filter((item) => item.listId === listId);
+    return allItems as ListItem[];
+  });
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<ListItemType | null>(null);
-
-  /**
-   * Busca todos os items da lista
-   */
-  const fetchItems = useCallback(async () => {
-    try {
-      const { results } = await getListItemsByListId({ listId: list.id });
-      if (results) {
-        // Mapeia isChecked para status para compatibilidade com o componente
-        const mappedItems = results.map((item) => ({
-          ...item,
-          price: item.price || 0,
-          status: item.isChecked,
-        }));
-        setItems(mappedItems);
-      }
-    } catch (error) {
-      console.error('[ListItemsScreen] Error fetching items:', error);
-    }
-  }, [list.id]);
-
-  // Busca items quando a tela ganha foco
-  useFocusEffect(
-    useCallback(() => {
-      fetchItems();
-    }, [fetchItems])
-  );
+  const [editingItem, setEditingItem] = useState<ListItem | null>(null);
 
   /**
    * Marca/desmarca um item como concluído
@@ -71,7 +48,7 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
       const success = await toggleCheckListItem({ id, isChecked: !currentStatus });
       if (success) {
         setItems((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, status: !currentStatus } : item))
+          prev.map((item) => (item.id === id ? { ...item, isChecked: !currentStatus } : item))
         );
       }
     } catch (error) {
@@ -104,7 +81,7 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
   /**
    * Abre o formulário em modo de edição
    */
-  const handleEdit = useCallback((item: ListItemType) => {
+  const handleEdit = useCallback((item: ListItem) => {
     setEditingItem(item);
     setIsDialogOpen(true);
   }, []);
@@ -121,9 +98,8 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
    * Callback após sucesso na criação/edição
    */
   const handleSuccess = useCallback(() => {
-    fetchItems();
     handleCloseDialog();
-  }, [fetchItems, handleCloseDialog]);
+  }, [handleCloseDialog]);
 
   // Separa items em checked e unchecked, ordenados por data
   const { unchecked, checked } = useMemo(() => separateItemsByStatus(items), [items]);
@@ -133,7 +109,9 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
 
   // Cores do tema
   const themeColors = themes[theme][colorScheme];
-  const accentColor = themeColors[`--color-${list.accentColor}`] || themeColors['--color-primary'];
+  const accentColor =
+    themeColors[`--color-${currentList?.accentColor || 'primary'}`] ||
+    themeColors['--color-primary'];
   const backgroundColor = themeColors['--color-card'];
   const textColor = themeColors['--color-foreground'];
   const mutedColor = themeColors['--color-muted'];
@@ -142,11 +120,11 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
    * Renderiza um item da lista
    */
   const renderItem = useCallback(
-    (item: ListItemType) => (
-      <ListItem
+    (item: ListItem) => (
+      <ListItemComponent
         key={item.id}
         background={accentColor}
-        status={item.status}
+        status={item.isChecked}
         title={item.title}
         item={item}
         price={formatCurrency(item.price)}
@@ -154,7 +132,7 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
         color={textColor}
         subColor={mutedColor}
         checkColor={accentColor}
-        checkHandle={() => handleToggleCheck(item.id, item.status)}
+        checkHandle={() => handleToggleCheck(item.id, item.isChecked)}
         editHandle={handleEdit}
         deleteHandle={handleDelete}
       />
@@ -162,14 +140,16 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
     [accentColor, textColor, mutedColor, handleToggleCheck, handleEdit, handleDelete]
   );
 
+  if (!currentList?.id) return null;
+
   return (
     <View className="flex-1 bg-background">
       <ListItemsHeader
-        title={list.title}
+        title={currentList?.title ?? ''}
         backgroundColor={backgroundColor}
         textColor={textColor}
-        topInset={top}
-        onBack={() => navigation.goBack()}
+        topInset={0}
+        onBack={() => router.back()}
       />
 
       <ScrollView className="w-full flex-1">
@@ -185,19 +165,21 @@ export default function ListItemsScreen({ navigation, route }: ListItemsScreenPr
         accentColor={accentColor}
         backgroundColor={backgroundColor}
         textColor={textColor}
-        bottomInset={bottom}
+        bottomInset={0}
         onAddPress={handleOpenAdd}
       />
 
-      <NewListItem
+      {/* <NewListItem
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         mode={editingItem ? 'edit' : 'add'}
         type="Items"
-        listId={list.id}
+        listId={currentList?.id || ''}
         editingItem={editingItem}
         onSuccess={handleSuccess}
-      />
+      /> */}
     </View>
   );
-}
+});
+
+export default ListItemsScreen;

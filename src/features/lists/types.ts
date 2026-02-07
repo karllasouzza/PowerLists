@@ -1,13 +1,3 @@
-export interface List {
-  id: string;
-  title: string;
-  accentColor: string;
-  icon: string;
-  background?: string;
-  color?: string;
-  iconBackground?: string;
-}
-
 export interface FormData {
   title: string;
   price?: string;
@@ -17,7 +7,3 @@ export interface FormData {
 }
 
 export type Mode = 'add' | 'edit' | null;
-
-export interface HomeScreenProps {
-  navigation: any;
-}

@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useAuthStore } from '@/stores/auth';
 
 import { LoginSchema } from '.';
 import { LoginSchemaType } from './types';
@@ -17,6 +16,7 @@ import { Icon } from '@/components/ui/icon';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { HatGlasses, LogIn } from 'lucide-react-native';
+import { useAuthStore } from '@/hooks/use-auth';
 
 export default function LoginScreen() {
   const router = useRouter();

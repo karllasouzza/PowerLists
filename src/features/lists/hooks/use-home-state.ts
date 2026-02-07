@@ -1,33 +1,28 @@
 import { useState } from 'react';
-import { Mode, FormData } from '../types';
+import { lists$ } from '@/data/states/lists';
+import { useValue } from '@legendapp/state/react';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { List } from '@/data/types';
 
 export const useHomeState = () => {
   const [listEditId, setListEditId] = useState('');
-  const [mode, setMode] = useState<Mode>(null);
-  const [defaultValues, setDefaultValues] = useState<Partial<FormData>>({});
   const [onSearch, setOnSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isExtended, setIsExtended] = useState(true);
+  const lists = useValue(lists$.get());
+  const listFormatted = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
 
   const returnOfMode = () => {
     setListEditId('');
-    setMode(null);
-    setDefaultValues({});
   };
 
   return {
+    lists: listFormatted,
     listEditId,
     setListEditId,
-    mode,
-    setMode,
-    defaultValues,
-    setDefaultValues,
     onSearch,
     setOnSearch,
     searchQuery,
     setSearchQuery,
-    isExtended,
-    setIsExtended,
     returnOfMode,
   };
 };

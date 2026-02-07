@@ -1,75 +1,19 @@
-import React, { useMemo, useRef, useCallback } from 'react';
-import { View, ScrollView, BackHandler } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import { useObserve } from '@legendapp/state/react';
-import humps from 'humps';
+import React from 'react';
+import { View } from 'react-native';
 import { CardList } from '@/components/card-list';
-import NewListItem from '@/components/new-list-item';
-import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/theme-config';
-import { lists$ } from '@/data/actions/lists';
+import { LegendList } from '@legendapp/list';
 
-import { HomeScreenProps } from './types';
 import { useHomeState } from './hooks/use-home-state';
 import { handleDeleteList } from './utils/list-operations';
 import { filterListsByQuery } from './utils/list-filters';
-import { transformListForDisplay } from './utils/list-transformer';
 import { HomeAppbar } from './components/home-appbar';
-import { HomeFab } from './components/home-fab';
+import { router } from 'expo-router';
+import { observer } from '@legendapp/state/react';
+import { List } from '@/data/types';
 
-export default function HomeScreen({ navigation }: HomeScreenProps) {
-  const { theme, colorScheme } = useTheme();
-  const refSearchbar = useRef<any>(null);
-
-  const {
-    setListEditId,
-    mode,
-    setMode,
-    defaultValues,
-    setDefaultValues,
-    onSearch,
-    setOnSearch,
-    searchQuery,
-    setSearchQuery,
-    isExtended,
-    setIsExtended,
-    returnOfMode,
-  } = useHomeState();
-
-  const listsData = useObserve(lists$);
-
-  const lists = useMemo(() => {
-    const listsArray = Object.values(listsData || {});
-    return humps.camelizeKeys(listsArray) as any[];
-  }, [listsData]);
-
-  useFocusEffect(
-    useCallback(() => {
-      const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-        if (mode === 'add' || mode === 'edit') {
-          returnOfMode();
-          return true;
-        } else if (onSearch) {
-          setOnSearch(false);
-          return true;
-        }
-        return false;
-      });
-
-      if (onSearch) {
-        refSearchbar?.current?.focus();
-      }
-
-      return () => {
-        backHandler.remove();
-      };
-    }, [mode, onSearch, returnOfMode, setOnSearch])
-  );
-
-  const onScroll = ({ nativeEvent }: any) => {
-    const currentScrollPosition = Math.floor(nativeEvent?.contentOffset?.y) ?? 0;
-    setIsExtended(currentScrollPosition <= 0);
-  };
+const HomeScreen = observer(() => {
+  const { listEditId, setListEditId, searchQuery, setSearchQuery, returnOfMode, lists } =
+    useHomeState();
 
   const filteredLists = filterListsByQuery(lists, searchQuery);
 
@@ -77,40 +21,20 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     await handleDeleteList(id);
   };
 
-  const renderList = (list: any, index: number) => {
-    const themeVars = themes[theme][colorScheme];
-    const themeBackground = themeVars['--color-background'] || '#fff';
-    const transformedList = transformListForDisplay(list, themeBackground);
-
+  const renderList = (list: List, index: number) => {
     return (
       <CardList
         key={index}
-        list={{
-          ...transformedList,
-          accentColor: {
-            name: list.accentColor,
-            value: list.accentColor,
-          },
-        }}
+        list={list}
         pressHandler={() =>
-          navigation.navigate('List', {
-            list: {
-              ...list,
-              accentColor: list.accentColor,
-            },
-            action: 'viewListItens',
+          router.push({
+            pathname: 'lists/[id]',
+            params: { id: list.id },
           })
         }
         deleteHandle={onDeleteList}
-        editHandle={(id, title, color, hideMenu) => {
-          setMode('edit');
+        editHandle={(id) => {
           setListEditId(id);
-          setDefaultValues({
-            title,
-            color,
-            icon: list.icon || 'cart',
-          });
-          hideMenu();
         }}
       />
     );
@@ -118,48 +42,27 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <View className="flex h-full w-full flex-1 items-center bg-background">
-      <HomeAppbar
-        onSearch={onSearch}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        setOnSearch={setOnSearch}
-        refSearchbar={refSearchbar}
+      <HomeAppbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+      <LegendList
+        data={searchQuery.length > 0 ? filteredLists : lists}
+        renderItem={({ item, index }) => renderList(item, index)}
+        className="flex h-full w-full flex-1 bg-red-300 py-2.5"
+        keyExtractor={(item) => item.id}
+        recycleItems
       />
 
-      <ScrollView className="w-full py-2.5" onScroll={onScroll} scrollEventThrottle={16}>
-        {searchQuery.length > 0 && onSearch
-          ? filteredLists?.map(renderList)
-          : lists?.map(renderList)}
-      </ScrollView>
-
-      <HomeFab
-        isExtended={isExtended}
-        onPress={() => {
-          setMode('add');
-          setDefaultValues({});
-        }}
-      />
-
-      {(mode === 'add' || mode === 'edit') && (
+      {/* {(mode === 'add' || mode === 'edit') && (
         <NewListItem
           type="Lists"
           mode={mode}
           open={true}
           onOpenChange={(open) => !open && returnOfMode()}
-          editingItem={mode === 'edit' ? defaultValues : undefined}
           onSuccess={() => returnOfMode()}
-          colors={['primary', 'secondary', 'tertiary', 'error']}
-          icons={[
-            'cart',
-            'credit-card-chip',
-            'baby-carriage',
-            'bag-suitcase',
-            'ambulance',
-            'book',
-            'chef-hat',
-          ]}
         />
-      )}
+      )} */}
     </View>
   );
-}
+});
+
+export default HomeScreen;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -6,9 +6,15 @@ import { HatGlasses } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
+import { useTheme } from '@/context/themes/use-themes';
 
 export default function AuthScreen() {
   const router = useRouter();
+  const { setBackgroundColor } = useTheme();
+
+  useEffect(() => {
+    setBackgroundColor('default');
+  }, []);
 
   const handleCreateAccount = () => {
     router.navigate('/create-account');

@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useAuthStore } from '@/stores/auth';
 
 import { PasswordRecoverySchema } from '.';
 import { PasswordRecoverySchemaType } from './types';
@@ -17,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
+import { useAuthStore } from '@/hooks/use-auth';
 
 export default function PasswordRecoveryScreen() {
   const router = useRouter();

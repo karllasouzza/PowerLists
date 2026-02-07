@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Pressable } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Pressable, BackHandler } from 'react-native';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
@@ -7,20 +7,30 @@ import { IconSearch, IconArrowLeft } from '@tabler/icons-react-native';
 import { cn } from '@/lib/utils';
 
 interface HomeAppbarProps {
-  onSearch: boolean;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  setOnSearch: (value: boolean) => void;
-  refSearchbar: React.RefObject<any>;
 }
 
-export const HomeAppbar: React.FC<HomeAppbarProps> = ({
-  onSearch,
-  searchQuery,
-  setSearchQuery,
-  setOnSearch,
-  refSearchbar,
-}) => {
+export const HomeAppbar = ({ searchQuery, setSearchQuery }: HomeAppbarProps) => {
+  const [onSearch, setOnSearch] = useState(false);
+  const refSearchbar = React.useRef<any>(null);
+
+  useEffect(() => {
+    if (onSearch && refSearchbar.current) {
+      refSearchbar.current.focus();
+    }
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (onSearch) {
+        setOnSearch(false);
+        return true;
+      }
+      return false;
+    });
+
+    return () => backHandler.remove();
+  }, [onSearch, refSearchbar]);
+
   return (
     <View
       className={cn(

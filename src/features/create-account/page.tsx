@@ -8,7 +8,6 @@ import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
-import { useAuthStore } from '@/stores/auth';
 
 import { CreateAccountSchema } from '.';
 import { CreateAccountSchemaType } from './types';
@@ -17,6 +16,7 @@ import { Image } from 'expo-image';
 import { Icon } from '@/components/ui/icon';
 import { HatGlasses } from 'lucide-react-native';
 import { Label } from '@/components/ui/label';
+import { useAuthStore } from '@/hooks/use-auth';
 
 export default function CreateAccountScreen() {
   const router = useRouter();

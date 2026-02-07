@@ -2,6 +2,8 @@
  * Tipos para a feature de List Items
  */
 
+import { List } from '@/data/types';
+
 /**
  * Representa um item de lista
  */
@@ -16,15 +18,6 @@ export interface ListItem {
   readonly updatedAt?: string | Date;
   readonly listId: string;
   readonly profileId: string;
-}
-
-/**
- * Representa uma lista
- */
-export interface List {
-  readonly id: string;
-  readonly title: string;
-  readonly accentColor: string;
 }
 
 /**

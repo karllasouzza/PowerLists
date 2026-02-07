@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 
 export default function CustomizationPage() {
   const { theme, colorScheme, setTheme, setColorScheme } = useTheme();
-  console.log('Theme:', theme, 'Color Scheme:', colorScheme);
 
   return (
     <View className="flex h-full w-full items-center justify-center gap-4 bg-background">
