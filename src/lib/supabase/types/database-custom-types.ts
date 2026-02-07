@@ -7,25 +7,25 @@ import type { MergeDeep } from 'type-fest';
 export type ListRow = {
   id: string;
   profile_id: string;
-  title: string;
-  accent_color: string;
-  icon: string;
-  created_at: string;
-  updated_at?: string;
-  deleted_at?: string;
+  title: string | null;
+  accent_color: string | null;
+  icon: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted: boolean | null;
 };
 
 export type ListItemRow = {
   id: string;
   profile_id: string;
-  lists_id: string;
-  title: string;
-  price?: number;
-  amount: number;
+  list_id: string;
+  title: string | null;
+  price: number | null;
+  amount: number | null;
   is_checked: boolean;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string;
+  created_at: string | null;
+  updated_at: string | null;
+  deleted: boolean | null;
 };
 
 // Merge the generated database types with our custom types

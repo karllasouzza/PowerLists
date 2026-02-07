@@ -1,22 +1,55 @@
 import { Alert } from 'react-native';
-import { MigrationResult } from '@/stores/auth';
-import { lists$ } from '@/data/actions/lists';
+import { lists$ } from '@/data/states/lists';
 import { showToast } from './toast';
 
+interface MigrationDataParams {
+  guestId: string;
+  userId: string;
+}
+
+interface MigrationResult {
+  success: boolean;
+  itemsMigrated: number;
+  error?: string;
+}
+
 /**
- * Serviço responsável pela migração de dados entre usuários
- * A sincronização automática é feita pelo LegendApp State
+ * Service responsible for synchronizing guest user data to authenticated user accounts.
+ *
+ * Provides functionality to detect guest data, prompt users for migration, and handle
+ * the migration process of lists from guest accounts to registered user accounts.
+ *
+ * @remarks
+ * - All methods catch errors internally and provide safe fallback returns
+ * - Relies on LegendApp State management for automatic Supabase synchronization
+ * - Uses native Alert dialogs for user interaction on mobile platforms
+ *
+ * @example
+ * ```typescript
+ * const syncService = new SyncService();
+ *
+ * // Check if guest has data
+ * const hasData = await syncService.hasGuestData('guest_123');
+ *
+ * // Prompt migration flow
+ * await syncService.promptDataMigration({
+ *   guestId: 'guest_123',
+ *   userId: 'user_456'
+ * });
+ * ```
  */
 export class SyncService {
   /**
-   * Verifica se existem dados do guest para migrar
+   * Checks if a guest has any associated lists in the system.
+   * @param guestId - The unique identifier of the guest to check
+   * @returns A promise that resolves to true if the guest has at least one list, false otherwise
+   * @throws Does not throw; catches and logs errors internally, returning false on failure
    */
   async hasGuestData(guestId: string): Promise<boolean> {
     try {
       const listsData = lists$.get();
       const listsArray = Object.values(listsData || {});
 
-      // Verifica se existem listas do guest
       const guestLists = listsArray.filter((list: any) => list.profile_id === guestId);
 
       return guestLists.length > 0;
@@ -27,7 +60,10 @@ export class SyncService {
   }
 
   /**
-   * Conta quantas listas o guest possui
+   * Retrieves the count of lists associated with a specific guest.
+   * @param guestId - The unique identifier of the guest
+   * @returns A promise that resolves to the number of lists owned by the guest
+   * @throws Silently catches errors and returns 0 if count operation fails
    */
   async getGuestListsCount(guestId: string): Promise<number> {
     try {
@@ -45,13 +81,28 @@ export class SyncService {
   }
 
   /**
-   * Mostra dialog perguntando se quer migrar dados
+   * Prompts the user to migrate guest data to their user account.
+   *
+   * Checks if the guest has any saved data. If data exists, displays an alert
+   * allowing the user to either discard the local data or migrate it to their
+   * authenticated account. On successful migration, shows a success toast with
+   * the number of migrated items. On failure, shows an error toast.
+   *
+   * @param params - The migration parameters
+   * @param params.guestId - The ID of the guest account
+   * @param params.userId - The ID of the user account to migrate data to
+   * @returns A promise that resolves when the user completes the migration flow
+   *
+   * @example
+   * await syncService.promptDataMigration({
+   *   guestId: 'guest_123',
+   *   userId: 'user_456'
+   * });
    */
-  async promptDataMigration(guestId: string, userId: string): Promise<void> {
+  async promptDataMigration({ guestId, userId }: MigrationDataParams): Promise<void> {
     const hasData = await this.hasGuestData(guestId);
 
     if (!hasData) {
-      // Não tem dados para migrar
       return;
     }
 
@@ -73,7 +124,7 @@ export class SyncService {
             text: 'Sim, migrar',
             onPress: async () => {
               // Migra dados do guest para o usuário
-              const result = await this.migrateGuestDataToUser(guestId, userId);
+              const result = await this.migrateGuestDataToUser({ guestId, userId });
 
               if (result.success) {
                 showToast({
@@ -99,11 +150,20 @@ export class SyncService {
   }
 
   /**
-   * Migra dados de guest para usuário authenticated
-   * Atualiza o profile_id das listas no observable
-   * O LegendApp State sincroniza automaticamente com Supabase
+   * Migrates all lists owned by a guest user to a registered user.
+   *
+   * @param params - The migration parameters
+   * @param params.guestId - The ID of the guest user whose lists will be migrated
+   * @param params.userId - The ID of the registered user who will own the lists
+   * @returns A promise that resolves to a migration result containing success status and the count of migrated lists
+   * @throws Does not throw; errors are caught and returned in the result object
+   *
+   * @remarks
+   * - This method automatically syncs changes to Supabase through the LegendApp State
+   * - If no lists are found for the guest, returns success with 0 items migrated
+   * - The migration updates the `profile_id` field of each list to the new user ID
    */
-  async migrateGuestDataToUser(guestId: string, userId: string): Promise<MigrationResult> {
+  async migrateGuestDataToUser({ guestId, userId }: MigrationDataParams): Promise<MigrationResult> {
     try {
       const listsData = lists$.get();
       const listsArray = Object.entries(listsData || {});

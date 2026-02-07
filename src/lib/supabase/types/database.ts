@@ -37,49 +37,52 @@ export type Database = {
         Row: {
           amount: number | null;
           created_at: string | null;
-          deleted_at: string | null;
+          deleted: boolean | null;
           id: string;
           is_checked: boolean;
-          lists_id: string;
+          list_id: string;
           price: number | null;
           profile_id: string;
           title: string | null;
+          updated_at: string | null;
         };
         Insert: {
           amount?: number | null;
           created_at?: string | null;
-          deleted_at?: string | null;
+          deleted?: boolean | null;
           id?: string;
           is_checked?: boolean;
-          lists_id: string;
+          list_id: string;
           price?: number | null;
           profile_id: string;
           title?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           amount?: number | null;
           created_at?: string | null;
-          deleted_at?: string | null;
+          deleted?: boolean | null;
           id?: string;
           is_checked?: boolean;
-          lists_id?: string;
+          list_id?: string;
           price?: number | null;
           profile_id?: string;
           title?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
-            foreignKeyName: 'items_profile_id_fkey';
-            columns: ['profile_id'];
+            foreignKeyName: 'list_items_list_id_fkey';
+            columns: ['list_id'];
             isOneToOne: false;
-            referencedRelation: 'profiles';
+            referencedRelation: 'lists';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'List_item_lists_id_fkey';
-            columns: ['lists_id'];
+            foreignKeyName: 'list_items_profile_id_fkey';
+            columns: ['profile_id'];
             isOneToOne: false;
-            referencedRelation: 'lists';
+            referencedRelation: 'profiles';
             referencedColumns: ['id'];
           },
         ];
@@ -88,29 +91,32 @@ export type Database = {
         Row: {
           accent_color: string | null;
           created_at: string | null;
-          deleted_at: string | null;
+          deleted: boolean | null;
           icon: string | null;
           id: string;
           profile_id: string;
           title: string | null;
+          updated_at: string | null;
         };
         Insert: {
           accent_color?: string | null;
           created_at?: string | null;
-          deleted_at?: string | null;
+          deleted?: boolean | null;
           icon?: string | null;
           id?: string;
           profile_id: string;
           title?: string | null;
+          updated_at?: string | null;
         };
         Update: {
           accent_color?: string | null;
           created_at?: string | null;
-          deleted_at?: string | null;
+          deleted?: boolean | null;
           icon?: string | null;
           id?: string;
           profile_id?: string;
           title?: string | null;
+          updated_at?: string | null;
         };
         Relationships: [
           {
@@ -127,28 +133,28 @@ export type Database = {
           avatar_url: string | null;
           bio: string | null;
           created_at: string;
+          deleted: boolean | null;
           id: string;
           name: string;
           updated_at: string | null;
-          user_id: string;
         };
         Insert: {
           avatar_url?: string | null;
           bio?: string | null;
           created_at?: string;
-          id?: string;
+          deleted?: boolean | null;
+          id: string;
           name: string;
           updated_at?: string | null;
-          user_id: string;
         };
         Update: {
           avatar_url?: string | null;
           bio?: string | null;
           created_at?: string;
+          deleted?: boolean | null;
           id?: string;
           name?: string;
           updated_at?: string | null;
-          user_id?: string;
         };
         Relationships: [];
       };

@@ -3,8 +3,13 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types/database';
 import { mmkvStorage } from '@/data/storage';
 
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+console.log('Supabase config:', {
+  url: SUPABASE_URL ? 'Set' : 'Missing',
+  key: SUPABASE_ANON_KEY ? 'Set' : 'Missing',
+});
 
 const mmkvAdapter = {
   getItem: (key: string) => {
