@@ -16,13 +16,13 @@ import { Icon } from '@/components/ui/icon';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { HatGlasses, LogIn } from 'lucide-react-native';
-import { useAuthStore } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [isSecureTextEntry, setIsSecureTextEntry] = useState(true);
 
-  const { signIn, isLoading } = useAuthStore();
+  const { signInWithPassword, isLoading } = useAuth();
 
   const {
     control,
@@ -37,7 +37,7 @@ export default function LoginScreen() {
   });
 
   const onSubmit = async (data: LoginSchemaType) => {
-    const success = await signIn({ email: data.email, password: data.password });
+    const success = await signInWithPassword({ email: data.email, password: data.password });
     if (!success) return;
 
     router.replace('/(tabs)');

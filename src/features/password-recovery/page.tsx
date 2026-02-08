@@ -16,11 +16,11 @@ import { Label } from '@/components/ui/label';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
-import { useAuthStore } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function PasswordRecoveryScreen() {
   const router = useRouter();
-  const { resetPassword, isLoading } = useAuthStore();
+  const { resetPassword, isLoading } = useAuth();
 
   const [isSecureNewPassword, setIsSecureNewPassword] = useState(true);
   const [isSecureNewPasswordConfirmation, setIsSecureNewPasswordConfirmation] = useState(true);

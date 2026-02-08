@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label';
 import { RequestPasswordRecoverySchema } from '.';
 import { RequestPasswordRecoverySchemaType } from './types';
 import { errorsCase } from './utils';
-import { useAuthStore } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 
 type LatestShipments = {
   date: Date;
@@ -26,7 +26,7 @@ type LatestShipments = {
 };
 
 export default function PasswordRecoveryScreen() {
-  const { sendResetPasswordByEmail, isLoading } = useAuthStore();
+  const { sendResetPasswordByEmail, isLoading } = useAuth();
 
   const [latestShipments, setLatestShipments] = React.useState<LatestShipments[]>([]);
 
