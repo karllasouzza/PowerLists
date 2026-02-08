@@ -46,7 +46,8 @@
             "enforceNavigationBarContrast": true
           }
         }
-      ]
+      ],
+      "expo-font"
     ],
     "ios": {
       "supportsTablet": true,

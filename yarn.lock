@@ -1237,6 +1237,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo-google-fonts/lora@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@expo-google-fonts/lora@npm:0.4.2"
+  checksum: 10c0/0be0a4fc59b9d39c607667f2a37b09c5d05ef74997410fa1a0c4d20246e6382137302dec7cf09cae8f7247a321340d571b6c0b1b50462f5e364b6416b6d13626
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/poppins@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/poppins@npm:0.4.1"
+  checksum: 10c0/068b995d7db0dab2a8884efe8b5d6ae1e78d1d52d86906e771d06af128718780bcf4b147d83cf4cc19fcd66e7a47bc6f867b877eaad6c095e9f7b5edf3bb50d4
+  languageName: node
+  linkType: hard
+
 "@expo/cli@npm:54.0.22":
   version: 54.0.22
   resolution: "@expo/cli@npm:54.0.22"
@@ -10331,6 +10345,8 @@ __metadata:
     "@babel/plugin-transform-flow-strip-types": "npm:^7.27.1"
     "@babel/plugin-transform-runtime": "npm:^7.28.5"
     "@babel/runtime": "npm:^7.28.4"
+    "@expo-google-fonts/lora": "npm:^0.4.2"
+    "@expo-google-fonts/poppins": "npm:^0.4.1"
     "@hookform/resolvers": "npm:^5.2.2"
     "@legendapp/list": "npm:^2.0.19"
     "@legendapp/state": "npm:^3.0.0-beta.42"
@@ -10376,6 +10392,7 @@ __metadata:
     expo-camera: "npm:~17.0.10"
     expo-constants: "npm:~18.0.13"
     expo-dev-client: "npm:~6.0.20"
+    expo-font: "npm:~14.0.11"
     expo-image: "npm:~3.0.11"
     expo-linking: "npm:~8.0.11"
     expo-navigation-bar: "npm:~5.0.10"
