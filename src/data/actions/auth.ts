@@ -35,7 +35,7 @@ export async function createSupabaseUser({
 }: CreateUserParams): Promise<UserOperationResult> {
   if (!email || !password) throw new Error('Email and password are required');
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUpWithPassword({ email, password });
   if (error) throw error;
   if (!data.user) throw new Error('User not created');
 

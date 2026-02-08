@@ -16,14 +16,13 @@ import { useValue } from '@legendapp/state/react';
 import * as Linking from 'expo-linking';
 import { auth$ } from '@/data/states/auth';
 
-export function useAuthStore() {
-  const user = useValue(auth$.user);
-  const session = useValue(auth$.session);
-  const isInitialized = useValue(auth$.isInitialized);
-  const isLoading = useValue(auth$.isLoading);
+export function useAuth() {
+  const user = useValue(auth$.user.get());
+  const session = useValue(auth$.session.get());
+  const isInitialized = useValue(auth$.isInitialized.get());
+  const isLoading = useValue(auth$.isLoading.get());
 
   return {
-    // state
     user,
     session,
     isInitialized,
@@ -74,7 +73,13 @@ export function useAuthStore() {
       }
     },
 
-    signIn: async ({ email, password }: { email: string; password: string }): Promise<boolean> => {
+    signInWithPassword: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }): Promise<boolean> => {
       try {
         if (!email || !password) throw new Error('Email and password are required');
 
@@ -104,7 +109,7 @@ export function useAuthStore() {
         showToast({ type: 'success', title: 'Sucesso!', subtitle: 'Login realizado com sucesso' });
         return true;
       } catch (error) {
-        console.error('Error on signIn:', error);
+        console.error('Error on signInWithPassword:', error);
         auth$.isLoading.set(false);
         showToast({
           type: 'error',
@@ -115,7 +120,13 @@ export function useAuthStore() {
       }
     },
 
-    signUp: async ({ email, password }: { email: string; password: string }): Promise<void> => {
+    signUpWithPassword: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }): Promise<void> => {
       try {
         auth$.isLoading.set(true);
         const previousUser = auth$.user.get();
