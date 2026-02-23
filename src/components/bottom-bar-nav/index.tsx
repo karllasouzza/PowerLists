@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { TabTrigger } from 'expo-router/ui';
 import { View, Animated, Pressable, Text } from 'react-native';
 import { cn } from '@/lib/utils';
 import { Icon } from '../ui/icon';
@@ -9,12 +9,12 @@ interface BottomNavigationProps {
   screens: {
     name: string;
     label: string;
+    href: string;
     icon: { default: any; filled: any };
   }[];
 }
 
 const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) => {
-  const router = useRouter();
   const [activeIcon, setActiveIcon] = useState(currentSegment);
 
   // Animation values for each icon
@@ -24,8 +24,8 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
         acc[screen.name] = new Animated.Value(screen.name === currentSegment ? 1.1 : 1);
         return acc;
       },
-      {} as { [key: string]: Animated.Value }
-    )
+      {} as { [key: string]: Animated.Value },
+    ),
   ).current;
 
   // Animation values for icon opacity
@@ -35,31 +35,9 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
         acc[screen.name] = new Animated.Value(screen.name === currentSegment ? 1 : 0.5);
         return acc;
       },
-      {} as { [key: string]: Animated.Value }
-    )
+      {} as { [key: string]: Animated.Value },
+    ),
   ).current;
-
-  // Animated value for the green indicator
-  const indicatorScale = useRef(new Animated.Value(1)).current;
-  const indicatorOpacity = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    // Pulse animation for the green indicator on "Explore"
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(indicatorScale, {
-          toValue: 1.2,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(indicatorScale, {
-          toValue: 1,
-          duration: 1000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  }, []);
 
   useEffect(() => {
     // Animate icon transitions
@@ -100,47 +78,39 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
     }
   }, [currentSegment, activeIcon, iconScales, iconOpacities]);
 
-  const handlePress = (screenName: string) => {
-    if (screenName !== currentSegment) {
-      // Haptic feedback
-      router.push(screenName === 'index' ? '/' : screenName);
-    }
-  };
-
   return (
-    <View className="absolute bottom-6 left-0 right-0 z-50 flex items-center justify-center px-4">
-      <View className="relative flex h-16 w-full max-w-md flex-row items-center justify-around rounded-3xl bg-black/90 px-4 shadow-2xl">
-        {screens.map((screen, index) => {
+    <View className="absolute bottom-4 left-0 right-0 z-50 flex items-center justify-center px-4">
+      <View className="relative flex h-16 w-full max-w-md flex-row items-center justify-around rounded-3xl bg-black/90 shadow-2xl">
+        {screens.map((screen) => {
           const isActive = screen.name === activeIcon;
           const showFilled = screen.name === activeIcon;
 
           return (
-            <Pressable
-              key={screen.name}
-              onPress={() => handlePress(screen.name)}
-              className="relative flex flex-row items-center justify-center gap-2">
-              <Animated.View
-                style={{
-                  transform: [{ scale: iconScales[screen.name] }],
-                  opacity: iconOpacities[screen.name],
-                }}
-                className="flex items-center justify-center">
-                <Icon
-                  as={showFilled ? screen.icon.filled : screen.icon.default}
-                  className={cn('size-6', showFilled ? 'text-primary' : 'text-white/70')}
-                />
-              </Animated.View>
-
-              {/* Active label */}
-              {isActive && (
+            <TabTrigger key={screen.name} name={screen.name} asChild>
+              <Pressable className="relative flex h-full flex-row items-center justify-center gap-2 px-2">
                 <Animated.View
                   style={{
+                    transform: [{ scale: iconScales[screen.name] }],
                     opacity: iconOpacities[screen.name],
-                  }}>
-                  <Text className="text-xs font-medium text-primary">{screen.label}</Text>
+                  }}
+                  className="flex items-center justify-center">
+                  <Icon
+                    as={showFilled ? screen.icon.filled : screen.icon.default}
+                    className={cn('size-6', showFilled ? 'text-primary' : 'text-white/70')}
+                  />
                 </Animated.View>
-              )}
-            </Pressable>
+
+                {/* Active label */}
+                {isActive && (
+                  <Animated.View
+                    style={{
+                      opacity: iconOpacities[screen.name],
+                    }}>
+                    <Text className="text-xs font-medium text-primary">{screen.label}</Text>
+                  </Animated.View>
+                )}
+              </Pressable>
+            </TabTrigger>
           );
         })}
       </View>
