@@ -2,15 +2,15 @@ import React from 'react';
 import { View } from 'react-native';
 import { CardList } from '@/components/card-list';
 import { LegendList } from '@legendapp/list';
+import { TopBar } from '@/components/top-bar';
 
 import { useHomeState } from './hooks/use-home-state';
 import { filterListsByQuery } from './utils/list-filters';
-import { HomeAppbar } from './components/home-appbar';
 import { observer } from '@legendapp/state/react';
 import { List } from '@/data/types';
 
 const HomeScreen = observer(() => {
-  const { listEditId, setListEditId, searchQuery, setSearchQuery, lists } = useHomeState();
+  const { searchQuery, setSearchQuery, lists } = useHomeState();
 
   const filteredLists = filterListsByQuery(lists, searchQuery);
 
@@ -20,7 +20,13 @@ const HomeScreen = observer(() => {
 
   return (
     <View className="flex h-full w-full flex-1 items-center bg-background">
-      <HomeAppbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <TopBar
+        title="Lists"
+        showSearch={true}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Procurando por algo?"
+      />
 
       <LegendList
         data={filteredLists}

@@ -35,7 +35,7 @@ export default function PasswordRecoveryScreen() {
   const lastShipment = latestShipments.at(-1);
   const targetDate = useMemo(
     () => (lastShipment ? new Date(lastShipment.date.getTime() + SEND_EMAIL_DELAY) : null),
-    [lastShipment]
+    [lastShipment, SEND_EMAIL_DELAY],
   );
 
   const { formattedTime, timeLeft } = useCountdown(targetDate);

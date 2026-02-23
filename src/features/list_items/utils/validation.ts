@@ -51,7 +51,7 @@ export const validateItemAmount = (amount: string): boolean => {
  */
 export const validateItemForm = (
   title: string,
-  amount: string
+  amount: string,
 ): { isValid: boolean; errorField: 'title' | 'amount' | '' } => {
   if (!validateItemTitle(title)) {
     return { isValid: false, errorField: 'title' };

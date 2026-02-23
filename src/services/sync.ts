@@ -144,7 +144,7 @@ export class SyncService {
             },
           },
         ],
-        { cancelable: false }
+        { cancelable: false },
       );
     });
   }
@@ -170,7 +170,7 @@ export class SyncService {
 
       // Filtra listas do guest
       const guestLists = listsArray.filter(
-        ([_, list]: [string, any]) => list.profile_id === guestId
+        ([_, list]: [string, any]) => list.profile_id === guestId,
       );
 
       if (guestLists.length === 0) {

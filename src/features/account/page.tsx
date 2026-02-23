@@ -3,6 +3,7 @@ import { View, Text, Pressable } from 'react-native';
 import { IconUser, IconLogout } from '@tabler/icons-react-native';
 import { isGuestUser } from '@/data/types/user';
 import { Icon } from '@/components/ui/icon';
+import { TopBar } from '@/components/top-bar';
 import { observer } from '@legendapp/state/react';
 import useProfileData from './use-profile-data';
 
@@ -11,6 +12,7 @@ const AccountScreen = observer(() => {
 
   return (
     <View className="h-full w-full bg-background">
+      <TopBar title="Account" />
       <View className="h-[28vh] flex-col items-center justify-center bg-red-200">
         <View className="size-32 items-center justify-center rounded-full bg-blue-300">
           <Icon as={IconUser} size={30} color="white" />

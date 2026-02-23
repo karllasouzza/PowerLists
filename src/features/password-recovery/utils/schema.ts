@@ -13,5 +13,5 @@ export const PasswordRecoverySchema = z
     z.refine((data) => data.newPassword === data.newPasswordConfirmation, {
       message: 'As senhas não coincidem',
       path: ['newPasswordConfirmation'],
-    })
+    }),
   );

@@ -45,7 +45,7 @@ export const parseAmount = (amount: string): number => {
  * @param items - Array de items
  * @returns Total formatado como moeda ou 0 se não houver items
  */
-export const calculateTotal = (items: ListItem[]): string => {
+export const calculateTotal = (items: Pick<ListItem, 'price' | 'amount'>[]): string => {
   if (!items.length) {
     return formatCurrency(0);
   }

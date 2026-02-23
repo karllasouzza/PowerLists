@@ -16,13 +16,13 @@ import { Image } from 'expo-image';
 import { Icon } from '@/components/ui/icon';
 import { HatGlasses } from 'lucide-react-native';
 import { Label } from '@/components/ui/label';
-import { useAuthStore } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function CreateAccountScreen() {
   const router = useRouter();
   const [isSecureTextEntry, setIsSecureTextEntry] = useState(true);
 
-  const { signUp, isLoading } = useAuthStore();
+  const { signUpWithPassword, isLoading } = useAuth();
 
   const {
     control,
@@ -38,10 +38,10 @@ export default function CreateAccountScreen() {
 
   const onSubmit = async (data: CreateAccountSchemaType) => {
     try {
-      await signUp({ email: data.email, password: data.password });
+      await signUpWithPassword({ email: data.email, password: data.password });
       router.push('/(tabs)');
     } catch (error) {
-      console.error('Error on signUp:', error);
+      console.error('Error on signUpWithPassword:', error);
     }
   };
 

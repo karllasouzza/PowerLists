@@ -35,9 +35,7 @@
       ],
       "expo-router",
       "expo-asset",
-      [
-        "expo-build-properties"
-      ],
+      ["expo-build-properties"],
       [
         "react-native-edge-to-edge",
         {
@@ -69,10 +67,7 @@
               "pathPrefix": "/password-recovery"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
       "edgeToEdgeEnabled": true,
@@ -80,9 +75,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "android.permission.CAMERA"
-      ],
+      "permissions": ["android.permission.CAMERA"],
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {

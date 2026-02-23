@@ -4,12 +4,12 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { observer, useValue } from '@legendapp/state/react';
 
 import ListItemComponent from '@/components/list-item';
-// import NewListItem from '@/components/new-list-item';
+import { TopBar } from '@/components/top-bar';
 import { useTheme } from '@/context/themes/use-themes';
 import { themes } from '@/context/themes/theme-config';
 import { toggleCheckListItem, deleteListItem, listItems$ } from '@/data/states/list-items';
 
-import { ListItemsHeader, ListItemsFooter } from './components';
+import { ListItemsFooter } from './components';
 import { calculateTotal, formatCurrency, separateItemsByStatus } from './utils';
 import type { ListItem as ListItem } from './types';
 import { lists$ } from '@/data/states/lists';
@@ -27,10 +27,8 @@ const ListItemsScreen = observer(() => {
 
   const listItemsRaw = useValue(listItems$.get());
   const listItemsFormated = convertFromSupabaseFormat(
-    Object.values(listItemsRaw || {})
+    Object.values(listItemsRaw || {}),
   ) as ListItem[];
-
-  console.log('listItemsRaw', listItemsFormated);
 
   const [items, setItems] = useState<ListItem[]>(() => {
     const allItems = listItemsFormated.filter((item) => item.listId === listId);
@@ -39,6 +37,7 @@ const ListItemsScreen = observer(() => {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ListItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   /**
    * Marca/desmarca um item como concluído
@@ -48,7 +47,7 @@ const ListItemsScreen = observer(() => {
       const success = await toggleCheckListItem({ id, isChecked: !currentStatus });
       if (success) {
         setItems((prev) =>
-          prev.map((item) => (item.id === id ? { ...item, isChecked: !currentStatus } : item))
+          prev.map((item) => (item.id === id ? { ...item, isChecked: !currentStatus } : item)),
         );
       }
     } catch (error) {
@@ -100,12 +99,22 @@ const ListItemsScreen = observer(() => {
   const handleSuccess = useCallback(() => {
     handleCloseDialog();
   }, [handleCloseDialog]);
+  // Filtra items baseado na busca
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return items;
+
+    const query = searchQuery.toLowerCase();
+    return items.filter((item) => item.title.toLowerCase().includes(query));
+  }, [items, searchQuery]);
 
   // Separa items em checked e unchecked, ordenados por data
-  const { unchecked, checked } = useMemo(() => separateItemsByStatus(items), [items]);
+  const { unchecked, checked } = useMemo(
+    () => separateItemsByStatus(filteredItems),
+    [filteredItems],
+  );
 
   // Calcula o total de todos os items
-  const total = useMemo(() => calculateTotal(items), [items]);
+  const total = useMemo(() => calculateTotal(filteredItems), [filteredItems]);
 
   // Cores do tema
   const themeColors = themes[theme][colorScheme];
@@ -137,19 +146,21 @@ const ListItemsScreen = observer(() => {
         deleteHandle={handleDelete}
       />
     ),
-    [accentColor, textColor, mutedColor, handleToggleCheck, handleEdit, handleDelete]
+    [accentColor, textColor, mutedColor, handleToggleCheck, handleEdit, handleDelete],
   );
 
   if (!currentList?.id) return null;
 
   return (
     <View className="flex-1 bg-background">
-      <ListItemsHeader
-        title={currentList?.title ?? ''}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        topInset={0}
+      <TopBar
+        title={currentList?.title ?? 'List'}
+        showBack={true}
         onBack={() => router.back()}
+        showSearch={true}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Search items..."
       />
 
       <ScrollView className="w-full flex-1">
