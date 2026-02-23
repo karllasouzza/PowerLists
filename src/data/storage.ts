@@ -98,7 +98,7 @@ const safeJsonStringify = (data: unknown): string | null => {
 const setValueAtPath = (
   obj: Record<string, unknown>,
   path: readonly (string | number)[],
-  value: unknown
+  value: unknown,
 ): Record<string, unknown> => {
   // Replace entire object if path is empty
   if (path.length === 0) {

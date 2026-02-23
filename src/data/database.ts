@@ -1,4 +1,3 @@
-import { useValue } from '@legendapp/state/react';
 import { configureSynced } from '@legendapp/state/sync';
 import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase';
 import { generateId } from './utils';
@@ -11,7 +10,6 @@ enableReactTracking({
   warnMissingUse: true,
 });
 
-// Create a configured sync function
 export const customSynced = configureSynced(syncedSupabase, {
   supabase,
   persist: {

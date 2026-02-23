@@ -28,7 +28,7 @@ export const listItems$ = observable(
     retry: {
       infinite: true,
     },
-  })
+  }),
 );
 
 export const getAllListItems = (): ListItem[] | null => {

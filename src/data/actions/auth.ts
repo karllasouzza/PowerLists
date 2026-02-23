@@ -14,8 +14,8 @@ import { resetListItemsStore } from '@/data/states/list-items';
 import { auth$ } from '@/data/states/auth';
 
 export async function fetchOrRestoreUser(): Promise<UserOperationResult> {
-  const cached = auth$.user.get();
-  if (cached) return { user: cached };
+  const useCached = auth$.user.get();
+  if (useCached) return { user: useCached };
 
   const {
     data: { user },
@@ -35,7 +35,7 @@ export async function createSupabaseUser({
 }: CreateUserParams): Promise<UserOperationResult> {
   if (!email || !password) throw new Error('Email and password are required');
 
-  const { data, error } = await supabase.auth.signUpWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signUp({ email, password });
   if (error) throw error;
   if (!data.user) throw new Error('User not created');
 
@@ -98,7 +98,7 @@ export async function syncWithSupabase(user?: AuthUser): Promise<UserOperationRe
 
 export async function signInWithPassword(
   email: string,
-  password: string
+  password: string,
 ): Promise<UserOperationResult> {
   if (!email || !password) throw new Error('Email and password are required');
 

@@ -16,12 +16,12 @@ export const lists$ = observable(
     collection: 'lists',
     select: (from: any) =>
       from.select(
-        'id,profile_id,title,accent_color,icon,created_at,updated_at,deleted, list_items(is_checked,amount,price)'
+        'id,profile_id,title,accent_color,icon,created_at,updated_at,deleted, list_items(is_checked,amount,price)',
       ),
     filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'lists', retrySync: true },
-  })
+  }),
 );
 
 interface getAllListsResult {

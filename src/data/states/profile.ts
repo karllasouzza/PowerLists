@@ -20,7 +20,7 @@ export const profiles$ = observable(
     retry: {
       infinite: true,
     },
-  })
+  }),
 );
 
 /**
