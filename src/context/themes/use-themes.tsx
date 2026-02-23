@@ -19,7 +19,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   const safeColorScheme = useMemo(
     () => customColorScheme || systemColorScheme || 'light',
-    [customColorScheme, systemColorScheme]
+    [customColorScheme, systemColorScheme],
   );
   const safeThemeName = useMemo(() => customTheme || 'default', [customTheme]);
 
@@ -78,7 +78,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
         return false;
       }
     },
-    [setCustomColorScheme]
+    [setCustomColorScheme],
   );
 
   const handleSetThemeName = useCallback((theme: keyof typeof themes): boolean => {
@@ -148,12 +148,12 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       handleSetThemeName,
       handleSetColorScheme,
       handleSetBackgroundColor,
-    ]
+    ],
   );
 
   const themeVars = useMemo(
     () => themes[safeThemeName][safeColorScheme],
-    [safeThemeName, safeColorScheme]
+    [safeThemeName, safeColorScheme],
   );
 
   return (

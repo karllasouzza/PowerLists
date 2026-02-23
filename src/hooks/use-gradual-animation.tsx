@@ -11,7 +11,7 @@ const useGradualAnimation = () => {
         height.value = Math.max(event.height, 0);
       },
     },
-    []
+    [],
   );
 
   return { height };

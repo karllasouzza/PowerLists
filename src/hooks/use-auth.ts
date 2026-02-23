@@ -1,7 +1,9 @@
-import { clearAllStorage } from '@/data/storage';
-import { isGuestUser, UserType, UserOperationResult } from '@/data/types/user';
-import { supabase } from '@/lib/supabase';
+import * as Linking from 'expo-linking';
+import { useValue } from '@legendapp/state/react';
+
 import { SyncService, showToast } from '@/services';
+import { supabase } from '@/lib/supabase';
+import { isGuestUser, UserType, UserOperationResult } from '@/data/types/user';
 import {
   fetchOrRestoreUser,
   syncWithSupabase,
@@ -12,9 +14,8 @@ import {
   performSignOut,
   createGuest,
 } from '@/data/actions/auth';
-import { useValue } from '@legendapp/state/react';
-import * as Linking from 'expo-linking';
 import { auth$ } from '@/data/states/auth';
+import { clearAllStorage } from '@/data/storage';
 
 export function useAuth() {
   const user = useValue(auth$.user.get());
@@ -28,15 +29,18 @@ export function useAuth() {
     isInitialized,
     isLoading,
 
-    // actions
-    initialize: async (): Promise<boolean> => {
+    fetchUserDataAsync: async (): Promise<boolean> => {
       try {
         auth$.isLoading.set(true);
 
         const current = auth$.user.get();
-        if (!current) throw new Error('No user found in store');
+        if (!current) {
+          auth$.isInitialized.set(true);
+          auth$.isLoading.set(false);
+          return false;
+        }
 
-        if (isGuestUser(current) && current.is_guest) {
+        if (isGuestUser(current)) {
           const result = await fetchOrRestoreUser();
           auth$.user.set(result.user);
           auth$.isInitialized.set(true);
@@ -63,8 +67,7 @@ export function useAuth() {
         auth$.isInitialized.set(true);
         auth$.isLoading.set(false);
         return true;
-      } catch (error) {
-        console.error('Erro ao inicializar autenticação:', error);
+      } catch {
         auth$.user.set(null);
         auth$.session.set(null);
         auth$.isInitialized.set(true);
@@ -94,7 +97,7 @@ export function useAuth() {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (isGuestUser(previousUser) && previousUser.is_guest) {
+        if (isGuestUser(previousUser)) {
           const syncService = new SyncService();
           await syncService.promptDataMigration({
             guestId: previousUser.id,
@@ -136,7 +139,7 @@ export function useAuth() {
 
         const { data: sessionData } = await supabase.auth.getSession();
 
-        if (isGuestUser(previousUser) && previousUser.is_guest) {
+        if (isGuestUser(previousUser)) {
           const syncService = new SyncService();
           await syncService.promptDataMigration({
             guestId: previousUser.id,

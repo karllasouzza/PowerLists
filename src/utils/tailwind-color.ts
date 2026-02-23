@@ -38,7 +38,7 @@ export const getTailwindColor = (colorString: string): string => {
 
   if (colorParts.length !== 2) {
     throw new Error(
-      `Invalid color format: '${colorString}'. Expected format: colorName-shade (e.g., blue-500) or special color (black, white, transparent)`
+      `Invalid color format: '${colorString}'. Expected format: colorName-shade (e.g., blue-500) or special color (black, white, transparent)`,
     );
   }
 
@@ -174,7 +174,7 @@ export const getThemeColorSafe = ({
 export const resolveColor = (
   colorInput: string,
   themeVars?: ThemeVars,
-  fallback = '#000000'
+  fallback = '#000000',
 ): string => {
   try {
     // Se começa com '--', é uma variável de tema CSS
