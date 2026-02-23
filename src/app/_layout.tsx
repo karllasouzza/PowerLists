@@ -42,19 +42,18 @@ export default function RootLayout() {
     Lora_700Bold,
   });
 
-  const { isLoading, user, initialize } = useAuth();
+  const { isLoading, user, fetchUserDataAsync } = useAuth();
 
   useEffect(() => {
-    initialize();
-  }, []);
+    fetchUserDataAsync();
+  });
 
   useEffect(() => {
-    console.log(visible, isLoading, fontsLoaded);
     if (!isLoading && fontsLoaded) {
       BootSplash.hide({ fade: true });
       setVisible(false);
     }
-  }, [isLoading, fontsLoaded]);
+  }, [isLoading, fontsLoaded, visible]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
