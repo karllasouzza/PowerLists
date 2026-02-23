@@ -28,7 +28,7 @@ function Checkbox({
         }),
         props.checked && cn('border-primary', checkedClassName),
         props.disabled && 'opacity-50',
-        className
+        className,
       )}
       hitSlop={DEFAULT_HIT_SLOP}
       {...props}>

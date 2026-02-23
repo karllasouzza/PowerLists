@@ -11,15 +11,15 @@ import {
 } from './ui/dropdown-menu';
 import { IconCheck, IconEdit, IconTrash } from '@tabler/icons-react-native';
 import { List } from '@/data/types';
+import { useRouter } from 'expo-router';
+import { calculateTotal } from '@/features/list_items';
 
 interface CardListProps {
   list: List;
-  pressHandler: () => void;
-  deleteHandle: (id: string) => void;
-  editHandle: (id: string, title: string, color: string, closeMenu: () => void) => void;
 }
 
-export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardListProps) => {
+export const CardList = ({ list }: CardListProps) => {
+  const router = useRouter();
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -29,19 +29,16 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
   const boughtCount = items.filter((item: any) => item?.isChecked === true).length;
   const totalCount = items.length;
 
-  const calculateTotal = () => {
-    const prices = items.map((item: any) => item.price * item.amount);
-    if (prices.length === 0) return 'R$ 0,00';
-    const total = prices.reduce((accum: number, curr: number) => accum + curr, 0);
-    return total.toLocaleString('pt-br', {
-      style: 'currency',
-      currency: 'BRL',
-    });
-  };
+  const totalPrice = calculateTotal(items);
 
   return (
     <Pressable
-      onPress={pressHandler}
+      onPress={() =>
+        router.push({
+          pathname: 'lists/[id]',
+          params: { id: list.id },
+        })
+      }
       onLongPress={openMenu}
       className="flex-row items-center justify-between px-6 py-3"
       style={{
@@ -79,7 +76,7 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
       {/* Right Section: Total Price + Menu */}
       <View className="flex-row items-center gap-2">
         <Text variant="large" className="font-bold">
-          {calculateTotal()}
+          {totalPrice}
         </Text>
 
         <DropdownMenu onOpenChange={setVisible}>
@@ -92,7 +89,7 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem
               onPress={() => {
-                editHandle(list.id, list.title, list.accentColor || '#000', closeMenu);
+                // editHandle(list.id, list.title, list.accentColor || '#000', closeMenu);
                 closeMenu();
               }}>
               <Icon as={IconEdit} size={18} />
@@ -102,7 +99,7 @@ export const CardList = ({ list, pressHandler, deleteHandle, editHandle }: CardL
             <DropdownMenuItem
               variant="destructive"
               onPress={() => {
-                deleteHandle(list.id);
+                // deleteHandle(list.id);
                 closeMenu();
               }}>
               <Icon as={IconTrash} size={18} />

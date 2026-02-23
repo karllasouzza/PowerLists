@@ -34,7 +34,7 @@ function DialogOverlay({
           Platform.select({
             web: 'animate-in fade-in-0 fixed cursor-default [&>*]:cursor-auto',
           }),
-          className
+          className,
         )}
         {...props}
         asChild={Platform.OS !== 'web'}>
@@ -65,7 +65,7 @@ function DialogContent({
             Platform.select({
               web: 'animate-in fade-in-0 zoom-in-95 duration-200',
             }),
-            className
+            className,
           )}
           {...props}>
           <>{children}</>
@@ -74,7 +74,7 @@ function DialogContent({
               'absolute right-4 top-4 rounded opacity-70 active:opacity-100',
               Platform.select({
                 web: 'ring-offset-background focus:ring-ring data-[state=open]:bg-accent transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2',
-              })
+              }),
             )}
             hitSlop={12}>
             <Icon

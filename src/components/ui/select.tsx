@@ -30,7 +30,7 @@ function SelectValue({
       className={cn(
         'text-foreground line-clamp-1 flex flex-row items-center gap-2 text-sm',
         !value && 'text-muted-foreground',
-        className
+        className,
       )}
       {...props}
     />
@@ -58,7 +58,7 @@ function SelectTrigger({
         }),
         props.disabled && 'opacity-50',
         size === 'sm' && 'h-8 py-2 sm:py-1.5',
-        className
+        className,
       )}
       {...props}>
       <>{children}</>
@@ -93,7 +93,7 @@ function SelectContent({
                     web: cn(
                       'animate-in fade-in-0 zoom-in-95 origin-(--radix-select-content-transform-origin) max-h-52 overflow-y-auto overflow-x-hidden',
                       props.side === 'bottom' && 'slide-in-from-top-2',
-                      props.side === 'top' && 'slide-in-from-bottom-2'
+                      props.side === 'top' && 'slide-in-from-bottom-2',
                     ),
                     native: 'p-1',
                   }),
@@ -101,10 +101,10 @@ function SelectContent({
                     Platform.select({
                       web: cn(
                         props.side === 'bottom' && 'translate-y-1',
-                        props.side === 'top' && '-translate-y-1'
+                        props.side === 'top' && '-translate-y-1',
                       ),
                     }),
-                  className
+                  className,
                 )}
                 position={position}
                 {...props}>
@@ -117,8 +117,8 @@ function SelectContent({
                         'w-full',
                         Platform.select({
                           web: 'h-[var(--radix-select-trigger-height)] min-w-[var(--radix-select-trigger-width)]',
-                        })
-                      )
+                        }),
+                      ),
                   )}>
                   {children}
                 </SelectPrimitive.Viewport>
@@ -157,7 +157,7 @@ function SelectItem({
           web: 'focus:bg-accent focus:text-accent-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2 cursor-default outline-none data-[disabled]:pointer-events-none [&_svg]:pointer-events-none',
         }),
         props.disabled && 'opacity-50',
-        className
+        className,
       )}
       {...props}>
       <View className="absolute right-2 flex size-3.5 items-center justify-center">
@@ -179,7 +179,7 @@ function SelectSeparator({
       className={cn(
         'bg-border -mx-1 my-1 h-px',
         Platform.select({ web: 'pointer-events-none' }),
-        className
+        className,
       )}
       {...props}
     />

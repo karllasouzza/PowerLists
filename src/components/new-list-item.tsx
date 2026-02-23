@@ -133,7 +133,7 @@ export default function NewListItem({
                 title: '',
                 color: 'primary',
                 icon: 'cart',
-              }
+              },
         );
       }
     }

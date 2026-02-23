@@ -40,7 +40,7 @@ function AccordionItem({
       className={cn(
         'border-border border-b',
         Platform.select({ web: 'last:border-b-0' }),
-        className
+        className,
       )}
       value={value}
       asChild
@@ -67,20 +67,20 @@ function AccordionTrigger({
 
   const progress = useDerivedValue(
     () => (isExpanded ? withTiming(1, { duration: 250 }) : withTiming(0, { duration: 200 })),
-    [isExpanded]
+    [isExpanded],
   );
   const chevronStyle = useAnimatedStyle(
     () => ({
       transform: [{ rotate: `${progress.value * 180}deg` }],
     }),
-    [progress]
+    [progress],
   );
 
   return (
     <TextClassContext.Provider
       value={cn(
         'text-left text-sm font-medium',
-        Platform.select({ web: 'group-hover:underline' })
+        Platform.select({ web: 'group-hover:underline' }),
       )}>
       <AccordionPrimitive.Header>
         <AccordionPrimitive.Trigger {...props} asChild>
@@ -90,7 +90,7 @@ function AccordionTrigger({
               Platform.select({
                 web: 'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 outline-none transition-all hover:underline focus-visible:ring-[3px] disabled:pointer-events-none [&[data-state=open]>svg]:rotate-180',
               }),
-              className
+              className,
             )}>
             <>{children}</>
             <Animated.View style={chevronStyle}>
@@ -101,7 +101,7 @@ function AccordionTrigger({
                   'text-muted-foreground shrink-0',
                   Platform.select({
                     web: 'pointer-events-none translate-y-0.5 transition-transform duration-200',
-                  })
+                  }),
                 )}
               />
             </Animated.View>
@@ -125,7 +125,7 @@ function AccordionContent({
           'overflow-hidden',
           Platform.select({
             web: isExpanded ? 'animate-accordion-down' : 'animate-accordion-up',
-          })
+          }),
         )}
         {...props}>
         <Animated.View

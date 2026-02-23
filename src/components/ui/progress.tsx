@@ -61,7 +61,7 @@ function NativeIndicator({ value, className }: IndicatorProps) {
     return {
       width: withSpring(
         `${interpolate(progress.value, [0, 100], [1, 100], Extrapolation.CLAMP)}%`,
-        { overshootClamping: true }
+        { overshootClamping: true },
       ),
     };
   }, [value]);

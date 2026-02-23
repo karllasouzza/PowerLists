@@ -41,7 +41,7 @@ export const OnboardingContainer = ({
         },
       },
     ],
-    []
+    [],
   );
 
   // Update NavigationBar color when slide changes
