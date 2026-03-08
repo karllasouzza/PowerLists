@@ -53,7 +53,7 @@ export const rawColors = {
       '--color-info-foreground': '#ffffff',
 
       // === ONBOARDING ===
-      '--color-onboarding-1': '#e9f6ea',
+      '--color-onboarding-1': '#FFE1E0',
       '--color-onboarding-1-foreground': '#09200b',
       '--color-onboarding-2': '#cae8cb',
       '--color-onboarding-2-foreground': '#19601f',
