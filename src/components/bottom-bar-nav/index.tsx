@@ -80,7 +80,7 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
 
   return (
     <View className="absolute bottom-4 left-0 right-0 z-50 flex items-center justify-center px-4">
-      <View className="relative flex h-16 w-full max-w-md flex-row items-center justify-around rounded-3xl bg-black/90 shadow-2xl">
+      <View className="relative flex h-16 w-full max-w-md flex-row items-center justify-around rounded-3xl bg-bottom-bar shadow-2xl border border-border">
         {screens.map((screen) => {
           const isActive = screen.name === activeIcon;
           const showFilled = screen.name === activeIcon;
@@ -96,7 +96,10 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
                   className="flex items-center justify-center">
                   <Icon
                     as={showFilled ? screen.icon.filled : screen.icon.default}
-                    className={cn('size-6', showFilled ? 'text-primary' : 'text-white/70')}
+                    className={cn(
+                      'size-6',
+                      showFilled ? 'text-bottom-bar-accent' : 'text-bottom-bar-foreground',
+                    )}
                   />
                 </Animated.View>
 
@@ -106,7 +109,9 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
                     style={{
                       opacity: iconOpacities[screen.name],
                     }}>
-                    <Text className="text-xs font-medium text-primary">{screen.label}</Text>
+                    <Text className="text-xs font-medium text-bottom-bar-accent">
+                      {screen.label}
+                    </Text>
                   </Animated.View>
                 )}
               </Pressable>

@@ -1,11 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Pressable, Animated, BackHandler, TextInput } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { IconSearch, IconArrowLeft, IconX } from '@tabler/icons-react-native';
-import { cn } from '@/lib/utils';
 
 interface TopBarProps {
   title: string;
@@ -30,12 +28,10 @@ export const TopBar = ({
   rightAction,
   className,
 }: TopBarProps) => {
-  const insets = useSafeAreaInsets();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const searchInputRef = useRef<TextInput>(null);
 
   // Animation values
-  const searchBarWidth = useRef(new Animated.Value(0)).current;
   const searchBarOpacity = useRef(new Animated.Value(0)).current;
   const titleOpacity = useRef(new Animated.Value(1)).current;
 
@@ -58,11 +54,6 @@ export const TopBar = ({
       searchInputRef.current?.focus();
 
       Animated.parallel([
-        Animated.timing(searchBarWidth, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: false,
-        }),
         Animated.timing(searchBarOpacity, {
           toValue: 1,
           duration: 200,
@@ -76,11 +67,6 @@ export const TopBar = ({
       ]).start();
     } else {
       Animated.parallel([
-        Animated.timing(searchBarWidth, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: false,
-        }),
         Animated.timing(searchBarOpacity, {
           toValue: 0,
           duration: 200,
@@ -104,81 +90,82 @@ export const TopBar = ({
     });
 
     return () => backHandler.remove();
-  }, [isSearchActive, searchBarWidth, searchBarOpacity, titleOpacity, handleCloseSearch]);
+  }, [isSearchActive, searchBarOpacity, titleOpacity, handleCloseSearch]);
 
   return (
-    <View
-      style={{ paddingTop: insets.top + 8 }}
-      className={cn('z-40 w-full bg-blue-100 px-4 pb-3')}>
-      <View className="relative flex-row items-center justify-between rounded-2xl bg-card px-4 py-3 shadow-md">
-        {/* Left Section */}
-        <View className="flex-row items-center gap-3">
-          {showBack && (
+    <View className="z-40 w-full flex-row items-center justify-between rounded-2xl px-4 py-3">
+      {/* Left Section */}
+      <View className="flex-row items-center gap-3">
+        {showBack && (
+          <Pressable
+            onPress={onBack}
+            className="active:opacity-70"
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Icon as={IconArrowLeft} size={24} className="text-muted" />
+          </Pressable>
+        )}
+
+        {/* Title - always rendered, animated visibility */}
+        <Animated.View
+          style={{
+            opacity: titleOpacity,
+            display: isSearchActive ? 'none' : 'flex',
+          }}>
+          <Text className="text-xl font-bold text-foreground">{title}</Text>
+        </Animated.View>
+
+        {/* Search Input - always rendered, animated visibility */}
+        <Animated.View
+          style={{
+            opacity: searchBarOpacity,
+            flexDirection: 'row',
+            display: isSearchActive ? 'flex' : 'none',
+          }}
+          className="flex-row items-center gap-2">
+          <Pressable
+            onPress={handleCloseSearch}
+            className="active:opacity-70"
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Icon as={IconArrowLeft} size={24} className="text-foreground" />
+          </Pressable>
+
+          <Input
+            ref={searchInputRef}
+            placeholder={searchPlaceholder}
+            value={searchQuery}
+            onChangeText={onSearchChange}
+            className="bg-muted/50 flex-1 border-0"
+          />
+
+          {searchQuery.length > 0 && (
             <Pressable
-              onPress={onBack}
+              onPress={handleClearSearch}
               className="active:opacity-70"
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Icon as={IconArrowLeft} size={24} className="text-muted" />
+              <Icon as={IconX} size={20} className="text-muted-foreground" />
             </Pressable>
           )}
-
-          {/* Title - fades out when search is active */}
-          {!isSearchActive && (
-            <Animated.View style={{ opacity: titleOpacity }}>
-              <Text className="text-xl font-bold text-foreground">{title}</Text>
-            </Animated.View>
-          )}
-
-          {/* Search Input - expands when active */}
-          {isSearchActive && showSearch && (
-            <Animated.View
-              style={{
-                opacity: searchBarOpacity,
-                flex: 1,
-              }}
-              className="flex-row items-center gap-2">
-              <Pressable
-                onPress={handleCloseSearch}
-                className="active:opacity-70"
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Icon as={IconArrowLeft} size={24} className="text-foreground" />
-              </Pressable>
-
-              <Input
-                ref={searchInputRef}
-                placeholder={searchPlaceholder}
-                value={searchQuery}
-                onChangeText={onSearchChange}
-                className="bg-muted/50 flex-1 border-0"
-              />
-
-              {searchQuery.length > 0 && (
-                <Pressable
-                  onPress={handleClearSearch}
-                  className="active:opacity-70"
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                  <Icon as={IconX} size={20} className="text-muted-foreground" />
-                </Pressable>
-              )}
-            </Animated.View>
-          )}
-        </View>
-
-        {/* Right Section */}
-        {!isSearchActive && (
-          <View className="flex-row items-center gap-2">
-            {showSearch && (
-              <Pressable
-                onPress={handleOpenSearch}
-                className="bg-muted/50 rounded-full p-2 active:opacity-70"
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Icon as={IconSearch} size={20} className="text-foreground" />
-              </Pressable>
-            )}
-            {rightAction}
-          </View>
-        )}
+        </Animated.View>
       </View>
+
+      {/* Right Section */}
+      <Animated.View
+        style={{
+          opacity: titleOpacity,
+          display: isSearchActive ? 'none' : 'flex',
+          flexDirection: 'row',
+        }}
+        className="flex-row items-center gap-2">
+        {showSearch && (
+          <Pressable
+            onPress={handleOpenSearch}
+            className="bg-muted/50 rounded-full p-2 active:opacity-70"
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Icon as={IconSearch} size={20} className="text-foreground" />
+          </Pressable>
+        )}
+        {rightAction}
+      </Animated.View>
     </View>
   );
 };
