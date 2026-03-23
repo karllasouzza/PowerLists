@@ -4,7 +4,6 @@ import { MMKVPersistPluginWrapper } from '@/data/storage';
 
 import type { UserType } from '@/data/types/user';
 import { Session } from '@supabase/supabase-js';
-
 interface AuthState {
   user: UserType;
   session: Session | null;

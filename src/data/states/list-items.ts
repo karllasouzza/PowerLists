@@ -22,7 +22,7 @@ export const listItems$ = observable(
     supabase,
     collection: 'list_items',
     select: (from: any) => from.select('*'),
-    // filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
+    filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'list_items', retrySync: true },
     retry: {

@@ -7,7 +7,6 @@ import { storage } from '../storage';
 import type { ProfileType, CreateProfileType, UpdateProfileType } from '../types/profile';
 import { generateId } from '../utils';
 
-// Lazy-initialized observable for profiles with Supabase sync
 export const profiles$ = observable(
   customSynced({
     initial: {} as Record<string, any>,
