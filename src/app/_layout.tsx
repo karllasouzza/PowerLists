@@ -46,14 +46,16 @@ export default function RootLayout() {
 
   useEffect(() => {
     fetchUserDataAsync();
-  });
+    // Intentionally run only once on mount to avoid repeated state updates
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (!isLoading && fontsLoaded) {
       BootSplash.hide({ fade: true });
       setVisible(false);
     }
-  }, [isLoading, fontsLoaded, visible]);
+  }, [isLoading, fontsLoaded]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

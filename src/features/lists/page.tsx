@@ -19,9 +19,9 @@ const HomeScreen = observer(() => {
   };
 
   return (
-    <View className="flex h-full w-full flex-1 items-center bg-background">
+    <View className="flex h-full w-full flex-1 items-center bg-background p-0!">
       <TopBar
-        title="Lists"
+        title="Minhas Listas"
         showSearch={true}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -32,7 +32,7 @@ const HomeScreen = observer(() => {
         data={filteredLists}
         renderItem={({ item, index }) => renderList(item, index)}
         estimatedItemSize={filteredLists.length}
-        className="flex h-full w-full flex-1 bg-red-300"
+        className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
         recycleItems
         ListFooterComponent={() => <View className="h-20" />}

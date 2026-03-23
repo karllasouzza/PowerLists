@@ -93,7 +93,7 @@ export const TopBar = ({
   }, [isSearchActive, searchBarOpacity, titleOpacity, handleCloseSearch]);
 
   return (
-    <View className="z-40 w-full flex-row items-center justify-between rounded-2xl px-4 py-3">
+    <View className="z-40 w-full flex-row items-center justify-between px-4 py-3 border-b border-border">
       {/* Left Section */}
       <View className="flex-row items-center gap-3">
         {showBack && (
