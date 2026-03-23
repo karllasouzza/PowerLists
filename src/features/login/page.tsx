@@ -17,6 +17,7 @@ import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { LogIn } from 'lucide-react-native';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function LoginScreen() {
     const success = await signInWithPassword({ email: data.email, password: data.password });
     if (!success) return;
 
-    router.replace('/(tabs)');
+    router.replace('/');
   };
 
   const handleCreateAccount = () => {
@@ -145,15 +146,12 @@ export default function LoginScreen() {
             className="w-full"
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}>
-            {isLoading ? (
-              <Icon
-                as={IconLoader2}
-                className="mr-2 animate-spin text-primary-foreground"
-                size={20}
-              />
-            ) : (
-              <Icon as={LogIn} className="mr-2 text-primary-foreground" size={20} />
-            )}
+            <Icon
+              key={isLoading ? 'loader' : 'login'}
+              as={isLoading ? IconLoader2 : LogIn}
+              className={cn('mr-2 text-primary-foreground', isLoading && 'animate-spin')}
+              size={20}
+            />
             <Text variant="large" className="font-bold">
               Entrar
             </Text>

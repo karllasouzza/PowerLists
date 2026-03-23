@@ -18,10 +18,10 @@ import { auth$ } from '@/data/states/auth';
 import { clearAllStorage } from '@/data/storage';
 
 export function useAuth() {
-  const user = useValue(auth$.user.get());
-  const session = useValue(auth$.session.get());
-  const isInitialized = useValue(auth$.isInitialized.get());
-  const isLoading = useValue(auth$.isLoading.get());
+  const user = useValue(auth$.user);
+  const session = useValue(auth$.session);
+  const isInitialized = useValue(auth$.isInitialized);
+  const isLoading = useValue(auth$.isLoading);
 
   return {
     user,

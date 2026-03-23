@@ -16,6 +16,7 @@ import { Image } from 'expo-image';
 import { Icon } from '@/components/ui/icon';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
+import { cn } from '@/lib/utils';
 
 export default function CreateAccountScreen() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function CreateAccountScreen() {
   const onSubmit = async (data: CreateAccountSchemaType) => {
     try {
       await signUpWithPassword({ email: data.email, password: data.password });
-      router.push('/(tabs)');
+      router.replace('/');
     } catch (error) {
       console.error('Error on signUpWithPassword:', error);
     }
@@ -132,15 +133,12 @@ export default function CreateAccountScreen() {
             className="w-full"
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}>
-            {isLoading ? (
-              <Icon
-                as={IconLoader2}
-                className="mr-2 animate-spin text-primary-foreground"
-                size={20}
-              />
-            ) : (
-              <Icon as={IconUserPlus} className="text-primary-foreground" size={20} />
-            )}
+            <Icon
+              key={isLoading ? 'loader' : 'user-plus'}
+              as={isLoading ? IconLoader2 : IconUserPlus}
+              className={cn('mr-2 text-primary-foreground', isLoading && 'animate-spin')}
+              size={20}
+            />
             <Text variant="large" className="font-bold text-primary-foreground">
               Criar Conta
             </Text>
