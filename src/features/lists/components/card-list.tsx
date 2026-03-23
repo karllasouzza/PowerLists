@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { Pressable, View } from 'react-native';
-import { Avatar, AvatarFallback } from './ui/avatar';
-import { Text } from './ui/text';
-import { Icon } from './ui/icon';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from './ui/dropdown-menu';
 import { IconCheck, IconEdit, IconTrash } from '@tabler/icons-react-native';
-import { List } from '@/data/types';
 import { useRouter } from 'expo-router';
+
+import { List } from '@/data/types';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import { calculateTotal } from '@/features/list_items';
 
 interface CardListProps {
@@ -24,6 +21,13 @@ export const CardList = ({ list }: CardListProps) => {
 
   const openMenu = () => setVisible(true);
   const closeMenu = () => setVisible(false);
+  const handleRouterPush = () => {
+    console.log('Navigating to list with ID:', list.id);
+    router.push({
+      pathname: 'lists/[id]',
+      params: { id: list.id },
+    });
+  };
 
   const items = list.listItems || [];
   const boughtCount = items.filter((item: any) => item?.isChecked === true).length;
@@ -33,26 +37,15 @@ export const CardList = ({ list }: CardListProps) => {
 
   return (
     <Pressable
-      onPress={() =>
-        router.push({
-          pathname: 'lists/[id]',
-          params: { id: list.id },
-        })
-      }
+      onPress={handleRouterPush}
       onLongPress={openMenu}
-      className="flex-row items-center justify-between px-6 py-3"
-      style={{
-        backgroundColor: visible ? '#ffffff16' : undefined,
-      }}>
+      className={cn('flex-row items-center justify-between px-4 py-3', visible && 'bg-primary/10')}>
       {/* Left Section: Avatar + Title/Description */}
       <View className="flex-1 flex-row items-center gap-3">
         <Avatar
           alt={list.title || 'Lista'}
-          className="size-[50px]"
-          style={{
-            backgroundColor: list.accentColor || '#000',
-          }}>
-          <AvatarFallback>
+          className={cn('size-[50px]', list.accentColor ? `bg-${list.accentColor}` : 'bg-primary')}>
+          <AvatarFallback className="bg-transparent">
             {visible ? (
               <Icon as={IconCheck} size={24} className="text-white" />
             ) : (
@@ -80,12 +73,6 @@ export const CardList = ({ list }: CardListProps) => {
         </Text>
 
         <DropdownMenu onOpenChange={setVisible}>
-          <DropdownMenuTrigger asChild>
-            <Pressable className="p-2">
-              <Icon as={IconEdit} size={20} />
-            </Pressable>
-          </DropdownMenuTrigger>
-
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem
               onPress={() => {
