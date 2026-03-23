@@ -121,7 +121,7 @@ export const TopBar = ({
             flexDirection: 'row',
             display: isSearchActive ? 'flex' : 'none',
           }}
-          className="flex-row items-center gap-2">
+          className="flex-row items-center gap-4">
           <Pressable
             onPress={handleCloseSearch}
             className="active:opacity-70"
@@ -129,22 +129,24 @@ export const TopBar = ({
             <Icon as={IconArrowLeft} size={24} className="text-foreground" />
           </Pressable>
 
-          <Input
-            ref={searchInputRef}
-            placeholder={searchPlaceholder}
-            value={searchQuery}
-            onChangeText={onSearchChange}
-            className="bg-muted/50 flex-1 border-0"
-          />
+          <View className="flex-1 flex-row items-center gap-2 rounded-xl bg-muted px-2 py-1">
+            <Input
+              ref={searchInputRef}
+              placeholder={searchPlaceholder}
+              value={searchQuery}
+              onChangeText={onSearchChange}
+              className="bg-muted/50 flex-1 border-0 shadow-none"
+            />
 
-          {searchQuery.length > 0 && (
-            <Pressable
-              onPress={handleClearSearch}
-              className="active:opacity-70"
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <Icon as={IconX} size={20} className="text-muted-foreground" />
-            </Pressable>
-          )}
+            {searchQuery.length > 0 && (
+              <Pressable
+                onPress={handleClearSearch}
+                className="active:opacity-70"
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+                <Icon as={IconX} size={20} className="text-muted-foreground" />
+              </Pressable>
+            )}
+          </View>
         </Animated.View>
       </View>
 
