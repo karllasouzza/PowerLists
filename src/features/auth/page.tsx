@@ -6,7 +6,7 @@ import { HatGlasses } from 'lucide-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { useTheme } from '@/context/themes/use-themes';
+import { useTheme } from '@/context/themes';
 
 export default function AuthScreen() {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function AuthScreen() {
 
   useEffect(() => {
     setBackgroundColor('default');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleCreateAccount = () => {
@@ -50,7 +51,7 @@ export default function AuthScreen() {
       <View className="w-full flex-col items-center justify-center gap-6 px-4 py-8">
         <View className="w-full items-center justify-center gap-4 p-2">
           <Button variant="default" className="h-12 w-full" onPress={handleCreateAccount}>
-            <Text className="text-base font-bold text-primary-foreground">Começe agora!</Text>
+            <Text className="text-base font-bold text-primary-foreground">Crie uma conta</Text>
           </Button>
           <Button variant="secondary" className="h-12 w-full" onPress={handleLogin}>
             <Text className="font-bold text-secondary-foreground">Já tem uma conta?</Text>

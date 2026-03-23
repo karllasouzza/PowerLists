@@ -15,7 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Icon } from '@/components/ui/icon';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { HatGlasses, LogIn } from 'lucide-react-native';
+import { LogIn } from 'lucide-react-native';
 import { useAuth } from '@/hooks/use-auth';
 
 export default function LoginScreen() {
@@ -45,10 +45,6 @@ export default function LoginScreen() {
 
   const handleCreateAccount = () => {
     router.navigate('/create-account');
-  };
-
-  const handleGuest = () => {
-    router.navigate('/guest');
   };
 
   const handleRecoveryPassword = () => {
@@ -145,17 +141,19 @@ export default function LoginScreen() {
 
           <Button
             variant="default"
+            size="lg"
             className="w-full"
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}>
-            {isLoading && (
+            {isLoading ? (
               <Icon
                 as={IconLoader2}
                 className="mr-2 animate-spin text-primary-foreground"
                 size={20}
               />
+            ) : (
+              <Icon as={LogIn} className="mr-2 text-primary-foreground" size={20} />
             )}
-            <Icon as={LogIn} className="mr-2 text-primary-foreground" size={20} />
             <Text variant="large" className="font-bold">
               Entrar
             </Text>
@@ -169,15 +167,6 @@ export default function LoginScreen() {
               Crie uma agora
             </Text>
           </Button>
-        </View>
-
-        <View className="w-full flex-row items-center justify-center gap-4 px-4">
-          <View className="h-[1px] w-full bg-border" />
-          <Button variant="link" className="w-max p-0" onPress={handleGuest}>
-            <Icon as={HatGlasses} className="text-secondary-foreground" size={20} />
-            <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
-          </Button>
-          <View className="h-[1px] w-full bg-border" />
         </View>
       </View>
     </KeyboardAwareScrollView>

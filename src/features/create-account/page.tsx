@@ -14,7 +14,6 @@ import { CreateAccountSchemaType } from './types';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { Image } from 'expo-image';
 import { Icon } from '@/components/ui/icon';
-import { HatGlasses } from 'lucide-react-native';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -47,10 +46,6 @@ export default function CreateAccountScreen() {
 
   const handleLogin = () => {
     router.navigate('/login');
-  };
-
-  const handleGuest = () => {
-    router.navigate('/guest');
   };
 
   return (
@@ -133,18 +128,20 @@ export default function CreateAccountScreen() {
 
           <Button
             variant="default"
+            size="lg"
             className="w-full"
             onPress={handleSubmit(onSubmit)}
             disabled={isLoading}>
-            {isLoading && (
+            {isLoading ? (
               <Icon
                 as={IconLoader2}
                 className="mr-2 animate-spin text-primary-foreground"
                 size={20}
               />
+            ) : (
+              <Icon as={IconUserPlus} className="text-primary-foreground" size={20} />
             )}
-            <IconUserPlus className="mr-2 text-primary-foreground" size={20} />
-            <Text variant="large" className="font-bold">
+            <Text variant="large" className="font-bold text-primary-foreground">
               Criar Conta
             </Text>
           </Button>
@@ -157,15 +154,6 @@ export default function CreateAccountScreen() {
               Faça o login
             </Text>
           </Button>
-        </View>
-
-        <View className="w-full flex-row items-center justify-center gap-4 px-4">
-          <View className="h-[1px] w-full bg-border" />
-          <Button variant="link" className="w-max p-0" onPress={handleGuest}>
-            <Icon as={HatGlasses} className="text-secondary-foreground" size={20} />
-            <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
-          </Button>
-          <View className="h-[1px] w-full bg-border" />
         </View>
       </View>
     </KeyboardAwareScrollView>
