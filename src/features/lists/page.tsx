@@ -7,13 +7,22 @@ import type { List } from '@/data/types';
 import { CardList } from '@/features/lists/components/card-list';
 import { TopBar } from '@/components/top-bar';
 
-import { useHomeState } from './hooks/use-home-state';
+import { useListPageLogics } from './hooks/use-list-page-logics';
 
 const HomeScreen = observer(() => {
-  const { searchQuery, setSearchQuery, lists } = useHomeState();
+  const { searchQuery, setSearchQuery, lists, toggleSelectList, isSelected, listsSelected } =
+    useListPageLogics();
 
   const renderList = (list: List, index: number) => {
-    return <CardList key={index} list={list} />;
+    return (
+      <CardList
+        key={index}
+        list={list}
+        toggleSelectList={toggleSelectList}
+        isSelected={isSelected}
+        listsSelected={listsSelected}
+      />
+    );
   };
 
   return (
