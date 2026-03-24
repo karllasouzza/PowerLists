@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import { mmkvStorage } from '@/data/storage';
 import { FocusAwareBars } from '@/components/focus-aware-bars';
-import { getTailwindColor, getThemeColorSafe } from '@/utils/tailwind-color';
+import { getThemeColorSafe } from '@/utils/tailwind-color';
 import { themes, rawColors } from './theme-config';
 import { ThemeContext } from './theme-context';
 import { ThemeProviderProps } from './types';
@@ -123,16 +123,16 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
   const backgroundColorConverted = useMemo(() => {
     const themeVars = rawColors[safeThemeName][effectiveColorScheme];
 
-    const backgroundColorFallback =
-      effectiveColorScheme === 'dark' ? getTailwindColor('black') : getTailwindColor('white');
+    const backgroundColorFallback = effectiveColorScheme === 'dark' ? '0 0% 0%' : '0 0% 100%';
 
     const colorVar = userPreferences?.backgroundColor || '--color-background';
 
-    return getThemeColorSafe({
+    const channels = getThemeColorSafe({
       themeVars,
       varName: colorVar,
       fallback: backgroundColorFallback,
     });
+    return `hsl(${channels})`;
   }, [safeThemeName, effectiveColorScheme, userPreferences]);
 
   const contextValue = useMemo(() => {
