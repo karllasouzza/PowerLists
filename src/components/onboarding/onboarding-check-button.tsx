@@ -41,7 +41,7 @@ export const OnboardingCheckButton = ({
         iconClassName={iconClassName}
       />
       <Text variant="default" className={cn(textForeground, isChecked && 'line-through')}>
-        {slide.content.title}
+        {slide.content.checkLabel || `Passo ${index + 1}`}
       </Text>
     </Button>
   );

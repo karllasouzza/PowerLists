@@ -5,6 +5,7 @@ export interface ISlide {
     img: ImageSourcePropType;
     title: string;
     subtitle: string;
+    checkLabel?: string;
   };
 }
 
