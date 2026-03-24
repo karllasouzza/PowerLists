@@ -46,7 +46,7 @@ export const AnimatedBootSplash = ({ onAnimationEnd }: Props) => {
   });
 
   return (
-    <Animated.View {...container} style={[container.style, { opacity }]}>
+    <Animated.View {...container} style={[container.style, { opacity }]} className="bg-background!">
       <Animated.Image {...logo} style={[logo.style, { transform: [{ translateY }] }]} />
 
       {/* <Animated.Image {...brand} style={[brand.style, { opacity }]} /> */}
