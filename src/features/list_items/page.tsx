@@ -5,7 +5,6 @@ import { observer, useValue } from '@legendapp/state/react';
 
 import ListItemComponent from '@/components/list-item';
 import { TopBar } from '@/components/top-bar';
-import { useTheme } from '@/context/themes/use-themes';
 import { themes } from '@/context/themes/theme-config';
 import { toggleCheckListItem, deleteListItem, listItems$ } from '@/data/states/list-items';
 
@@ -15,6 +14,7 @@ import type { ListItem as ListItem } from './types';
 import { lists$ } from '@/data/states/lists';
 import { List } from '@/data/types';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { useTheme } from '@/context/themes';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();

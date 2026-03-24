@@ -1,58 +1,37 @@
-/**
- * Utilitários de formatação para items de lista
- */
-
 import type { ListItem } from '../types';
+import { Decimal } from 'decimal.js';
 
-/**
- * Formata um valor numérico para moeda brasileira (BRL)
- *
- * @param value - Valor a ser formatado
- * @returns String formatada como moeda
- */
 export const formatCurrency = (value: number): string => {
-  return value.toLocaleString('pt-br', {
+  return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-  });
+  }).format(value);
 };
 
-/**
- * Converte string de preço para número
- * Remove vírgulas e converte para float
- *
- * @param price - Preço em formato string
- * @returns Número convertido
- */
 export const parsePrice = (price: string): number => {
   return parseFloat(price.replace(',', '.'));
 };
 
-/**
- * Converte string de quantidade para número
- * Remove vírgulas e converte para float
- *
- * @param amount - Quantidade em formato string
- * @returns Número convertido
- */
 export const parseAmount = (amount: string): number => {
   return parseFloat(amount.replace(',', '.'));
 };
 
-/**
- * Calcula o total de todos os items
- *
- * @param items - Array de items
- * @returns Total formatado como moeda ou 0 se não houver items
- */
 export const calculateTotal = (items: Pick<ListItem, 'price' | 'amount'>[]): string => {
   if (!items.length) {
     return formatCurrency(0);
   }
 
-  const total = items.reduce((accum, item) => {
-    return accum + item.price * item.amount;
-  }, 0);
+  const validItems = items.filter((item) => item.price != null && item.amount != null);
 
-  return formatCurrency(total);
+  if (!validItems.length) {
+    return formatCurrency(0);
+  }
+
+  const total = validItems.reduce((accum, item) => {
+    const price = new Decimal(item.price);
+    const amount = new Decimal(item.amount);
+    return accum.plus(price.times(amount));
+  }, new Decimal(0));
+
+  return formatCurrency(total.toNumber());
 };
