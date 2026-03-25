@@ -28,8 +28,6 @@ export const CardList = ({ list, toggleSelectList, isSelected, listsSelected }: 
   const items = list.listItems || [];
   const boughtCount = items.filter((item: any) => item?.isChecked === true).length;
   const totalCount = items.length;
-  const accentColorClass = list.accentColor ? `bg-${list.accentColor}` : 'bg-primary';
-  console.log('accentColorClass', accentColorClass);
   const cardIcon = CardIcons[list.icon as keyof typeof CardIcons] || IconShoppingCart;
   const totalPrice = calculateTotal(items);
 
@@ -61,11 +59,7 @@ export const CardList = ({ list, toggleSelectList, isSelected, listsSelected }: 
       )}>
       {/* Left Section: Avatar + Title/Description */}
       <View className="flex-1 flex-row items-center gap-3">
-        <View
-          className={cn(
-            'size-[50px] rounded-full flex items-center justify-center',
-            accentColorClass,
-          )}>
+        <View className="size-[50px] rounded-full flex items-center justify-center">
           {isSelected(list.id) ? (
             <Icon as={IconCheck} size={24} className="text-foreground" />
           ) : (

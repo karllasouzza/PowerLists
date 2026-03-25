@@ -15,8 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { Icon } from '@/components/ui/icon';
-import { useTheme } from '@/context/themes/use-themes';
-import { themes } from '@/context/themes/theme-config';
 import {
   IconShoppingCart,
   IconCreditCard,
@@ -25,10 +23,9 @@ import {
   IconAmbulance,
   IconBook,
   IconChefHat,
-  icons,
 } from '@tabler/icons-react-native';
 import { createNewListItem, updateListItem } from '@/data/states/list-items';
-import colors from 'tailwindcss/colors';
+import { cn } from '@/lib/utils';
 
 // Schema de validação para Items
 const itemFormSchema = z.object({
@@ -40,7 +37,6 @@ const itemFormSchema = z.object({
 // Schema de validação para Lists
 const listFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
-  color: z.string().optional(),
   icon: z.string().optional(),
 });
 
@@ -57,6 +53,8 @@ export const iconMap: Record<string, any> = {
   book: IconBook,
   'chef-hat': IconChefHat,
 };
+
+const AVAILABLE_ICONS = Object.keys(iconMap);
 
 interface NewListItemProps {
   open: boolean;
@@ -77,9 +75,6 @@ export default function NewListItem({
   currentItem,
   onSuccess,
 }: NewListItemProps) {
-  const { theme, colorScheme } = useTheme();
-  // @ts-ignore
-  const currentTheme = themes[theme][colorScheme];
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const schema = type === 'Items' ? itemFormSchema : listFormSchema;
@@ -102,12 +97,10 @@ export default function NewListItem({
           }
         : {
             title: '',
-            color: 'primary',
             icon: 'cart',
           },
   });
 
-  const selectedColor = watch('color');
   const selectedIcon = watch('icon');
 
   // Reset form when opening or currentItem changes
@@ -118,7 +111,6 @@ export default function NewListItem({
           title: currentItem.title || '',
           price: currentItem.price ? String(currentItem.price) : '',
           amount: currentItem.amount ? String(currentItem.amount) : '1',
-          color: currentItem.accentColor || 'primary',
           icon: currentItem.icon || 'cart',
         });
       } else {
@@ -131,7 +123,6 @@ export default function NewListItem({
               }
             : {
                 title: '',
-                color: 'primary',
                 icon: 'cart',
               },
         );
@@ -272,51 +263,32 @@ export default function NewListItem({
             </View>
           )}
 
-          {/* Colors (Lists only) */}
-          {type === 'Lists' && colors && (
-            <View className="gap-2">
-              <Label>Cor</Label>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View className="flex-row gap-4 p-1">
-                  {colors.map((color) => {
-                    const colorVar = `--color-${color}`;
-                    const bgStyle = currentTheme[colorVar] || color;
-
-                    return (
-                      <Pressable
-                        key={color}
-                        onPress={() => setValue('color', color)}
-                        className={`h-10 w-10 rounded-full border-2 ${
-                          selectedColor === color ? 'border-foreground' : 'border-transparent'
-                        }`}
-                        style={{ backgroundColor: bgStyle }}
-                      />
-                    );
-                  })}
-                </View>
-              </ScrollView>
-            </View>
-          )}
-
           {/* Icons (Lists only) */}
-          {type === 'Lists' && icons && (
+          {type === 'Lists' && (
             <View className="gap-2">
               <Label>Ícone</Label>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-4 p-1">
-                  {icons.map((iconName) => {
+                  {AVAILABLE_ICONS.map((iconName) => {
                     const IconComponent = iconMap[iconName] || IconShoppingCart;
                     const isSelected = selectedIcon === iconName;
 
                     return (
-                      <Pressable
+                      <Button
+                        variant="outline"
+                        size="icon"
                         key={iconName}
                         onPress={() => setValue('icon', iconName)}
-                        className={`h-10 w-10 items-center justify-center rounded-full ${
-                          isSelected ? 'bg-primary/20' : 'bg-transparent'
-                        }`}>
-                        <Icon as={IconComponent} size={24} className="text-foreground" />
-                      </Pressable>
+                        className={cn(
+                          'items-center justify-center rounded-full border',
+                          isSelected ? 'bg-primary border-primary' : 'bg-transparent border-border',
+                        )}>
+                        <Icon
+                          as={IconComponent}
+                          size={20}
+                          className={isSelected ? 'text-primary-foreground' : 'text-foreground'}
+                        />
+                      </Button>
                     );
                   })}
                 </View>
