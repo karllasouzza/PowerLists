@@ -29,6 +29,7 @@ export const CardList = ({ list, toggleSelectList, isSelected, listsSelected }: 
   const boughtCount = items.filter((item: any) => item?.isChecked === true).length;
   const totalCount = items.length;
   const accentColorClass = list.accentColor ? `bg-${list.accentColor}` : 'bg-primary';
+  console.log('accentColorClass', accentColorClass);
   const cardIcon = CardIcons[list.icon as keyof typeof CardIcons] || IconShoppingCart;
   const totalPrice = calculateTotal(items);
 

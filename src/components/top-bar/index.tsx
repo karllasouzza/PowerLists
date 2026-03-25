@@ -4,6 +4,7 @@ import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { IconSearch, IconArrowLeft, IconX } from '@tabler/icons-react-native';
+import { Button } from '../ui/button';
 
 interface TopBarProps {
   title: string;
@@ -122,12 +123,13 @@ export const TopBar = ({
             display: isSearchActive ? 'flex' : 'none',
           }}
           className="flex-row items-center gap-4">
-          <Pressable
+          <Button
+            variant="ghost"
+            size="icon"
             onPress={handleCloseSearch}
-            className="active:opacity-70"
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            className="active:opacity-70">
             <Icon as={IconArrowLeft} size={24} className="text-foreground" />
-          </Pressable>
+          </Button>
 
           <View className="flex-1 flex-row items-center gap-2 rounded-xl bg-muted px-2 py-1">
             <Input
