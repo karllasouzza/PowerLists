@@ -8,6 +8,9 @@ import { CardList } from '@/features/lists/components/card-list';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-list-page-logics';
+import { IconPlus } from '@tabler/icons-react-native';
+import { Fab } from '@/components/ui/fab';
+import NewListItem from '@/components/new-list-item';
 
 const HomeScreen = observer(() => {
   const { searchQuery, setSearchQuery, lists, toggleSelectList, isSelected, listsSelected } =
@@ -42,18 +45,18 @@ const HomeScreen = observer(() => {
         className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
         recycleItems
-        ListFooterComponent={() => <View className="h-20" />}
+        ListFooterComponent={() => <View className="h-44 border-t border-border" />}
       />
 
-      {/* {(mode === 'add' || mode === 'edit') && (
-        <NewListItem
-          type="Lists"
-          mode={mode}
-          open={true}
-          onOpenChange={(open) => !open && returnOfMode()}
-          onSuccess={() => returnOfMode()}
-        />
-      )} */}
+      <Fab icon={IconPlus} />
+
+      <NewListItem
+        type="Lists"
+        mode="add"
+        open={true}
+        onOpenChange={() => {}}
+        onSuccess={() => {}}
+      />
     </View>
   );
 });
