@@ -22,9 +22,9 @@ interface ListItemProps {
   color: string;
   subColor: string;
   checkHandle: () => void;
-  deleteHandle: (id: string) => void;
-  editHandle: (item: any) => void;
-  options?: any; // For compatibility with original code if needed
+  options?: any;
+  onEdit: (itemId: string) => void;
+  onDelete: (itemId: string) => void;
 }
 
 export default function ListItem({
@@ -38,8 +38,8 @@ export default function ListItem({
   color,
   subColor,
   checkHandle,
-  deleteHandle,
-  editHandle,
+  onEdit,
+  onDelete,
 }: ListItemProps) {
   const [visible, setVisible] = useState(false);
 
@@ -94,7 +94,7 @@ export default function ListItem({
             <DropdownMenuItem
               onPress={() => {
                 setVisible(false);
-                editHandle(item);
+                onEdit(item.id);
               }}>
               <Icon as={IconEdit} size={18} />
               <Text>Editar</Text>
@@ -104,7 +104,7 @@ export default function ListItem({
               variant="destructive"
               onPress={() => {
                 setVisible(false);
-                deleteHandle(item.id);
+                onDelete(item.id);
               }}>
               <Icon as={IconTrash} size={18} />
               <Text>Deletar</Text>

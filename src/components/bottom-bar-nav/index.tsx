@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { TabTrigger } from 'expo-router/ui';
+import { useRouter } from 'expo-router';
 import { View, Animated, Pressable, Text } from 'react-native';
 import { cn } from '@/lib/utils';
 import { Icon } from '../ui/icon';
@@ -15,6 +15,7 @@ interface BottomNavigationProps {
 }
 
 const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) => {
+  const router = useRouter();
   const [activeIcon, setActiveIcon] = useState(currentSegment);
 
   // Animation values for each icon
@@ -85,37 +86,42 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
           const isActive = screen.name === activeIcon;
           const showFilled = screen.name === activeIcon;
 
+          const handlePress = () => {
+            if (screen.name !== currentSegment) {
+              router.replace(screen.href as any);
+            }
+          };
+
           return (
-            <TabTrigger key={screen.name} name={screen.name} asChild>
-              <Pressable className="relative flex h-full flex-row items-center justify-center gap-2 px-2">
+            <Pressable
+              key={screen.name}
+              onPress={handlePress}
+              className="relative flex h-full flex-row items-center justify-center gap-2 px-2">
+              <Animated.View
+                style={{
+                  transform: [{ scale: iconScales[screen.name] }],
+                  opacity: iconOpacities[screen.name],
+                }}
+                className="flex items-center justify-center">
+                <Icon
+                  as={showFilled ? screen.icon.filled : screen.icon.default}
+                  className={cn(
+                    'size-6',
+                    showFilled ? 'text-bottom-bar-accent' : 'text-bottom-bar-foreground',
+                  )}
+                />
+              </Animated.View>
+
+              {/* Active label */}
+              {isActive && (
                 <Animated.View
                   style={{
-                    transform: [{ scale: iconScales[screen.name] }],
                     opacity: iconOpacities[screen.name],
-                  }}
-                  className="flex items-center justify-center">
-                  <Icon
-                    as={showFilled ? screen.icon.filled : screen.icon.default}
-                    className={cn(
-                      'size-6',
-                      showFilled ? 'text-bottom-bar-accent' : 'text-bottom-bar-foreground',
-                    )}
-                  />
+                  }}>
+                  <Text className="text-xs font-medium text-bottom-bar-accent">{screen.label}</Text>
                 </Animated.View>
-
-                {/* Active label */}
-                {isActive && (
-                  <Animated.View
-                    style={{
-                      opacity: iconOpacities[screen.name],
-                    }}>
-                    <Text className="text-xs font-medium text-bottom-bar-accent">
-                      {screen.label}
-                    </Text>
-                  </Animated.View>
-                )}
-              </Pressable>
-            </TabTrigger>
+              )}
+            </Pressable>
           );
         })}
       </View>
