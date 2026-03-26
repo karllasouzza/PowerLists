@@ -1,6 +1,13 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
-import { IconBook, IconCheck, IconChefHat, IconShoppingCart } from '@tabler/icons-react-native';
+import {
+  IconBook,
+  IconCheck,
+  IconChefHat,
+  IconShoppingCart,
+  IconEdit,
+  IconTrash,
+} from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
 
 import { List } from '@/data/types';
@@ -8,12 +15,20 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import { calculateTotal } from '@/features/list_items';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface CardListProps {
   list: List;
   toggleSelectList: (id: string) => void;
   isSelected: (listId: string) => string | undefined;
   listsSelected: string[];
+  onEdit: (listId: string) => void;
+  onDelete: (listId: string) => void;
 }
 
 const CardIcons = {
@@ -22,7 +37,14 @@ const CardIcons = {
   book: IconBook,
 } as const;
 
-export const CardList = ({ list, toggleSelectList, isSelected, listsSelected }: CardListProps) => {
+export const CardList = ({
+  list,
+  toggleSelectList,
+  isSelected,
+  listsSelected,
+  onEdit,
+  onDelete,
+}: CardListProps) => {
   const router = useRouter();
 
   const items = list.listItems || [];
@@ -33,7 +55,7 @@ export const CardList = ({ list, toggleSelectList, isSelected, listsSelected }: 
 
   const handleRouterPush = () => {
     router.push({
-      pathname: 'lists/[id]',
+      pathname: '/(authenticated)/lists/[id]',
       params: { id: list.id },
     });
   };
@@ -78,11 +100,27 @@ export const CardList = ({ list, toggleSelectList, isSelected, listsSelected }: 
       </View>
 
       {/* Right Section: Total Price + Menu */}
-      <View className="flex items-center justify-center gap-2">
-        <Text variant="p" className="tracking-normal font-bold">
-          {totalPrice}
-        </Text>
-      </View>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Pressable className="items-end justify-center">
+            <Text variant="p" className="tracking-normal font-bold">
+              {totalPrice}
+            </Text>
+          </Pressable>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent className="w-48">
+          <DropdownMenuItem onPress={() => onEdit(list.id)}>
+            <Icon as={IconEdit} size={18} />
+            <Text>Editar</Text>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem variant="destructive" onPress={() => onDelete(list.id)}>
+            <Icon as={IconTrash} size={18} />
+            <Text>Deletar</Text>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </Pressable>
   );
 };

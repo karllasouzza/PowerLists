@@ -10,11 +10,27 @@ import { TopBar } from '@/components/top-bar';
 import { useListPageLogics } from './hooks/use-list-page-logics';
 import { IconPlus } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
-import NewListItem from '@/components/new-list-item';
+import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
 
 const HomeScreen = observer(() => {
-  const { searchQuery, setSearchQuery, lists, toggleSelectList, isSelected, listsSelected } =
-    useListPageLogics();
+  const {
+    searchQuery,
+    setSearchQuery,
+    lists,
+    toggleSelectList,
+    isSelected,
+    listsSelected,
+    isCreateOpen,
+    setCreateOpen,
+    isUpdateOpen,
+    setUpdateOpen,
+    isDeleteOpen,
+    setDeleteOpen,
+    activeListId,
+    handleOpenCreateModal,
+    handleOpenUpdateModal,
+    handleOpenDeleteModal,
+  } = useListPageLogics();
 
   const renderList = (list: List, index: number) => {
     return (
@@ -24,6 +40,8 @@ const HomeScreen = observer(() => {
         toggleSelectList={toggleSelectList}
         isSelected={isSelected}
         listsSelected={listsSelected}
+        onEdit={handleOpenUpdateModal}
+        onDelete={handleOpenDeleteModal}
       />
     );
   };
@@ -48,15 +66,11 @@ const HomeScreen = observer(() => {
         ListFooterComponent={() => <View className="h-44 border-t border-border" />}
       />
 
-      <Fab icon={IconPlus} />
+      <Fab icon={IconPlus} onPress={handleOpenCreateModal} />
 
-      <NewListItem
-        type="Lists"
-        mode="add"
-        open={true}
-        onOpenChange={() => {}}
-        onSuccess={() => {}}
-      />
+      <ListCreateModal open={isCreateOpen} onOpenChange={setCreateOpen} />
+      <ListUpdateModal open={isUpdateOpen} listId={activeListId} onOpenChange={setUpdateOpen} />
+      <ListDeleteModal open={isDeleteOpen} listId={activeListId} onOpenChange={setDeleteOpen} />
     </View>
   );
 });

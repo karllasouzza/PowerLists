@@ -8,6 +8,10 @@ import { filterListsByQuery } from '../utils/list-filters';
 export const useListPageLogics = () => {
   const [onSearch, setOnSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isCreateOpen, setCreateOpen] = useState(false);
+  const [isUpdateOpen, setUpdateOpen] = useState(false);
+  const [isDeleteOpen, setDeleteOpen] = useState(false);
+  const [activeListId, setActiveListId] = useState<string>();
   const lists = useValue(lists$.get());
   const listFormatted = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
   const [listsSelected, setListsSelected] = useState<string[]>([]);
@@ -28,6 +32,20 @@ export const useListPageLogics = () => {
   };
   const isSelected = (listId: string) => listsSelected.find((item) => item === listId);
 
+  const handleOpenCreateModal = () => {
+    setCreateOpen(true);
+  };
+
+  const handleOpenUpdateModal = (listId: string) => {
+    setActiveListId(listId);
+    setUpdateOpen(true);
+  };
+
+  const handleOpenDeleteModal = (listId: string) => {
+    setActiveListId(listId);
+    setDeleteOpen(true);
+  };
+
   return {
     lists: filteredLists,
 
@@ -39,5 +57,16 @@ export const useListPageLogics = () => {
     listsSelected,
     toggleSelectList,
     isSelected,
+
+    isCreateOpen,
+    setCreateOpen,
+    isUpdateOpen,
+    setUpdateOpen,
+    isDeleteOpen,
+    setDeleteOpen,
+    activeListId,
+    handleOpenCreateModal,
+    handleOpenUpdateModal,
+    handleOpenDeleteModal,
   };
 };
