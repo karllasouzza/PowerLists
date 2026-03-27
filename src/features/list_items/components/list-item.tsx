@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, Platform, Dimensions } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,13 @@ import { cn } from '@/lib/utils';
 
 const ACTION_WIDTH = 84;
 const ACTIONS_TOTAL_WIDTH = ACTION_WIDTH * 2;
+
+const panGuard = Gesture.Pan().activeOffsetX([-15, 15]).failOffsetY([-8, 8]);
+
+const swipeHitSlop = Platform.select({
+  android: { left: -Math.round(Dimensions.get('window').width * 0.15) },
+  ios: undefined,
+});
 
 type SwipeableInstance = React.ElementRef<typeof Swipeable>;
 
@@ -129,46 +137,49 @@ export default function ListItem({
 
   return (
     <View className="mx-4 mb-2 overflow-hidden rounded-2xl">
-      <Swipeable
-        ref={swipeableRef}
-        friction={4}
-        leftThreshold={42}
-        rightThreshold={42}
-        overshootLeft={false}
-        overshootRight={false}
-        dragOffsetFromLeftEdge={15}
-        dragOffsetFromRightEdge={15}
-        renderLeftActions={renderLeftActions}
-        renderRightActions={renderRightActions}
-        onSwipeableWillOpen={handleSwipeWillOpen}
-        onSwipeableOpen={handleSwipeOpen}
-        onSwipeableWillClose={handleSwipeClose}
-        onSwipeableClose={handleSwipeClose}>
-        <View className="min-h-[88px] h-max w-full flex-row items-center gap-3 bg-card p-3">
-          <View
-            className="rounded-xl items-center justify-center overflow-hidden"
-            style={{
-              width: 64,
-              height: 64,
-            }}>
-            <Text className="text-2xl font-bold text-foreground">
-              {(title || '?').charAt(0).toUpperCase()}
-            </Text>
-          </View>
+      <GestureDetector gesture={panGuard}>
+        <Swipeable
+          ref={swipeableRef}
+          friction={2}
+          leftThreshold={60}
+          rightThreshold={60}
+          dragOffsetFromLeftEdge={30}
+          dragOffsetFromRightEdge={30}
+          overshootLeft={false}
+          overshootRight={false}
+          renderLeftActions={renderLeftActions}
+          renderRightActions={renderRightActions}
+          onSwipeableWillOpen={handleSwipeWillOpen}
+          onSwipeableOpen={handleSwipeOpen}
+          onSwipeableWillClose={handleSwipeClose}
+          onSwipeableClose={handleSwipeClose}
+          hitSlop={swipeHitSlop}>
+          <View className="min-h-[88px] h-max w-full flex-row items-center gap-3 bg-card p-3">
+            <View
+              className="rounded-xl items-center justify-center overflow-hidden"
+              style={{
+                width: 64,
+                height: 64,
+              }}>
+              <Text className="text-2xl font-bold text-foreground">
+                {(title || '?').charAt(0).toUpperCase()}
+              </Text>
+            </View>
 
-          <View className="flex-1 justify-center gap-0.5">
-            <Text
-              className="text-base font-semibold text-foreground"
-              style={{ textDecorationLine: status ? 'line-through' : 'none' }}
-              numberOfLines={1}>
-              {title}
-            </Text>
-            <Text className="text-sm text-muted-foreground">
-              {price} • {amount} und
-            </Text>
+            <View className="flex-1 justify-center gap-0.5">
+              <Text
+                className="text-base font-semibold text-foreground"
+                style={{ textDecorationLine: status ? 'line-through' : 'none' }}
+                numberOfLines={1}>
+                {title}
+              </Text>
+              <Text className="text-sm text-muted-foreground">
+                {price} • {amount} und
+              </Text>
+            </View>
           </View>
-        </View>
-      </Swipeable>
+        </Swipeable>
+      </GestureDetector>
     </View>
   );
 }

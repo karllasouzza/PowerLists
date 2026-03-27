@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, Platform, Dimensions } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
   IconBook,
   IconCheck,
@@ -19,6 +20,13 @@ import { calculateTotal } from '@/features/list_items';
 
 const ACTION_WIDTH = 84;
 const ACTIONS_TOTAL_WIDTH = ACTION_WIDTH * 2;
+
+const panGuard = Gesture.Pan().activeOffsetX([-15, 15]).failOffsetY([-8, 8]);
+
+const swipeHitSlop = Platform.select({
+  android: { left: -Math.round(Dimensions.get('window').width * 0.15) },
+  ios: undefined,
+});
 
 type SwipeableInstance = React.ElementRef<typeof Swipeable>;
 
@@ -133,22 +141,28 @@ export const CardList = ({
 
   return (
     <View className="mx-4 mb-2 overflow-hidden rounded-2xl">
-      <Swipeable
-        ref={swipeableRef}
-        friction={2}
-        rightThreshold={42}
-        overshootRight={false}
-        renderRightActions={renderRightActions}
-        onSwipeableWillOpen={handleSwipeWillOpen}
-        onSwipeableWillClose={handleSwipeClose}
-        onSwipeableClose={handleSwipeClose}>
-        <Pressable
-          onPress={handlePress}
-          onLongPress={handleLongPress}
-          className={cn(
-            'flex-row items-center justify-between bg-card px-4 py-4',
-            isSelected(list.id) && 'bg-primary/15',
-          )}>
+      <GestureDetector gesture={panGuard}>
+        <Swipeable
+          ref={swipeableRef}
+          friction={2}
+          leftThreshold={60}
+          rightThreshold={60}
+          dragOffsetFromLeftEdge={30}
+          dragOffsetFromRightEdge={30}
+          overshootLeft={false}
+          overshootRight={false}
+          renderRightActions={renderRightActions}
+          onSwipeableWillOpen={handleSwipeWillOpen}
+          onSwipeableWillClose={handleSwipeClose}
+          onSwipeableClose={handleSwipeClose}
+          hitSlop={swipeHitSlop}>
+          <Pressable
+            onPress={handlePress}
+            onLongPress={handleLongPress}
+            className={cn(
+              'flex-row items-center justify-between bg-card px-4 py-4',
+              isSelected(list.id) && 'bg-primary/15',
+            )}>
           <View className="flex-1 flex-row items-center gap-3">
             <View className="size-[50px] rounded-full flex items-center justify-center">
               {isSelected(list.id) ? (
@@ -173,8 +187,9 @@ export const CardList = ({
               {totalPrice}
             </Text>
           </View>
-        </Pressable>
-      </Swipeable>
+          </Pressable>
+        </Swipeable>
+      </GestureDetector>
     </View>
   );
 };
