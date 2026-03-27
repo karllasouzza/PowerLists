@@ -25,7 +25,6 @@ import ThemeProvider from '@/context/themes/use-themes';
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
-
 export default function RootLayout() {
   verifyInstallation();
   const [visible, setVisible] = useState(true);
