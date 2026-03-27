@@ -1,15 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
-import { useValue } from '@legendapp/state/react';
+import { useSelector, useValue } from '@legendapp/state/react';
 
 import { themes } from '@/context/themes/theme-config';
 import { useTheme } from '@/context/themes';
 import { lists$ } from '@/data/states/lists';
 import { listItems$, toggleCheckListItem } from '@/data/states/list-items';
-import { List } from '@/data/types';
+import { List, ListItem as DataListItem } from '@/data/types';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 
 import { calculateTotal, separateItemsByStatus } from '../utils';
+import type { SortMode } from '../utils';
 import type { ListItem } from '../types';
 
 export const useListItemsPageLogics = () => {
@@ -20,13 +21,20 @@ export const useListItemsPageLogics = () => {
   const listsFormated = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
   const currentList = listsFormated.find((list) => list.id === listId);
 
-  const listItemsRaw = useValue(listItems$);
-  const items = useMemo(() => {
-    const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
-    return allItems.filter((item) => item.listId === listId);
-  }, [listItemsRaw, listId]);
+  const items = useSelector(() => {
+    if (!listId) return [] as ListItem[];
+    const raw = Object.values(listItems$.get() ?? {}).filter((item) => item.list_id === listId);
+    return (convertFromSupabaseFormat(raw) as DataListItem[]).map((item) => ({
+      ...item,
+      title: item.title ?? '',
+      price: item.price ?? 0,
+      amount: item.amount ?? 0,
+      status: item.isChecked,
+    })) as ListItem[];
+  });
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortMode, setSortMode] = useState<SortMode>('default');
   const [isCreateOpen, setCreateOpen] = useState(false);
   const [isUpdateOpen, setUpdateOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
@@ -62,8 +70,8 @@ export const useListItemsPageLogics = () => {
   }, [items, searchQuery]);
 
   const { unchecked, checked } = useMemo(
-    () => separateItemsByStatus(filteredItems),
-    [filteredItems],
+    () => separateItemsByStatus(filteredItems, sortMode),
+    [filteredItems, sortMode],
   );
 
   const total = useMemo(() => calculateTotal(filteredItems), [filteredItems]);
@@ -82,6 +90,8 @@ export const useListItemsPageLogics = () => {
 
     searchQuery,
     setSearchQuery,
+    sortMode,
+    setSortMode,
 
     unchecked,
     checked,

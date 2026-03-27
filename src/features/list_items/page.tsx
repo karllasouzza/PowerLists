@@ -1,16 +1,27 @@
 import React, { useCallback } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
+import { IconPlus } from '@tabler/icons-react-native';
 
-import ListItemComponent from '@/components/list-item';
+import ListItemComponent from '@/features/list_items/components/list-item';
 import { TopBar } from '@/components/top-bar';
+import { Text } from '@/components/ui/text';
 
-import { ListItemsFooter } from './components';
 import { formatCurrency } from './utils';
-import type { ListItem as ListItem } from './types';
+import type { SortMode } from './utils';
+import type { ListItem } from './types';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
+import { cn } from '@/lib/utils';
+import { Fab } from '@/components/ui/fab';
+import { ListItemsContent, ListItemsFooter } from './components';
+
+const SORT_OPTIONS: { key: SortMode; label: string }[] = [
+  { key: 'default', label: 'Padrão' },
+  { key: 'az', label: 'A-Z' },
+  { key: 'price', label: '$ → $$' },
+];
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();
@@ -19,13 +30,11 @@ const ListItemsScreen = observer(() => {
     currentList,
     searchQuery,
     setSearchQuery,
+    sortMode,
+    setSortMode,
     unchecked,
     checked,
     total,
-    accentColor,
-    backgroundColor,
-    textColor,
-    mutedColor,
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,
@@ -43,21 +52,17 @@ const ListItemsScreen = observer(() => {
     (item: ListItem) => (
       <ListItemComponent
         key={item.id}
-        background={accentColor}
+        id={item.id}
         status={item.isChecked}
         title={item.title}
-        item={item}
-        price={formatCurrency(item.price)}
-        amount={String(item.amount)}
-        color={textColor}
-        subColor={mutedColor}
-        checkColor={accentColor}
+        price={formatCurrency(item.price ?? 0)}
+        amount={String(item.amount ?? 0)}
         checkHandle={() => handleToggleCheck(item.id, item.isChecked)}
         onEdit={handleOpenUpdate}
         onDelete={handleOpenDelete}
       />
     ),
-    [accentColor, textColor, mutedColor, handleToggleCheck, handleOpenUpdate, handleOpenDelete],
+    [handleToggleCheck, handleOpenUpdate, handleOpenDelete],
   );
 
   if (!currentList?.id) return null;
@@ -65,31 +70,41 @@ const ListItemsScreen = observer(() => {
   return (
     <View className="flex-1 bg-background">
       <TopBar
-        title={currentList?.title ?? 'List'}
+        title={currentList?.title ?? 'Lista'}
         showBack={true}
         onBack={() => router.back()}
         showSearch={true}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Search items..."
+        searchPlaceholder="Buscar itens..."
       />
 
-      <ScrollView className="w-full flex-1">
-        {/* Items não marcados primeiro */}
-        {unchecked.map(renderItem)}
+      {/* Sort Bar */}
+      <View className="flex-row items-center gap-2 px-4 py-3">
+        {SORT_OPTIONS.map((opt) => {
+          const isActive = sortMode === opt.key;
+          return (
+            <Pressable
+              key={opt.key}
+              onPress={() => setSortMode(opt.key)}
+              className={cn('rounded-full px-4 py-1.5', isActive && 'bg-accent')}>
+              <Text
+                className={cn(
+                  'text-sm font-semibold',
+                  isActive ? 'text-white' : 'text-muted-foreground',
+                )}>
+                {opt.label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
-        {/* Items marcados por último */}
-        {checked.map(renderItem)}
-      </ScrollView>
+      <ListItemsContent unchecked={unchecked} checked={checked} renderItem={renderItem} />
 
-      <ListItemsFooter
-        total={total}
-        accentColor={accentColor}
-        backgroundColor={backgroundColor}
-        textColor={textColor}
-        bottomInset={0}
-        onAddPress={handleOpenAdd}
-      />
+      <ListItemsFooter total={total} />
+
+      <Fab onPress={handleOpenAdd} icon={IconPlus} label="Adicionar Item" />
 
       <ItemCreateModal open={isCreateOpen} listId={listId} onOpenChange={setCreateOpen} />
       <ItemUpdateModal open={isUpdateOpen} itemId={activeItemId} onOpenChange={setUpdateOpen} />

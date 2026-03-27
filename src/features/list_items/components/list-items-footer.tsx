@@ -3,45 +3,24 @@
  */
 
 import React from 'react';
-import { View, Pressable } from 'react-native';
+import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
-import { Icon } from '@/components/ui/icon';
-import { IconPlus } from '@tabler/icons-react-native';
 
 interface ListItemsFooterProps {
   readonly total: string;
-  readonly accentColor: string;
-  readonly backgroundColor: string;
-  readonly textColor: string;
-  readonly bottomInset: number;
-  readonly onAddPress: () => void;
 }
 
-/**
- * Rodapé da tela de items com botão de adicionar e total
- */
-export const ListItemsFooter = ({
-  total,
-  accentColor,
-  backgroundColor,
-  textColor,
-  bottomInset,
-  onAddPress,
-}: ListItemsFooterProps) => {
+export const ListItemsFooter = ({ total }: ListItemsFooterProps) => {
   return (
-    <View
-      style={{
-        paddingBottom: bottomInset,
-        backgroundColor,
-      }}
-      className="w-full flex-row items-center justify-between px-5 py-3">
-      <Pressable onPress={onAddPress} className="rounded-md p-2">
-        <Icon as={IconPlus} size={32} />
-      </Pressable>
-
-      <Text variant="large" style={{ color: textColor }}>
-        Total: {total}
-      </Text>
+    <View className="w-full flex-row items-center justify-between px-5 py-3 bg-bottom-bar border-t border-border">
+      <View className="flex items-center justify-center gap-2 flex-row">
+        <Text variant="p" className="text-muted-foreground m-0">
+          Total:
+        </Text>
+        <Text variant="large" className="font-bold text-bottom-bar-accent">
+          {total}
+        </Text>
+      </View>
     </View>
   );
 };

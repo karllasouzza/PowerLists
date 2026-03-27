@@ -4,3 +4,4 @@
 
 export * from './list-items-header';
 export * from './list-items-footer';
+export * from './list-items-content';

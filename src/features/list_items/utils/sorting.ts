@@ -2,33 +2,52 @@
  * Utilitários de ordenação para items de lista
  */
 
+import { Decimal } from 'decimal.js';
 import type { ListItem } from '../types';
 
-/**
- * Ordena items por data de criação (mais antigos primeiro)
- *
- * @param items - Array de items a serem ordenados
- * @returns Array ordenado
- */
+export type SortMode = 'default' | 'az' | 'price';
+
 export const sortItemsByDate = (items: ListItem[]): ListItem[] => {
   return [...items].sort((a, b) => {
-    const dateA = new Date(a.createdAt!).getTime();
-    const dateB = new Date(b.createdAt!).getTime();
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return dateA - dateB;
   });
 };
 
-/**
- * Separa items em checked e unchecked, mantendo ordenação por data
- *
- * @param items - Array de items
- * @returns Objeto com items separados
- */
-export const separateItemsByStatus = (items: ListItem[]) => {
-  const sorted = sortItemsByDate(items);
+export const sortItemsByName = (items: ListItem[]): ListItem[] => {
+  return [...items].sort((a, b) => {
+    const titleA = (a.title ?? '').trim();
+    const titleB = (b.title ?? '').trim();
+
+    return titleA.localeCompare(titleB, 'pt-BR', { sensitivity: 'base' });
+  });
+};
+
+export const sortItemsByPrice = (items: ListItem[]): ListItem[] => {
+  return [...items].sort((a, b) => {
+    const priceA = new Decimal(a.price ?? 0);
+    const priceB = new Decimal(b.price ?? 0);
+    return priceA.comparedTo(priceB);
+  });
+};
+
+export const sortItems = (items: ListItem[], mode: SortMode): ListItem[] => {
+  switch (mode) {
+    case 'az':
+      return sortItemsByName(items);
+    case 'price':
+      return sortItemsByPrice(items);
+    default:
+      return sortItemsByDate(items);
+  }
+};
+
+export const separateItemsByStatus = (items: ListItem[], mode: SortMode = 'default') => {
+  const sorted = sortItems(items, mode);
 
   return {
-    unchecked: sorted.filter((item) => !item.status),
-    checked: sorted.filter((item) => item.status),
+    unchecked: sorted.filter((item) => !item.isChecked),
+    checked: sorted.filter((item) => item.isChecked),
   };
 };

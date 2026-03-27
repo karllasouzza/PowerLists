@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Decimal } from 'decimal.js';
 import { useValue } from '@legendapp/state/react';
 
 import {
@@ -29,13 +30,21 @@ const itemFormSchema = z.object({
 type ItemFormData = z.infer<typeof itemFormSchema>;
 
 const parsePrice = (val: string): number => {
-  const parsed = parseFloat(val);
-  return Number.isNaN(parsed) ? 0 : parsed;
+  try {
+    const d = new Decimal(val.replace(',', '.') || '0');
+    return d.isNaN() || d.isNegative() ? 0 : d.toDecimalPlaces(2).toNumber();
+  } catch {
+    return 0;
+  }
 };
 
 const parseAmount = (val: string): number => {
-  const parsed = parseInt(val, 10);
-  return Number.isNaN(parsed) || parsed < 1 ? 1 : parsed;
+  try {
+    const d = new Decimal(val.replace(',', '.') || '1').toDecimalPlaces(0);
+    return d.lessThan(1) ? 1 : d.toNumber();
+  } catch {
+    return 1;
+  }
 };
 
 type ItemUpdateModalProps = {
