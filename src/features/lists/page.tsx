@@ -30,16 +30,17 @@ const HomeScreen = observer(() => {
     handleOpenDeleteModal,
   } = useListPageLogics();
 
-  const renderList = (list: List, index: number) => {
-    return (
+  const renderList = useCallback(
+    (list: List, index: number) => (
       <CardList
-        key={index}
+        key={list.id}
         list={list}
         onEdit={handleOpenUpdateModal}
         onDelete={handleOpenDeleteModal}
       />
-    );
-  };
+    ),
+    [handleOpenUpdateModal, handleOpenDeleteModal],
+  );
 
   const handleListScrollStart = useCallback(() => {
     closeOpenedSwipeable();
@@ -58,7 +59,7 @@ const HomeScreen = observer(() => {
       <LegendList
         data={lists}
         renderItem={({ item, index }) => renderList(item, index)}
-        estimatedItemSize={lists.length}
+        estimatedItemSize={88}
         className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
         recycleItems

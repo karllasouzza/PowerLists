@@ -30,7 +30,7 @@ const CardIcons = {
   book: IconBook,
 } as const;
 
-export const CardList = ({ list, onEdit, onDelete }: CardListProps) => {
+export const CardList = function CardList({ list, onEdit, onDelete }: CardListProps) {
   const router = useRouter();
   const swipeableRef = useRef<SwipeableItemRef>(null);
 
