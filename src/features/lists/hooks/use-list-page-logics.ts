@@ -14,23 +14,11 @@ export const useListPageLogics = () => {
   const [activeListId, setActiveListId] = useState<string>();
   const lists = useValue(lists$.get());
   const listFormatted = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
-  const [listsSelected, setListsSelected] = useState<string[]>([]);
 
   const filteredLists = useMemo(
     () => filterListsByQuery(listFormatted, searchQuery),
     [listFormatted, searchQuery],
   );
-
-  const toggleSelectList = (id: string) => {
-    setListsSelected((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((item) => item !== id);
-      } else {
-        return [...prev, id];
-      }
-    });
-  };
-  const isSelected = (listId: string) => listsSelected.find((item) => item === listId);
 
   const handleOpenCreateModal = () => {
     setCreateOpen(true);
@@ -53,10 +41,6 @@ export const useListPageLogics = () => {
     setOnSearch,
     searchQuery,
     setSearchQuery,
-
-    listsSelected,
-    toggleSelectList,
-    isSelected,
 
     isCreateOpen,
     setCreateOpen,

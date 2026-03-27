@@ -6,14 +6,13 @@ import { z } from 'zod';
 import { Decimal } from 'decimal.js';
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+  AppModal,
+  AppModalContent,
+  AppModalHandle,
+  AppModalHeader,
+  AppModalFooter,
+} from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { createNewListItem } from '@/data/states/list-items';
@@ -86,13 +85,12 @@ export function ItemCreateModal({ open, listId, onOpenChange }: ItemCreateModalP
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[94%] p-0">
-        <DialogHeader className="px-4 pb-2 pt-4">
-          <DialogTitle>Novo item</DialogTitle>
-        </DialogHeader>
+    <AppModal open={open} onOpenChange={onOpenChange}>
+      <AppModalContent>
+        <AppModalHandle />
+        <AppModalHeader title="Novo item" />
 
-        <View className="gap-4 px-4 pt-4">
+        <View className="gap-4 px-6 pb-2">
           <View className="gap-2">
             <Label nativeID="title">Nome do item</Label>
             <Controller
@@ -148,15 +146,13 @@ export function ItemCreateModal({ open, listId, onOpenChange }: ItemCreateModalP
           </View>
         </View>
 
-        <DialogFooter className="px-4 pb-4 pt-4">
-          <Button variant="outline" onPress={closeModal} disabled={isSubmitting}>
-            <Text>Cancelar</Text>
-          </Button>
-          <Button onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-            <Text>Salvar</Text>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <AppModalFooter
+          onCancel={closeModal}
+          onConfirm={handleSubmit(onSubmit)}
+          confirmLabel="Salvar"
+          isLoading={isSubmitting}
+        />
+      </AppModalContent>
+    </AppModal>
   );
 }

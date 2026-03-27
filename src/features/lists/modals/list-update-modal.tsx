@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,12 +6,12 @@ import { z } from 'zod';
 import { useValue } from '@legendapp/state/react';
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+  AppModal,
+  AppModalContent,
+  AppModalHandle,
+  AppModalHeader,
+  AppModalFooter,
+} from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
@@ -72,26 +72,28 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
 
   const selectedIcon = watch('icon');
 
-  const onSubmit = async (data: ListFormData) => {
-    if (!listId) return;
+  const onSubmit = useCallback(
+    async (data: ListFormData) => {
+      if (!listId) return;
 
-    setIsSubmitting(true);
-    try {
-      const { success } = await handleEditList(listId, { title: data.title, icon: data.icon });
-      if (success) onOpenChange(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+      setIsSubmitting(true);
+      try {
+        const { success } = await handleEditList(listId, { title: data.title, icon: data.icon });
+        if (success) onOpenChange(false);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [listId, onOpenChange],
+  );
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[94%] p-0">
-        <DialogHeader className="px-4 pb-2 pt-4">
-          <DialogTitle>Editar lista</DialogTitle>
-        </DialogHeader>
+    <AppModal open={open} onOpenChange={onOpenChange}>
+      <AppModalContent>
+        <AppModalHandle />
+        <AppModalHeader title="Editar lista" />
 
-        <ScrollView className="max-h-[70vh] px-4" keyboardShouldPersistTaps="handled">
+        <ScrollView className="max-h-[60vh] px-6" keyboardShouldPersistTaps="handled">
           <View className="mb-4 gap-2">
             <Label nativeID="title">Nome da lista</Label>
             <Controller
@@ -141,15 +143,14 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
           </View>
         </ScrollView>
 
-        <DialogFooter className="px-4 pb-4 pt-2">
-          <Button variant="outline" onPress={() => onOpenChange(false)} disabled={isSubmitting}>
-            <Text>Cancelar</Text>
-          </Button>
-          <Button onPress={handleSubmit(onSubmit)} disabled={isSubmitting || !listId}>
-            <Text>Salvar</Text>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <AppModalFooter
+          onCancel={() => onOpenChange(false)}
+          onConfirm={() => handleSubmit(onSubmit)}
+          confirmLabel="Salvar"
+          isLoading={isSubmitting}
+          isConfirmDisabled={!listId}
+        />
+      </AppModalContent>
+    </AppModal>
   );
 }

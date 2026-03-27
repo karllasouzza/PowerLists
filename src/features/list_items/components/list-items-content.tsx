@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { LegendList } from '@legendapp/list';
 
 import { Text } from '@/components/ui/text';
-import { closeOpenedListItemSwipe } from './list-item';
+import { closeOpenedSwipeable } from '@/components/swipeable';
 
 import type { ListItem } from '../types';
 
@@ -54,6 +54,10 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
     ];
   }, [unchecked, checked]);
 
+  const handleListScrollStart = () => {
+    closeOpenedSwipeable();
+  };
+
   return (
     <LegendList
       data={data}
@@ -73,10 +77,10 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
         return renderItem(item.item);
       }}
       estimatedItemSize={92}
-      className="flex-1"
+      className="flex-1 flex w-full h-full py-2"
       keyExtractor={(item) => item.key}
       recycleItems
-      onScrollBeginDrag={() => closeOpenedListItemSwipe()}
+      onScrollBeginDrag={handleListScrollStart}
       ListEmptyComponent={() => (
         <View className="flex-1 items-center justify-center py-16">
           <Text variant="muted" className="text-center">

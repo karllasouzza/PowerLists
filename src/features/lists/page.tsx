@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { LegendList } from '@legendapp/list';
 import { observer } from '@legendapp/state/react';
 
 import type { List } from '@/data/types';
 import { CardList } from '@/features/lists/components/card-list';
+import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-list-page-logics';
@@ -17,9 +18,6 @@ const HomeScreen = observer(() => {
     searchQuery,
     setSearchQuery,
     lists,
-    toggleSelectList,
-    isSelected,
-    listsSelected,
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,
@@ -32,19 +30,21 @@ const HomeScreen = observer(() => {
     handleOpenDeleteModal,
   } = useListPageLogics();
 
-  const renderList = (list: List, index: number) => {
-    return (
+  const renderList = useCallback(
+    (list: List, index: number) => (
       <CardList
-        key={index}
+        key={list.id}
         list={list}
-        toggleSelectList={toggleSelectList}
-        isSelected={isSelected}
-        listsSelected={listsSelected}
         onEdit={handleOpenUpdateModal}
         onDelete={handleOpenDeleteModal}
       />
-    );
-  };
+    ),
+    [handleOpenUpdateModal, handleOpenDeleteModal],
+  );
+
+  const handleListScrollStart = useCallback(() => {
+    closeOpenedSwipeable();
+  }, []);
 
   return (
     <View className="flex h-full w-full flex-1 items-center bg-background p-0!">
@@ -59,10 +59,11 @@ const HomeScreen = observer(() => {
       <LegendList
         data={lists}
         renderItem={({ item, index }) => renderList(item, index)}
-        estimatedItemSize={lists.length}
+        estimatedItemSize={88}
         className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
         recycleItems
+        onScrollBeginDrag={handleListScrollStart}
         ListFooterComponent={() => <View className="h-44 border-t border-border" />}
       />
 

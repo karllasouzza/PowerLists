@@ -7,14 +7,13 @@ import { Decimal } from 'decimal.js';
 import { useValue } from '@legendapp/state/react';
 
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+  AppModal,
+  AppModalContent,
+  AppModalHandle,
+  AppModalHeader,
+  AppModalFooter,
+} from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { updateListItem, listItems$ } from '@/data/states/list-items';
@@ -103,13 +102,12 @@ export function ItemUpdateModal({ open, itemId, onOpenChange }: ItemUpdateModalP
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[94%] p-0">
-        <DialogHeader className="px-4 pb-2 pt-4">
-          <DialogTitle>Editar item</DialogTitle>
-        </DialogHeader>
+    <AppModal open={open} onOpenChange={onOpenChange}>
+      <AppModalContent>
+        <AppModalHandle />
+        <AppModalHeader title="Editar item" />
 
-        <View className="gap-4 px-4 pt-4">
+        <View className="gap-4 px-6 pb-2">
           <View className="gap-2">
             <Label nativeID="title">Nome do item</Label>
             <Controller
@@ -165,15 +163,14 @@ export function ItemUpdateModal({ open, itemId, onOpenChange }: ItemUpdateModalP
           </View>
         </View>
 
-        <DialogFooter className="px-4 pb-4 pt-4">
-          <Button variant="outline" onPress={() => onOpenChange(false)} disabled={isSubmitting}>
-            <Text>Cancelar</Text>
-          </Button>
-          <Button onPress={handleSubmit(onSubmit)} disabled={isSubmitting || !itemId}>
-            <Text>Salvar</Text>
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <AppModalFooter
+          onCancel={() => onOpenChange(false)}
+          onConfirm={handleSubmit(onSubmit)}
+          confirmLabel="Salvar"
+          isLoading={isSubmitting}
+          isConfirmDisabled={!itemId}
+        />
+      </AppModalContent>
+    </AppModal>
   );
 }
