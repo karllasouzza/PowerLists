@@ -80,8 +80,7 @@ const Fab = React.forwardRef<View, FabProps>(
               opacity,
             }}
             className={cn(
-              'flex flex-row items-center justify-center rounded-3xl bg-primary border border-border',
-              label ? 'px-5 py-3' : 'h-16 w-16',
+              'flex flex-row items-center justify-center rounded-3xl bg-primary border border-border p-4',
               buttonClassName,
             )}>
             <Icon as={icon} className={cn('size-6 text-primary-foreground', iconClassName)} />

@@ -17,9 +17,6 @@ const HomeScreen = observer(() => {
     searchQuery,
     setSearchQuery,
     lists,
-    toggleSelectList,
-    isSelected,
-    listsSelected,
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,
@@ -37,9 +34,6 @@ const HomeScreen = observer(() => {
       <CardList
         key={index}
         list={list}
-        toggleSelectList={toggleSelectList}
-        isSelected={isSelected}
-        listsSelected={listsSelected}
         onEdit={handleOpenUpdateModal}
         onDelete={handleOpenDeleteModal}
       />

@@ -4,7 +4,6 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
   IconBook,
-  IconCheck,
   IconChefHat,
   IconShoppingCart,
   IconEdit,
@@ -15,7 +14,6 @@ import { useRouter } from 'expo-router';
 import { List } from '@/data/types';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { cn } from '@/lib/utils';
 import { calculateTotal } from '@/features/list_items';
 
 const ACTION_WIDTH = 84;
@@ -41,9 +39,6 @@ export const closeOpenedCardListSwipe = () => {
 
 interface CardListProps {
   list: List;
-  toggleSelectList: (id: string) => void;
-  isSelected: (listId: string) => string | undefined;
-  listsSelected: string[];
   onEdit: (listId: string) => void;
   onDelete: (listId: string) => void;
 }
@@ -54,20 +49,11 @@ const CardIcons = {
   book: IconBook,
 } as const;
 
-export const CardList = ({
-  list,
-  toggleSelectList,
-  isSelected,
-  listsSelected,
-  onEdit,
-  onDelete,
-}: CardListProps) => {
+export const CardList = ({ list, onEdit, onDelete }: CardListProps) => {
   const router = useRouter();
   const swipeableRef = useRef<SwipeableInstance>(null);
 
   const items = list.listItems || [];
-  const boughtCount = items.filter((item: any) => item?.isChecked === true).length;
-  const totalCount = items.length;
   const cardIcon = CardIcons[list.icon as keyof typeof CardIcons] || IconShoppingCart;
   const totalPrice = calculateTotal(items);
 
@@ -85,22 +71,11 @@ export const CardList = ({
     }
   }, []);
 
-  const handleRouterPush = () => {
+  const handlePress = () => {
     router.push({
       pathname: '/(authenticated)/lists/[id]',
       params: { id: list.id },
     });
-  };
-  const handleSelect = () => toggleSelectList(list.id);
-  const handlePress = () => {
-    if (listsSelected.length > 0) {
-      handleSelect();
-    } else {
-      handleRouterPush();
-    }
-  };
-  const handleLongPress = () => {
-    toggleSelectList(list.id);
   };
 
   const handleEdit = useCallback(() => {
@@ -138,8 +113,8 @@ export const CardList = ({
           onPress={handleDelete}
           className="items-center justify-center bg-destructive"
           style={{ width: ACTION_WIDTH }}>
-          <Icon as={IconTrash} size={20} color="#fff" />
-          <Text className="mt-1 text-xs font-semibold text-white">Deletar</Text>
+          <Icon as={IconTrash} size={20} className="text-destructive-foreground" />
+          <Text className="mt-1 text-xs font-semibold text-destructive-foreground">Deletar</Text>
         </Pressable>
       </View>
     ),
@@ -147,7 +122,7 @@ export const CardList = ({
   );
 
   return (
-    <View className="mb-2 overflow-hidden rounded-2xl">
+    <View className="mb-2 overflow-hidden">
       <GestureDetector gesture={panGuard}>
         <Swipeable
           ref={swipeableRef}
@@ -165,32 +140,15 @@ export const CardList = ({
           hitSlop={swipeHitSlop}>
           <Pressable
             onPress={handlePress}
-            onLongPress={handleLongPress}
-            className={cn(
-              'flex-row items-center justify-between bg-card px-4 py-4',
-              isSelected(list.id) && 'bg-primary/15',
-            )}>
-            <View className="flex-1 flex-row items-center gap-3">
-              <View className="size-[50px] rounded-full flex items-center justify-center">
-                {isSelected(list.id) ? (
-                  <Icon as={IconCheck} size={24} className="text-foreground" />
-                ) : (
-                  <Icon as={cardIcon} size={24} className="text-foreground" />
-                )}
-              </View>
-
-              <View className="flex flex-col items-start justify-center">
-                <Text variant="p" className="tracking-normal mt-0">
-                  {list.title}
-                </Text>
-                <Text variant="muted" className="text-sm tracking-tight">
-                  <Text className="text-primary">{boughtCount}</Text>/{totalCount} compradas
-                </Text>
-              </View>
+            className="flex-row items-center gap-3 bg-card px-4 py-4">
+            <View className="size-[50px] rounded-full flex items-center justify-center">
+              <Icon as={cardIcon} size={24} className="text-foreground" />
             </View>
-
-            <View className="items-end justify-center">
-              <Text variant="p" className="tracking-normal font-bold">
+            <View className="flex-1 flex-col items-start justify-center">
+              <Text variant="p" className="tracking-normal mt-0">
+                {list.title}
+              </Text>
+              <Text variant="p" className="tracking-normal font-bold mt-1">
                 {totalPrice}
               </Text>
             </View>
