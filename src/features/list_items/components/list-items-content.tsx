@@ -54,6 +54,10 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
     ];
   }, [unchecked, checked]);
 
+  const handleListScrollStart = () => {
+    closeOpenedListItemSwipe();
+  };
+
   return (
     <LegendList
       data={data}
@@ -76,7 +80,7 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
       className="flex-1 flex w-full h-full py-2"
       keyExtractor={(item) => item.key}
       recycleItems
-      onScrollBeginDrag={() => closeOpenedListItemSwipe()}
+      onScrollBeginDrag={handleListScrollStart}
       ListEmptyComponent={() => (
         <View className="flex-1 items-center justify-center py-16">
           <Text variant="muted" className="text-center">

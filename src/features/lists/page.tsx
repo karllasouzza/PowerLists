@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { LegendList } from '@legendapp/list';
 import { observer } from '@legendapp/state/react';
 
 import type { List } from '@/data/types';
-import { CardList } from '@/features/lists/components/card-list';
+import { CardList, closeOpenedCardListSwipe } from '@/features/lists/components/card-list';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-list-page-logics';
@@ -46,6 +46,10 @@ const HomeScreen = observer(() => {
     );
   };
 
+  const handleListScrollStart = useCallback(() => {
+    closeOpenedCardListSwipe();
+  }, []);
+
   return (
     <View className="flex h-full w-full flex-1 items-center bg-background p-0!">
       <TopBar
@@ -63,6 +67,7 @@ const HomeScreen = observer(() => {
         className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
         recycleItems
+        onScrollBeginDrag={handleListScrollStart}
         ListFooterComponent={() => <View className="h-44 border-t border-border" />}
       />
 

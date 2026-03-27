@@ -21,7 +21,7 @@ import { calculateTotal } from '@/features/list_items';
 const ACTION_WIDTH = 84;
 const ACTIONS_TOTAL_WIDTH = ACTION_WIDTH * 2;
 
-const panGuard = Gesture.Pan().activeOffsetX([-15, 15]).failOffsetY([-8, 8]);
+const panGuard = Gesture.Pan().activeOffsetX([-12, 12]).failOffsetY([-8, 8]);
 
 const swipeHitSlop = Platform.select({
   android: { left: -Math.round(Dimensions.get('window').width * 0.15) },
@@ -31,6 +31,13 @@ const swipeHitSlop = Platform.select({
 type SwipeableInstance = React.ElementRef<typeof Swipeable>;
 
 let openedSwipeable: SwipeableInstance | null = null;
+
+export const closeOpenedCardListSwipe = () => {
+  if (openedSwipeable) {
+    openedSwipeable.close();
+    openedSwipeable = null;
+  }
+};
 
 interface CardListProps {
   list: List;
@@ -144,11 +151,11 @@ export const CardList = ({
       <GestureDetector gesture={panGuard}>
         <Swipeable
           ref={swipeableRef}
-          friction={2}
-          leftThreshold={60}
-          rightThreshold={60}
-          dragOffsetFromLeftEdge={30}
-          dragOffsetFromRightEdge={30}
+          friction={1.35}
+          leftThreshold={40}
+          rightThreshold={52}
+          dragOffsetFromLeftEdge={22}
+          dragOffsetFromRightEdge={14}
           overshootLeft={false}
           overshootRight={false}
           renderRightActions={renderRightActions}
