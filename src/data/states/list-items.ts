@@ -28,6 +28,11 @@ export const listItems$ = observable(
     retry: {
       infinite: true,
     },
+    realtime: {
+      get filter() {
+        return `profile_id=eq.${getCurrentUserId()}`;
+      },
+    },
   }),
 );
 
@@ -53,18 +58,10 @@ export const getListItemsByListId = async ({
   try {
     if (!listId) throw new Error('Missing required fields');
 
-    const itemsData = listItems$.get();
-    const allItems = Object.values(itemsData || {});
-    if (!allItems) throw new Error('Items not found');
+    const raw = Object.values(listItems$.get() ?? {}).filter((item) => item.list_id === listId);
+    const results = convertFromSupabaseFormat(raw) as ListItem[];
 
-    // Convert snake_case to camelCase
-    const camelizedItems = convertFromSupabaseFormat(allItems) as ListItem[];
-    if (!camelizedItems) throw new Error('Failed to convert to camelCase');
-
-    const filteredItems = camelizedItems.filter((item) => item.listId === listId);
-    if (!filteredItems) throw new Error('Items not found after filtering');
-
-    return { results: filteredItems };
+    return { results };
   } catch (error) {
     console.error('Error getting items:', error);
     return { results: null };
@@ -126,6 +123,9 @@ export const toggleCheckListItem = async ({
   try {
     if (!id || typeof isChecked !== 'boolean') throw new Error('Missing required fields');
 
+    const listItemRaw = listItems$[id].get();
+    if (!listItemRaw) throw new Error('Item not found');
+
     // Update in observable using snake_case - this will trigger sync to Supabase
     listItems$[id].is_checked.set(isChecked);
 
@@ -181,6 +181,9 @@ export const updateListItem = async ({
 export const deleteListItem = async ({ itemId }: DeleteListItemProps): Promise<boolean> => {
   try {
     if (!itemId) throw new Error('Missing required fields');
+
+    const listItemRaw = listItems$[itemId].get();
+    if (!listItemRaw) throw new Error('Item not found');
 
     // Delete from observable - this will trigger sync to Supabase
     listItems$[itemId].delete();
