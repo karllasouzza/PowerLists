@@ -73,7 +73,7 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
         return renderItem(item.item);
       }}
       estimatedItemSize={92}
-      className="flex-1"
+      className="flex-1 flex w-full h-full py-2"
       keyExtractor={(item) => item.key}
       recycleItems
       onScrollBeginDrag={() => closeOpenedListItemSwipe()}

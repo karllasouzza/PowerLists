@@ -4,7 +4,6 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
 import { IconCheck, IconPencil, IconTrash } from '@tabler/icons-react-native';
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
@@ -136,7 +135,7 @@ export default function ListItem({
   );
 
   return (
-    <View className="mx-4 mb-2 overflow-hidden rounded-2xl">
+    <View className="overflow-hidden">
       <GestureDetector gesture={panGuard}>
         <Swipeable
           ref={swipeableRef}

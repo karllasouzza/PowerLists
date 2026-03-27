@@ -140,7 +140,7 @@ export const CardList = ({
   );
 
   return (
-    <View className="mx-4 mb-2 overflow-hidden rounded-2xl">
+    <View className="mb-2 overflow-hidden rounded-2xl">
       <GestureDetector gesture={panGuard}>
         <Swipeable
           ref={swipeableRef}
@@ -163,30 +163,30 @@ export const CardList = ({
               'flex-row items-center justify-between bg-card px-4 py-4',
               isSelected(list.id) && 'bg-primary/15',
             )}>
-          <View className="flex-1 flex-row items-center gap-3">
-            <View className="size-[50px] rounded-full flex items-center justify-center">
-              {isSelected(list.id) ? (
-                <Icon as={IconCheck} size={24} className="text-foreground" />
-              ) : (
-                <Icon as={cardIcon} size={24} className="text-foreground" />
-              )}
+            <View className="flex-1 flex-row items-center gap-3">
+              <View className="size-[50px] rounded-full flex items-center justify-center">
+                {isSelected(list.id) ? (
+                  <Icon as={IconCheck} size={24} className="text-foreground" />
+                ) : (
+                  <Icon as={cardIcon} size={24} className="text-foreground" />
+                )}
+              </View>
+
+              <View className="flex flex-col items-start justify-center">
+                <Text variant="p" className="tracking-normal mt-0">
+                  {list.title}
+                </Text>
+                <Text variant="muted" className="text-sm tracking-tight">
+                  <Text className="text-primary">{boughtCount}</Text>/{totalCount} compradas
+                </Text>
+              </View>
             </View>
 
-            <View className="flex flex-col items-start justify-center">
-              <Text variant="p" className="tracking-normal mt-0">
-                {list.title}
-              </Text>
-              <Text variant="muted" className="text-sm tracking-tight">
-                <Text className="text-primary">{boughtCount}</Text>/{totalCount} compradas
+            <View className="items-end justify-center">
+              <Text variant="p" className="tracking-normal font-bold">
+                {totalPrice}
               </Text>
             </View>
-          </View>
-
-          <View className="items-end justify-center">
-            <Text variant="p" className="tracking-normal font-bold">
-              {totalPrice}
-            </Text>
-          </View>
           </Pressable>
         </Swipeable>
       </GestureDetector>
