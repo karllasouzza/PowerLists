@@ -83,11 +83,8 @@ export const CardList = ({ list, onEdit, onDelete }: CardListProps) => {
       ref={swipeableRef}
       className="mb-2"
       friction={1.35}
-      leftThreshold={40}
       rightThreshold={52}
-      dragOffsetFromLeftEdge={22}
       dragOffsetFromRightEdge={14}
-      overshootLeft={false}
       overshootRight={false}
       renderRightActions={renderRightActions}>
       <Pressable onPress={handlePress} className="flex-row items-center gap-3 bg-card px-4 py-4">
