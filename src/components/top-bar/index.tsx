@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Pressable, Animated, BackHandler, TextInput } from 'react-native';
+import { View, Pressable, Animated, BackHandler, TextInput, Platform } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
@@ -51,6 +51,8 @@ export const TopBar = ({
   }, [onSearchChange]);
 
   useEffect(() => {
+    const useNative = Platform.OS !== 'web';
+
     if (isSearchActive) {
       searchInputRef.current?.focus();
 
@@ -58,12 +60,12 @@ export const TopBar = ({
         Animated.timing(searchBarOpacity, {
           toValue: 1,
           duration: 200,
-          useNativeDriver: true,
+          useNativeDriver: useNative,
         }),
         Animated.timing(titleOpacity, {
           toValue: 0,
           duration: 150,
-          useNativeDriver: true,
+          useNativeDriver: useNative,
         }),
       ]).start();
     } else {
@@ -71,13 +73,13 @@ export const TopBar = ({
         Animated.timing(searchBarOpacity, {
           toValue: 0,
           duration: 200,
-          useNativeDriver: true,
+          useNativeDriver: useNative,
         }),
         Animated.timing(titleOpacity, {
           toValue: 1,
           duration: 300,
           delay: 100,
-          useNativeDriver: true,
+          useNativeDriver: useNative,
         }),
       ]).start();
     }
@@ -97,13 +99,15 @@ export const TopBar = ({
     <View className="z-40 w-full flex-row items-center justify-between px-4 py-3 border-b border-border">
       {/* Left Section */}
       <View className="flex-row items-center gap-3">
-        {showBack && (
-          <Pressable
+        {showBack && !isSearchActive && (
+          <Button
+            variant="ghost"
+            size="icon"
             onPress={onBack}
             className="active:opacity-70"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Icon as={IconArrowLeft} size={24} className="text-muted" />
-          </Pressable>
+            <Icon as={IconArrowLeft} size={24} className="text-foreground" />
+          </Button>
         )}
 
         {/* Title - always rendered, animated visibility */}
@@ -131,7 +135,7 @@ export const TopBar = ({
             <Icon as={IconArrowLeft} size={24} className="text-foreground" />
           </Button>
 
-          <View className="flex-1 flex-row items-center gap-2 rounded-xl bg-muted px-2 py-1">
+          <View className="flex-1 flex-row items-center gap-2 rounded-xl px-2 py-1">
             <Input
               ref={searchInputRef}
               placeholder={searchPlaceholder}
@@ -161,12 +165,14 @@ export const TopBar = ({
         }}
         className="flex-row items-center gap-2">
         {showSearch && (
-          <Pressable
+          <Button
+            variant="ghost"
+            size="icon"
             onPress={handleOpenSearch}
             className="bg-muted/50 rounded-full p-2 active:opacity-70"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Icon as={IconSearch} size={20} className="text-foreground" />
-          </Pressable>
+          </Button>
         )}
         {rightAction}
       </Animated.View>

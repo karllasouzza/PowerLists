@@ -81,7 +81,6 @@ export const CardList = ({ list, onEdit, onDelete }: CardListProps) => {
   return (
     <SwipeableItem
       ref={swipeableRef}
-      className="mb-2"
       friction={1.35}
       rightThreshold={52}
       dragOffsetFromRightEdge={14}
