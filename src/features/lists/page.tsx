@@ -4,7 +4,8 @@ import { LegendList } from '@legendapp/list';
 import { observer } from '@legendapp/state/react';
 
 import type { List } from '@/data/types';
-import { CardList, closeOpenedCardListSwipe } from '@/features/lists/components/card-list';
+import { CardList } from '@/features/lists/components/card-list';
+import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-list-page-logics';
@@ -41,7 +42,7 @@ const HomeScreen = observer(() => {
   };
 
   const handleListScrollStart = useCallback(() => {
-    closeOpenedCardListSwipe();
+    closeOpenedSwipeable();
   }, []);
 
   return (
