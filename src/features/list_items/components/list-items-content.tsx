@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { LegendList } from '@legendapp/list';
 
 import { Text } from '@/components/ui/text';
-import { closeOpenedListItemSwipe } from './list-item';
+import { closeOpenedSwipeable } from '@/components/swipeable';
 
 import type { ListItem } from '../types';
 
@@ -55,7 +55,7 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
   }, [unchecked, checked]);
 
   const handleListScrollStart = () => {
-    closeOpenedListItemSwipe();
+    closeOpenedSwipeable();
   };
 
   return (
