@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
+import { Text, View } from 'react-native';
 import { useValue } from '@legendapp/state/react';
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Text } from '@/components/ui/text';
+  AppModal,
+  AppModalContent,
+  AppModalHandle,
+  AppModalHeader,
+  AppModalFooter,
+} from '@/components/molecules/app-modal';
 import { lists$ } from '@/data/states/lists';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { List } from '@/data/types';
@@ -43,28 +40,28 @@ export function ListDeleteModal({ open, listId, onOpenChange }: ListDeleteModalP
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Deletar lista</AlertDialogTitle>
-          <AlertDialogDescription>
+    <AppModal open={open} onOpenChange={onOpenChange}>
+      <AppModalContent>
+        <AppModalHandle />
+        <AppModalHeader title="Deletar lista" />
+
+        <View className="px-6 pb-2">
+          <Text className="text-muted-foreground text-center text-sm">
             Tem certeza que deseja deletar{' '}
-            <Text className="font-bold text-foreground">{currentList?.title ?? 'esta lista'}</Text>?
-            Esta acao nao pode ser desfeita.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isSubmitting}>
-            <Text>Cancelar</Text>
-          </AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-destructive"
-            disabled={isSubmitting || !listId}
-            onPress={handleDelete}>
-            <Text>Deletar</Text>
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+            <Text className="text-foreground font-bold">{currentList?.title ?? 'esta lista'}</Text>?
+            Esta ação não pode ser desfeita.
+          </Text>
+        </View>
+
+        <AppModalFooter
+          onCancel={() => onOpenChange(false)}
+          onConfirm={handleDelete}
+          confirmLabel="Deletar"
+          confirmVariant="destructive"
+          isLoading={isSubmitting}
+          isConfirmDisabled={!listId}
+        />
+      </AppModalContent>
+    </AppModal>
   );
 }
