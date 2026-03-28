@@ -64,11 +64,9 @@ export default function AuthenticatedLayout() {
     <>
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="index" />
-        <Stack.Screen name="explore" />
-        <Stack.Screen name="saved" />
         <Stack.Screen name="account" />
         <Stack.Screen name="settings" />
-        <Stack.Screen name="lists" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="lists" options={{ animation: 'slide_from_bottom' }} />
       </Stack>
 
       {showBottomBar && <BottomNavigation screens={SCREENS} currentSegment={currentTab} />}
