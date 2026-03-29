@@ -90,7 +90,7 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
 
           const handlePress = () => {
             if (screen.name !== currentSegment) {
-              router.replace(screen.href as any);
+              router.navigate(screen.href as any);
             }
           };
 
