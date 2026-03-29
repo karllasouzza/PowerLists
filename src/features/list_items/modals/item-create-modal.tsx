@@ -47,9 +47,17 @@ type ItemCreateModalProps = {
   open: boolean;
   listId: string;
   onOpenChange: (open: boolean) => void;
+  accentBgClassName: string;
+  accentForegroundClassName: string;
 };
 
-export function ItemCreateModal({ open, listId, onOpenChange }: ItemCreateModalProps) {
+export function ItemCreateModal({
+  open,
+  listId,
+  onOpenChange,
+  accentBgClassName,
+  accentForegroundClassName,
+}: ItemCreateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -150,6 +158,8 @@ export function ItemCreateModal({ open, listId, onOpenChange }: ItemCreateModalP
           onCancel={closeModal}
           onConfirm={handleSubmit(onSubmit)}
           confirmLabel="Salvar"
+          confirmButtonClassName={accentBgClassName}
+          confirmLabelClassName={accentForegroundClassName}
           isLoading={isSubmitting}
         />
       </AppModalContent>

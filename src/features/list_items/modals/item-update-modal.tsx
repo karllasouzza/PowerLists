@@ -50,9 +50,17 @@ type ItemUpdateModalProps = {
   open: boolean;
   itemId?: string;
   onOpenChange: (open: boolean) => void;
+  accentBgClassName: string;
+  accentForegroundClassName: string;
 };
 
-export function ItemUpdateModal({ open, itemId, onOpenChange }: ItemUpdateModalProps) {
+export function ItemUpdateModal({
+  open,
+  itemId,
+  onOpenChange,
+  accentBgClassName,
+  accentForegroundClassName,
+}: ItemUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const listItemsRaw = useValue(listItems$);
@@ -167,6 +175,8 @@ export function ItemUpdateModal({ open, itemId, onOpenChange }: ItemUpdateModalP
           onCancel={() => onOpenChange(false)}
           onConfirm={handleSubmit(onSubmit)}
           confirmLabel="Salvar"
+          confirmButtonClassName={accentBgClassName}
+          confirmLabelClassName={accentForegroundClassName}
           isLoading={isSubmitting}
           isConfirmDisabled={!itemId}
         />
