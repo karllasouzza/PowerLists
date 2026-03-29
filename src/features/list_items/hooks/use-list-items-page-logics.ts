@@ -2,12 +2,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { useSelector, useValue } from '@legendapp/state/react';
 
-import { themes } from '@/context/themes/theme-config';
-import { useTheme } from '@/context/themes';
 import { lists$ } from '@/data/states/lists';
 import { listItems$, toggleCheckListItem } from '@/data/states/list-items';
 import { List, ListItem as DataListItem } from '@/data/types';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { getAccentColorOption } from '@/features/lists/utils/accent-colors';
 
 import { calculateTotal, separateItemsByStatus } from '../utils';
 import type { SortMode } from '../utils';
@@ -15,7 +14,6 @@ import type { ListItem } from '../types';
 
 export const useListItemsPageLogics = () => {
   const { id: listId } = useLocalSearchParams<{ id: string }>();
-  const { theme, colorScheme } = useTheme();
 
   const lists = useValue(lists$ || {});
   const listsFormated = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
@@ -75,14 +73,12 @@ export const useListItemsPageLogics = () => {
   );
 
   const total = useMemo(() => calculateTotal(filteredItems), [filteredItems]);
+  const payableTotal = useMemo(() => calculateTotal(checked), [checked]);
 
-  const themeColors = themes[theme][colorScheme];
-  const accentColor =
-    themeColors[`--color-${currentList?.accentColor || 'primary'}`] ||
-    themeColors['--color-primary'];
-  const backgroundColor = themeColors['--color-card'];
-  const textColor = themeColors['--color-foreground'];
-  const mutedColor = themeColors['--color-muted'];
+  const accentColorOption = useMemo(
+    () => getAccentColorOption(currentList?.accentColor),
+    [currentList?.accentColor],
+  );
 
   return {
     listId,
@@ -96,11 +92,10 @@ export const useListItemsPageLogics = () => {
     unchecked,
     checked,
     total,
+    payableTotal,
 
-    accentColor,
-    backgroundColor,
-    textColor,
-    mutedColor,
+    accentBgClassName: accentColorOption.cardClassName,
+    accentForegroundClassName: accentColorOption.cardForegroundClassName,
 
     isCreateOpen,
     setCreateOpen,
