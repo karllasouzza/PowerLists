@@ -1,8 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { View, Animated, Pressable, Text } from 'react-native';
+import { View, Animated, Pressable } from 'react-native';
+
 import { cn } from '@/lib/utils';
 import { Icon } from '../ui/icon';
+import { Text } from '../ui/text';
 
 interface BottomNavigationProps {
   currentSegment: string;
@@ -118,7 +120,7 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
                   style={{
                     opacity: iconOpacities[screen.name],
                   }}>
-                  <Text className="text-xs font-medium text-bottom-bar-accent">{screen.label}</Text>
+                  <Text className="font-medium text-bottom-bar-accent">{screen.label}</Text>
                 </Animated.View>
               )}
             </Pressable>
