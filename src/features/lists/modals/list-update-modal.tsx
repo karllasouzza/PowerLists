@@ -17,7 +17,13 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { Icon } from '@/components/ui/icon';
+import { ListAccentColorPicker } from '@/features/lists/components/list-accent-color-picker';
 import { handleEditList } from '@/features/lists/utils/list-operations';
+import {
+  DEFAULT_ACCENT_COLOR,
+  LIST_ACCENT_COLOR_TOKENS,
+  getAccentColorToken,
+} from '@/features/lists/utils/accent-colors';
 import { iconMap } from '@/features/lists/utils/icon-map';
 import { lists$ } from '@/data/states/lists';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
@@ -27,6 +33,7 @@ import { cn } from '@/lib/utils';
 const listFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
   icon: z.string().optional(),
+  color: z.enum(LIST_ACCENT_COLOR_TOKENS).optional(),
 });
 
 type ListFormData = z.infer<typeof listFormSchema>;
@@ -58,6 +65,7 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
     defaultValues: {
       title: '',
       icon: 'cart',
+      color: DEFAULT_ACCENT_COLOR,
     },
   });
 
@@ -66,11 +74,13 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
       reset({
         title: currentList?.title || '',
         icon: currentList?.icon || 'cart',
+        color: getAccentColorToken(currentList?.accentColor),
       });
     }
-  }, [open, currentList?.title, currentList?.icon, reset]);
+  }, [open, currentList?.title, currentList?.icon, currentList?.accentColor, reset]);
 
   const selectedIcon = watch('icon');
+  const selectedColor = watch('color');
 
   const onSubmit = useCallback(
     async (data: ListFormData) => {
@@ -78,7 +88,11 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
 
       setIsSubmitting(true);
       try {
-        const { success } = await handleEditList(listId, { title: data.title, icon: data.icon });
+        const { success } = await handleEditList(listId, {
+          title: data.title,
+          icon: data.icon,
+          color: data.color,
+        });
         if (success) onOpenChange(false);
       } finally {
         setIsSubmitting(false);
@@ -141,11 +155,19 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
               </View>
             </ScrollView>
           </View>
+
+          <View className="mb-2 gap-2">
+            <Label>Cor da lista</Label>
+            <ListAccentColorPicker
+              value={selectedColor}
+              onChange={(color) => setValue('color', color)}
+            />
+          </View>
         </ScrollView>
 
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
-          onConfirm={() => handleSubmit(onSubmit)}
+          onConfirm={handleSubmit(onSubmit)}
           confirmLabel="Salvar"
           isLoading={isSubmitting}
           isConfirmDisabled={!listId}

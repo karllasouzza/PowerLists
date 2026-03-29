@@ -14,6 +14,8 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
 import { calculateTotal } from '@/features/list_items';
+import { getAccentColorCardClasses } from '@/features/lists/utils/accent-colors';
+import { cn } from '@/lib/utils';
 
 const ACTION_WIDTH = 84;
 const ACTIONS_TOTAL_WIDTH = ACTION_WIDTH * 2;
@@ -37,6 +39,7 @@ export const CardList = function CardList({ list, onEdit, onDelete }: CardListPr
   const items = list.listItems || [];
   const cardIcon = CardIcons[list.icon as keyof typeof CardIcons] || IconShoppingCart;
   const totalPrice = calculateTotal(items);
+  const { backgroundClassName, foregroundClassName } = getAccentColorCardClasses(list.accentColor);
 
   const handlePress = () => {
     router.push({
@@ -87,8 +90,12 @@ export const CardList = function CardList({ list, onEdit, onDelete }: CardListPr
       overshootRight={false}
       renderRightActions={renderRightActions}>
       <Pressable onPress={handlePress} className="flex-row items-center gap-3 bg-card px-4 py-4">
-        <View className="size-[50px] rounded-full flex items-center justify-center">
-          <Icon as={cardIcon} size={24} className="text-foreground" />
+        <View
+          className={cn(
+            'size-[50px] rounded-full overflow-hidden flex items-center justify-center',
+            backgroundClassName,
+          )}>
+          <Icon as={cardIcon} size={24} className={foregroundClassName} />
         </View>
         <View className="flex-1 flex-col items-start justify-center">
           <Text variant="p" className="tracking-normal mt-0">

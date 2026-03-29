@@ -16,13 +16,19 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { Icon } from '@/components/ui/icon';
+import { ListAccentColorPicker } from '@/features/lists/components/list-accent-color-picker';
 import { handleAddNewList } from '@/features/lists/utils/list-operations';
+import {
+  DEFAULT_ACCENT_COLOR,
+  LIST_ACCENT_COLOR_TOKENS,
+} from '@/features/lists/utils/accent-colors';
 import { iconMap } from '@/features/lists/utils/icon-map';
 import { cn } from '@/lib/utils';
 
 const listFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
   icon: z.string().optional(),
+  color: z.enum(LIST_ACCENT_COLOR_TOKENS).optional(),
 });
 
 type ListFormData = z.infer<typeof listFormSchema>;
@@ -46,20 +52,25 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
     formState: { errors },
   } = useForm<ListFormData>({
     resolver: zodResolver(listFormSchema),
-    defaultValues: { title: '', icon: 'cart' },
+    defaultValues: { title: '', icon: 'cart', color: DEFAULT_ACCENT_COLOR },
   });
 
   const selectedIcon = watch('icon');
+  const selectedColor = watch('color');
 
   const closeModal = () => {
     onOpenChange(false);
-    reset({ title: '', icon: 'cart' });
+    reset({ title: '', icon: 'cart', color: DEFAULT_ACCENT_COLOR });
   };
 
   const onSubmit = async (data: ListFormData) => {
     setIsSubmitting(true);
     try {
-      const { success } = await handleAddNewList({ title: data.title, icon: data.icon });
+      const { success } = await handleAddNewList({
+        title: data.title,
+        icon: data.icon,
+        color: data.color,
+      });
       if (success) closeModal();
     } finally {
       setIsSubmitting(false);
@@ -119,6 +130,14 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
                 })}
               </View>
             </ScrollView>
+          </View>
+
+          <View className="mb-2 gap-2">
+            <Label>Cor da lista</Label>
+            <ListAccentColorPicker
+              value={selectedColor}
+              onChange={(color) => setValue('color', color)}
+            />
           </View>
         </ScrollView>
 
