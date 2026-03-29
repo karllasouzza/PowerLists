@@ -83,10 +83,10 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
 
   return (
     <View className="absolute bottom-4 left-0 right-0 z-50 flex items-center justify-center px-4">
-      <View className="relative flex h-16 w-full max-w-md flex-row items-center justify-around rounded-3xl bg-bottom-bar shadow-2xl border border-border">
+      <View className="relative flex h-16 flex-row gap-4 items-center rounded-3xl bg-bottom-bar shadow-2xl border border-border">
         {screens.map((screen) => {
           const isActive = screen.name === activeIcon;
-          const showFilled = screen.name === activeIcon;
+          const showFilled = isActive;
 
           const handlePress = () => {
             if (screen.name !== currentSegment) {
@@ -98,7 +98,7 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
             <Pressable
               key={screen.name}
               onPress={handlePress}
-              className="relative flex h-full flex-row items-center justify-center gap-2 px-2">
+              className="relative flex h-full w-max flex-row items-center justify-center gap-2 px-4">
               <Animated.View
                 style={{
                   transform: [{ scale: iconScales[screen.name] }],
@@ -114,14 +114,8 @@ const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) =>
                 />
               </Animated.View>
 
-              {/* Active label */}
               {isActive && (
-                <Animated.View
-                  style={{
-                    opacity: iconOpacities[screen.name],
-                  }}>
-                  <Text className="font-medium text-bottom-bar-accent">{screen.label}</Text>
-                </Animated.View>
+                <Text className="font-medium text-bottom-bar-accent">{screen.label}</Text>
               )}
             </Pressable>
           );
