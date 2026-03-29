@@ -29,7 +29,7 @@ export type AppModalFooterProps = {
   isConfirmDisabled?: boolean;
 };
 
-export type AppModalContextType = { onOpenChange: (open: boolean) => void };
+export type AppModalContextType = { open: boolean; onOpenChange: (open: boolean) => void };
 
 export type AppModalDragContextType = {
   translateY: SharedValue<number>;

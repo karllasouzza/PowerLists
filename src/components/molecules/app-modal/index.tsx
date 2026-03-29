@@ -14,6 +14,7 @@ import {
   withSpring,
   type SharedValue,
 } from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
 
 import { Text } from '@/components/ui/text';
@@ -34,7 +35,7 @@ const AppModalDragContext = React.createContext<AppModalDragContextType | null>(
 
 function AppModal({ open, onOpenChange, children }: AppModalProps) {
   return (
-    <AppModalContext.Provider value={{ onOpenChange }}>
+    <AppModalContext.Provider value={{ open, onOpenChange }}>
       <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
         {children}
       </DialogPrimitive.Root>
@@ -86,6 +87,13 @@ function AppModalContent({
     modalCtx?.onOpenChange(false);
   }, [modalCtx]);
 
+  // Reset drag offset every time the modal opens
+  React.useEffect(() => {
+    if (modalCtx?.open) {
+      translateY.value = 0;
+    }
+  }, [modalCtx?.open]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
   }));
@@ -93,24 +101,29 @@ function AppModalContent({
   return (
     <DialogPrimitive.Portal hostName={portalHost}>
       <AppModalOverlay>
+        {/* Backdrop: tapping the dark area closes the modal */}
+        <Pressable className="flex-1" onPress={close} />
+        {/* Outer: entering/exiting animation only — no style transform here */}
         <NativeOnlyAnimatedView
           entering={SlideInDown.duration(300).springify().damping(32).stiffness(180).mass(0.8)}
           exiting={SlideOutDown.duration(220)}
-          style={animatedStyle}
           className="w-full">
-          <AppModalDragContext.Provider value={{ translateY, close }}>
-            <DialogPrimitive.Content
-              className={cn(
-                'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden border border-b-0 border-border',
-                Platform.select({
-                  web: 'animate-in slide-in-from-bottom duration-300',
-                }),
-                className,
-              )}
-              {...props}>
-              {children}
-            </DialogPrimitive.Content>
-          </AppModalDragContext.Provider>
+          {/* Inner: drag offset only — no entering/exiting here */}
+          <Animated.View style={animatedStyle}>
+            <AppModalDragContext.Provider value={{ translateY, close }}>
+              <DialogPrimitive.Content
+                className={cn(
+                  'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden border border-b-0 border-border',
+                  Platform.select({
+                    web: 'animate-in slide-in-from-bottom duration-300',
+                  }),
+                  className,
+                )}
+                {...props}>
+                {children}
+              </DialogPrimitive.Content>
+            </AppModalDragContext.Provider>
+          </Animated.View>
         </NativeOnlyAnimatedView>
       </AppModalOverlay>
     </DialogPrimitive.Portal>
@@ -130,7 +143,8 @@ function AppModalHandle({ className, ...props }: ViewProps) {
       if (!dragCtx) return;
       const shouldClose = e.translationY > 80 || e.velocityY > 600;
       if (shouldClose) {
-        dragCtx.translateY.value = 0;
+        // Don't reset translateY here — let SlideOutDown compose with the current
+        // drag offset so the modal continues sliding down without snapping back.
         return dragCtx.close();
       }
 
