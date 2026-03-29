@@ -22,19 +22,13 @@ const SCREENS = [
   },
   {
     name: 'explore',
-    label: 'Explore',
+    label: 'Explorar',
     href: '/explore',
     icon: { default: IconCompass, filled: IconCompassFilled },
   },
   {
-    name: 'saved',
-    label: 'Saved',
-    href: '/saved',
-    icon: { default: IconBookmark, filled: IconBookmarkFilled },
-  },
-  {
     name: 'account',
-    label: 'Account',
+    label: 'Conta',
     href: '/account',
     icon: { default: IconUser, filled: IconUserFilled },
   },
@@ -47,7 +41,6 @@ export default function AuthenticatedLayout() {
   const pathname = usePathname();
 
   const currentTab = useMemo(() => {
-    // segments[0] = '(authenticated)', rest = screen name(s)
     const allSegments = segments as string[];
     const innerSegment = allSegments[1];
     if (!innerSegment || innerSegment === '(authenticated)') return 'index';
@@ -65,7 +58,6 @@ export default function AuthenticatedLayout() {
       <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="account" />
-        <Stack.Screen name="settings" />
         <Stack.Screen name="lists" options={{ animation: 'slide_from_bottom' }} />
       </Stack>
 
