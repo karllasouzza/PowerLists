@@ -94,13 +94,14 @@ export default function ListItem({
   return (
     <SwipeableItem
       ref={swipeableRef}
-      friction={1.35}
-      leftThreshold={70}
-      rightThreshold={52}
-      dragOffsetFromLeftEdge={22}
-      dragOffsetFromRightEdge={22}
-      overshootLeft={false}
-      overshootRight={false}
+      friction={1.2}
+      leftThreshold={46}
+      rightThreshold={50}
+      dragOffsetFromLeftEdge={10}
+      dragOffsetFromRightEdge={18}
+      overshootLeft
+      overshootRight
+      overshootFriction={8}
       renderLeftActions={renderLeftActions}
       renderRightActions={renderRightActions}
       onOpen={handleSwipeOpen}>
