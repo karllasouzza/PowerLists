@@ -25,7 +25,9 @@ const ListItemsScreen = observer(() => {
     setSortMode,
     unchecked,
     checked,
-    total,
+    payableTotal,
+    accentBgClassName,
+    accentForegroundClassName,
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,
@@ -48,12 +50,20 @@ const ListItemsScreen = observer(() => {
         title={item.title}
         price={formatCurrency(item.price ?? 0)}
         amount={String(item.amount ?? 0)}
+        accentBgClassName={accentBgClassName}
+        accentForegroundClassName={accentForegroundClassName}
         checkHandle={() => handleToggleCheck(item.id, item.isChecked)}
         onEdit={handleOpenUpdate}
         onDelete={handleOpenDelete}
       />
     ),
-    [handleToggleCheck, handleOpenUpdate, handleOpenDelete],
+    [
+      accentBgClassName,
+      accentForegroundClassName,
+      handleToggleCheck,
+      handleOpenUpdate,
+      handleOpenDelete,
+    ],
   );
 
   if (!currentList?.id) return null;
@@ -69,13 +79,35 @@ const ListItemsScreen = observer(() => {
         onSearchChange={setSearchQuery}
         searchPlaceholder="Buscar itens..."
       />
-      <ListItemsSortBar sortMode={sortMode} setSortMode={setSortMode} />
+      <ListItemsSortBar
+        sortMode={sortMode}
+        setSortMode={setSortMode}
+        accentBgClassName={accentBgClassName}
+        accentForegroundClassName={accentForegroundClassName}
+      />
 
-      <ListItemsContent unchecked={unchecked} checked={checked} renderItem={renderItem} />
+      <ListItemsContent
+        unchecked={unchecked}
+        checked={checked}
+        accentBgClassName={accentBgClassName}
+        accentForegroundClassName={accentForegroundClassName}
+        renderItem={renderItem}
+      />
 
-      <ListItemsFooter total={total} />
+      <ListItemsFooter
+        total={payableTotal}
+        accentBgClassName={accentBgClassName}
+        accentForegroundClassName={accentForegroundClassName}
+      />
 
-      <Fab onPress={handleOpenAdd} icon={IconPlus} label="Adicionar Item" />
+      <Fab
+        onPress={handleOpenAdd}
+        icon={IconPlus}
+        label="Adicionar Item"
+        buttonClassName={accentBgClassName}
+        iconClassName={accentForegroundClassName}
+        labelClassName={accentForegroundClassName}
+      />
 
       <ItemCreateModal open={isCreateOpen} listId={listId} onOpenChange={setCreateOpen} />
       <ItemUpdateModal open={isUpdateOpen} itemId={activeItemId} onOpenChange={setUpdateOpen} />
