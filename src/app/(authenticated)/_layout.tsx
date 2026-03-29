@@ -21,12 +21,6 @@ const SCREENS = [
     icon: { default: IconHome, filled: IconHomeFilled },
   },
   {
-    name: 'explore',
-    label: 'Explorar',
-    href: '/explore',
-    icon: { default: IconCompass, filled: IconCompassFilled },
-  },
-  {
     name: 'account',
     label: 'Conta',
     href: '/account',
@@ -55,7 +49,12 @@ export default function AuthenticatedLayout() {
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+          contentStyle: { backgroundColor: 'transparent' },
+        }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="account" />
         <Stack.Screen name="lists" options={{ animation: 'slide_from_bottom' }} />

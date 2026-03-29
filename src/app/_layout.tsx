@@ -60,7 +60,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
         <ThemeProvider>
-          <Stack>
+          <Stack screenOptions={{ contentStyle: { backgroundColor: 'transparent' } }}>
             <Stack.Protected guard={!user}>
               <Stack.Screen name="index" options={{ headerShown: false }} />
               <Stack.Screen name="login" options={{ headerShown: false }} />
