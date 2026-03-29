@@ -59,15 +59,15 @@ const HomeScreen = observer(() => {
       <LegendList
         data={lists}
         renderItem={({ item, index }) => renderList(item, index)}
-        estimatedItemSize={88}
+        estimatedItemSize={200}
+        drawDistance={500}
         className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
         recycleItems
         onScrollBeginDrag={handleListScrollStart}
-        ListFooterComponent={() => <View className="h-44 border-t border-border" />}
       />
 
-      <Fab icon={IconPlus} onPress={handleOpenCreateModal} />
+      <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />
 
       <ListCreateModal open={isCreateOpen} onOpenChange={setCreateOpen} />
       <ListUpdateModal open={isUpdateOpen} listId={activeListId} onOpenChange={setUpdateOpen} />
