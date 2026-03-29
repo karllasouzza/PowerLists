@@ -2,9 +2,10 @@ import { NativeOnlyAnimatedView } from '@/components/ui/native-only-animated-vie
 import { cn } from '@/lib/utils';
 import * as DialogPrimitive from '@rn-primitives/dialog';
 import * as React from 'react';
-import { ActivityIndicator, Platform, Pressable, View, type ViewProps } from 'react-native';
+import { Platform, Pressable, View, type ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
+  default as Animated,
   FadeIn,
   FadeOut,
   SlideInDown,
@@ -12,9 +13,7 @@ import {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  type SharedValue,
 } from 'react-native-reanimated';
-import Animated from 'react-native-reanimated';
 import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
 
 import { Text } from '@/components/ui/text';
@@ -92,7 +91,7 @@ function AppModalContent({
     if (modalCtx?.open) {
       translateY.value = 0;
     }
-  }, [modalCtx?.open]);
+  }, [modalCtx?.open, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -162,10 +161,10 @@ function AppModalHandle({ className, ...props }: ViewProps) {
   return <GestureDetector gesture={gesture}>{handleBar}</GestureDetector>;
 }
 
-function AppModalHeader({ title, className, ...props }: AppModalHeaderProps) {
+function AppModalHeader({ title, className, titleClassName, ...props }: AppModalHeaderProps) {
   return (
     <View className={cn('items-center px-6 pb-4', className)} {...props}>
-      <Text variant="large" className="text-foreground font-bold">
+      <Text variant="large" className={cn('text-foreground font-bold', titleClassName)}>
         {title}
       </Text>
     </View>
@@ -179,6 +178,8 @@ function AppModalFooter({
   confirmLabel = 'Save',
   confirmingLabel = 'Saving...',
   confirmVariant = 'default',
+  confirmButtonClassName,
+  confirmLabelClassName,
   isLoading = false,
   isConfirmDisabled = false,
 }: AppModalFooterProps) {
@@ -197,11 +198,19 @@ function AppModalFooter({
       <Button
         onPress={onConfirm}
         disabled={isDisabled}
-        className="flex-1 items-center justify-center rounded-full py-3"
+        className={cn(
+          'flex-1 items-center justify-center rounded-full py-3',
+          confirmButtonClassName,
+        )}
         variant={confirmVariant}>
-        {isLoading && <IconLoader2 size={20} className="text-background animate-spin" />}
+        {isLoading && (
+          <IconLoader2
+            size={20}
+            className={cn('text-primary-foreground animate-spin', confirmLabelClassName)}
+          />
+        )}
 
-        <Text className="font-semibold text-primary-foreground">
+        <Text className={cn('font-semibold text-primary-foreground', confirmLabelClassName)}>
           {isLoading ? confirmingLabel : confirmLabel}
         </Text>
       </Button>

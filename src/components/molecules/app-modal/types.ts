@@ -16,6 +16,7 @@ export type AppModalContentProps = DialogPrimitive.ContentProps &
 
 export type AppModalHeaderProps = ViewProps & {
   title: string;
+  titleClassName?: string;
 };
 
 export type AppModalFooterProps = {
@@ -25,6 +26,8 @@ export type AppModalFooterProps = {
   confirmLabel: string;
   confirmingLabel?: string;
   confirmVariant?: 'default' | 'destructive';
+  confirmButtonClassName?: string;
+  confirmLabelClassName?: string;
   isLoading?: boolean;
   isConfirmDisabled?: boolean;
 };
