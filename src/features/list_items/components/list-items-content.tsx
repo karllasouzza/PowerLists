@@ -23,10 +23,18 @@ type ListItemsRow =
 type ListItemsContentProps = {
   readonly unchecked: ListItem[];
   readonly checked: ListItem[];
+  readonly accentBgClassName: string;
+  readonly accentForegroundClassName: string;
   readonly renderItem: (item: ListItem) => React.ReactElement;
 };
 
-export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsContentProps) {
+export function ListItemsContent({
+  unchecked,
+  checked,
+  accentBgClassName,
+  accentForegroundClassName,
+  renderItem,
+}: ListItemsContentProps) {
   const data = useMemo<ListItemsRow[]>(() => {
     const uncheckedRows: ListItemsRow[] = unchecked.map((item) => ({
       type: 'item',
@@ -83,7 +91,12 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
       keyExtractor={(item) => item.key}
       recycleItems
       onScrollBeginDrag={handleListScrollStart}
-      ListEmptyComponent={ListItemsEmptyComponent}
+      ListEmptyComponent={() => (
+        <ListItemsEmptyComponent
+          accentBgClassName={accentBgClassName}
+          accentForegroundClassName={accentForegroundClassName}
+        />
+      )}
     />
   );
 }
