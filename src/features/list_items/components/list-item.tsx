@@ -23,7 +23,7 @@ interface ListItemProps {
   onDelete: (itemId: string) => void;
 }
 
-export default function ListItem({
+function ListItemComponent({
   id,
   title,
   price,
@@ -100,9 +100,9 @@ export default function ListItem({
       ref={swipeableRef}
       friction={1.2}
       leftThreshold={46}
-      rightThreshold={50}
+      rightThreshold={42}
       dragOffsetFromLeftEdge={10}
-      dragOffsetFromRightEdge={18}
+      dragOffsetFromRightEdge={12}
       overshootLeft
       overshootRight
       overshootFriction={8}
@@ -111,7 +111,10 @@ export default function ListItem({
       onOpen={handleSwipeOpen}>
       <View className="min-h-[88px] h-max w-full flex-row items-center gap-3 bg-card p-3 overflow-hidden">
         <View
-          className={cn('rounded-xl items-center justify-center overflow-hidden', accentBgClassName)}
+          className={cn(
+            'rounded-xl items-center justify-center overflow-hidden',
+            accentBgClassName,
+          )}
           style={{
             width: 64,
             height: 64,
@@ -138,3 +141,16 @@ export default function ListItem({
     </SwipeableItem>
   );
 }
+
+const areListItemPropsEqual = (prev: ListItemProps, next: ListItemProps) =>
+  prev.id === next.id &&
+  prev.title === next.title &&
+  prev.price === next.price &&
+  prev.amount === next.amount &&
+  prev.status === next.status &&
+  prev.accentBgClassName === next.accentBgClassName &&
+  prev.accentForegroundClassName === next.accentForegroundClassName;
+
+const ListItem = React.memo(ListItemComponent, areListItemPropsEqual);
+
+export default ListItem;

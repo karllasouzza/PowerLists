@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { View } from 'react-native';
 import { LegendList } from '@legendapp/list';
 
@@ -27,6 +27,9 @@ type ListItemsContentProps = {
   readonly accentForegroundClassName: string;
   readonly renderItem: (item: ListItem) => React.ReactElement;
 };
+
+const LIST_ITEM_ESTIMATED_SIZE = 96;
+const LIST_ITEM_DRAW_DISTANCE = 800;
 
 export function ListItemsContent({
   unchecked,
@@ -63,15 +66,17 @@ export function ListItemsContent({
     ];
   }, [unchecked, checked]);
 
-  const handleListScrollStart = () => {
+  const listExtraData = `${accentBgClassName}:${accentForegroundClassName}`;
+
+  const handleListScrollStart = useCallback(() => {
     closeOpenedSwipeable();
-  };
+  }, []);
 
   return (
     <LegendList
       data={data}
-      estimatedItemSize={200}
-      drawDistance={500}
+      estimatedItemSize={LIST_ITEM_ESTIMATED_SIZE}
+      drawDistance={LIST_ITEM_DRAW_DISTANCE}
       renderItem={({ item }) => {
         if (item.type === 'divider') {
           return (
@@ -89,6 +94,7 @@ export function ListItemsContent({
       }}
       className="flex-1 flex w-full h-full py-2"
       keyExtractor={(item) => item.key}
+      extraData={listExtraData}
       recycleItems
       onScrollBeginDrag={handleListScrollStart}
       ListEmptyComponent={() => (
