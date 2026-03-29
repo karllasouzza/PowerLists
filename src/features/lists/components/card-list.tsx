@@ -25,7 +25,7 @@ interface CardListProps {
   onDelete: (listId: string) => void;
 }
 
-export const CardList = function CardList({ list, onEdit, onDelete }: CardListProps) {
+function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
   const router = useRouter();
   const swipeableRef = useRef<SwipeableItemRef>(null);
 
@@ -105,4 +105,14 @@ export const CardList = function CardList({ list, onEdit, onDelete }: CardListPr
       </Pressable>
     </SwipeableItem>
   );
-};
+}
+
+const areCardListPropsEqual = (prev: CardListProps, next: CardListProps) =>
+  prev.list.id === next.list.id &&
+  prev.list.title === next.list.title &&
+  prev.list.icon === next.list.icon &&
+  prev.list.accentColor === next.list.accentColor &&
+  prev.onEdit === next.onEdit &&
+  prev.onDelete === next.onDelete;
+
+export const CardList = React.memo(CardListComponent, areCardListPropsEqual);

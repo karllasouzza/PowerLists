@@ -13,6 +13,9 @@ import { IconPlus } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
 import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
 
+const LIST_CARD_ESTIMATED_ITEM_SIZE = 96;
+const LIST_CARD_DRAW_DISTANCE = 700;
+
 const HomeScreen = observer(() => {
   const {
     searchQuery,
@@ -31,13 +34,8 @@ const HomeScreen = observer(() => {
   } = useListPageLogics();
 
   const renderList = useCallback(
-    (list: List, index: number) => (
-      <CardList
-        key={list.id}
-        list={list}
-        onEdit={handleOpenUpdateModal}
-        onDelete={handleOpenDeleteModal}
-      />
+    (list: List) => (
+      <CardList list={list} onEdit={handleOpenUpdateModal} onDelete={handleOpenDeleteModal} />
     ),
     [handleOpenUpdateModal, handleOpenDeleteModal],
   );
@@ -58,11 +56,12 @@ const HomeScreen = observer(() => {
 
       <LegendList
         data={lists}
-        renderItem={({ item, index }) => renderList(item, index)}
-        estimatedItemSize={200}
-        drawDistance={500}
+        renderItem={({ item }) => renderList(item)}
+        estimatedItemSize={LIST_CARD_ESTIMATED_ITEM_SIZE}
+        drawDistance={LIST_CARD_DRAW_DISTANCE}
         className="flex h-full w-full flex-1"
         keyExtractor={(item) => item.id}
+        extraData={searchQuery}
         recycleItems
         onScrollBeginDrag={handleListScrollStart}
       />
