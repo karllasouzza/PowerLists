@@ -64,6 +64,8 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
       try {
         if (!['light', 'dark', 'system'].includes(scheme)) throw new Error('Invalid color scheme');
 
+        setSystemColorScheme(scheme);
+
         if (scheme === 'system') {
           setUserPreferences((prev) => ({ ...prev, colorScheme: 'system' }));
           mmkvStorage.removeItem('colorScheme');
@@ -78,20 +80,15 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
         return false;
       }
     },
-    [setUserPreferences],
+    [setUserPreferences, setSystemColorScheme],
   );
 
   const handleSetThemeName = useCallback((theme: UserPreferences['theme']): boolean => {
     try {
       if (!themes[theme]) throw new Error('Theme not found');
 
-      if (theme === 'default') {
-        mmkvStorage.removeItem('colorScheme');
-        setUserPreferences((prev) => ({ ...prev, colorScheme: 'system' }));
-      } else if (theme in themes) {
-        setUserPreferences((prev) => ({ ...prev, theme }));
-        mmkvStorage.setItem('theme', theme);
-      }
+      setUserPreferences((prev) => ({ ...prev, theme }));
+      mmkvStorage.setItem('theme', theme);
 
       return true;
     } catch (error) {
