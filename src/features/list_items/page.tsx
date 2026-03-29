@@ -109,8 +109,20 @@ const ListItemsScreen = observer(() => {
         labelClassName={accentForegroundClassName}
       />
 
-      <ItemCreateModal open={isCreateOpen} listId={listId} onOpenChange={setCreateOpen} />
-      <ItemUpdateModal open={isUpdateOpen} itemId={activeItemId} onOpenChange={setUpdateOpen} />
+      <ItemCreateModal
+        open={isCreateOpen}
+        listId={listId}
+        onOpenChange={setCreateOpen}
+        accentBgClassName={accentBgClassName}
+        accentForegroundClassName={accentForegroundClassName}
+      />
+      <ItemUpdateModal
+        open={isUpdateOpen}
+        itemId={activeItemId}
+        onOpenChange={setUpdateOpen}
+        accentBgClassName={accentBgClassName}
+        accentForegroundClassName={accentForegroundClassName}
+      />
       <ItemDeleteModal open={isDeleteOpen} itemId={activeItemId} onOpenChange={setDeleteOpen} />
     </View>
   );
