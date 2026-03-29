@@ -1,38 +1,30 @@
 {
   "expo": {
     "name": "PowerLists",
-    "scheme": "powerlists",
+    "scheme": "com.karllasouzza.powerlists",
     "slug": "powerlists",
-    "privacy": "public",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash-light.png",
-      "resizeMode": "contain"
-    },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.karllasouzza.PowerLists"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.karllasouzza.PowerLists"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "1a24e7ab-b7e5-47d1-b3d4-78d8fa867693"
-      }
+    "newArchEnabled": true,
+    "experiments": {
+      "tsconfigPaths": true
     },
     "plugins": [
-      "expo-secure-store",
+      [
+        "react-native-bootsplash",
+        {
+          "assetsDir": "assets/bootsplash"
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
+        }
+      ],
       [
         "expo-camera",
         {
@@ -40,7 +32,60 @@
           "microphonePermission": "Permitir que $(PRODUCT_NAME) acesse seu microfone",
           "recordAudioAndroid": false
         }
-      ]
-    ]
+      ],
+      "expo-router",
+      "expo-asset",
+      ["expo-build-properties"],
+      [
+        "react-native-edge-to-edge",
+        {
+          "android": {
+            "parentTheme": "Default",
+            "enforceNavigationBarContrast": true
+          }
+        }
+      ],
+      "expo-font"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.karllasouzza.PowerLists",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.karllasouzza.powerlists",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "powerlists.com",
+              "pathPrefix": "/password-recovery"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
+      "edgeToEdgeEnabled": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": ["android.permission.CAMERA"],
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "web": {
+      "favicon": "./assets/icon.png",
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1a24e7ab-b7e5-47d1-b3d4-78d8fa867693"
+      }
+    }
   }
 }
