@@ -95,16 +95,16 @@ export default function ListItem({
     <SwipeableItem
       ref={swipeableRef}
       friction={1.35}
-      leftThreshold={40}
+      leftThreshold={70}
       rightThreshold={52}
       dragOffsetFromLeftEdge={22}
-      dragOffsetFromRightEdge={14}
+      dragOffsetFromRightEdge={22}
       overshootLeft={false}
       overshootRight={false}
       renderLeftActions={renderLeftActions}
       renderRightActions={renderRightActions}
       onOpen={handleSwipeOpen}>
-      <View className="min-h-[88px] h-max w-full flex-row items-center gap-3 bg-card p-3">
+      <View className="min-h-[88px] h-max w-full flex-row items-center gap-3 bg-card p-3 overflow-hidden">
         <View
           className="rounded-xl items-center justify-center overflow-hidden"
           style={{
@@ -118,8 +118,7 @@ export default function ListItem({
 
         <View className="flex-1 justify-center gap-0.5">
           <Text
-            className="text-base font-semibold text-foreground"
-            style={{ textDecorationLine: status ? 'line-through' : 'none' }}
+            className={cn('text-base font-semibold text-foreground', status && 'line-through')}
             numberOfLines={1}>
             {title}
           </Text>

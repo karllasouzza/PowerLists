@@ -1,7 +1,3 @@
-/**
- * Barrel export para componentes da feature list
- */
-
-export * from './list-items-header';
+export * from './list-items-sort-bar';
 export * from './list-items-footer';
 export * from './list-items-content';

@@ -6,6 +6,7 @@ import { Text } from '@/components/ui/text';
 import { closeOpenedSwipeable } from '@/components/swipeable';
 
 import type { ListItem } from '../types';
+import { ListItemsEmptyComponent } from './list-items-empty-component';
 
 type ListItemsRow =
   | {
@@ -61,13 +62,15 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
   return (
     <LegendList
       data={data}
+      estimatedItemSize={200}
+      drawDistance={500}
       renderItem={({ item }) => {
         if (item.type === 'divider') {
           return (
             <View className="mx-4 mb-2 flex-row items-center gap-2">
               <View className="h-px flex-1 bg-border" />
               <Text variant="muted" className="text-xs">
-                Adicionados ({item.checkedCount})
+                Comprados ({item.checkedCount})
               </Text>
               <View className="h-px flex-1 bg-border" />
             </View>
@@ -76,19 +79,11 @@ export function ListItemsContent({ unchecked, checked, renderItem }: ListItemsCo
 
         return renderItem(item.item);
       }}
-      estimatedItemSize={92}
       className="flex-1 flex w-full h-full py-2"
       keyExtractor={(item) => item.key}
       recycleItems
       onScrollBeginDrag={handleListScrollStart}
-      ListEmptyComponent={() => (
-        <View className="flex-1 items-center justify-center py-16">
-          <Text variant="muted" className="text-center">
-            Nenhum item nesta lista.{'\n'}Toque em + para adicionar.
-          </Text>
-        </View>
-      )}
-      ListFooterComponent={() => <View className="h-44 border-t border-border" />}
+      ListEmptyComponent={ListItemsEmptyComponent}
     />
   );
 }

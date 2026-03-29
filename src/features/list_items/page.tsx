@@ -1,27 +1,18 @@
 import React, { useCallback } from 'react';
-import { View, Pressable } from 'react-native';
+import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
 import { IconPlus } from '@tabler/icons-react-native';
 
 import ListItemComponent from '@/features/list_items/components/list-item';
 import { TopBar } from '@/components/top-bar';
-import { Text } from '@/components/ui/text';
 
 import { formatCurrency } from './utils';
-import type { SortMode } from './utils';
 import type { ListItem } from './types';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
-import { cn } from '@/lib/utils';
 import { Fab } from '@/components/ui/fab';
-import { ListItemsContent, ListItemsFooter } from './components';
-
-const SORT_OPTIONS: { key: SortMode; label: string }[] = [
-  { key: 'default', label: 'Padrão' },
-  { key: 'az', label: 'A-Z' },
-  { key: 'price', label: '$ → $$' },
-];
+import { ListItemsContent, ListItemsFooter, ListItemsSortBar } from './components';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();
@@ -78,27 +69,7 @@ const ListItemsScreen = observer(() => {
         onSearchChange={setSearchQuery}
         searchPlaceholder="Buscar itens..."
       />
-
-      {/* Sort Bar */}
-      <View className="flex-row items-center gap-2 px-4 py-3">
-        {SORT_OPTIONS.map((opt) => {
-          const isActive = sortMode === opt.key;
-          return (
-            <Pressable
-              key={opt.key}
-              onPress={() => setSortMode(opt.key)}
-              className={cn('rounded-full px-4 py-1.5', isActive && 'bg-accent')}>
-              <Text
-                className={cn(
-                  'text-sm font-semibold',
-                  isActive ? 'text-white' : 'text-muted-foreground',
-                )}>
-                {opt.label}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+      <ListItemsSortBar sortMode={sortMode} setSortMode={setSortMode} />
 
       <ListItemsContent unchecked={unchecked} checked={checked} renderItem={renderItem} />
 
