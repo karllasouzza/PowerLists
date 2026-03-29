@@ -1,20 +1,19 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Pressable, View } from 'react-native';
-import {
-  IconBook,
-  IconChefHat,
-  IconShoppingCart,
-  IconEdit,
-  IconTrash,
-} from '@tabler/icons-react-native';
+import { IconShoppingCart, IconEdit, IconTrash } from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
+import { useValue } from '@legendapp/state/react';
 
 import { List } from '@/data/types';
+import type { ListItem } from '@/features/list_items';
+import { listItems$ } from '@/data/states/list-items';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
 import { calculateTotal } from '@/features/list_items';
 import { getAccentColorCardClasses } from '@/features/lists/utils/accent-colors';
+import { iconMap } from '@/features/lists/utils/icon-map';
 import { cn } from '@/lib/utils';
 
 const ACTION_WIDTH = 84;
@@ -26,18 +25,16 @@ interface CardListProps {
   onDelete: (listId: string) => void;
 }
 
-const CardIcons = {
-  cart: IconShoppingCart,
-  'chef-hat': IconChefHat,
-  book: IconBook,
-} as const;
-
 export const CardList = function CardList({ list, onEdit, onDelete }: CardListProps) {
   const router = useRouter();
   const swipeableRef = useRef<SwipeableItemRef>(null);
 
-  const items = list.listItems || [];
-  const cardIcon = CardIcons[list.icon as keyof typeof CardIcons] || IconShoppingCart;
+  const listItemsRaw = useValue(listItems$);
+  const items = useMemo(() => {
+    const raw = Object.values(listItemsRaw || {}).filter((item) => item.list_id === list.id);
+    return convertFromSupabaseFormat(raw) as ListItem[];
+  }, [listItemsRaw, list.id]);
+  const cardIcon = iconMap[list.icon] ?? IconShoppingCart;
   const totalPrice = calculateTotal(items);
   const { backgroundClassName, foregroundClassName } = getAccentColorCardClasses(list.accentColor);
 
