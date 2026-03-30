@@ -1,7 +1,6 @@
 import React, { useRef, useMemo, useImperativeHandle } from 'react';
 import { View, useWindowDimensions } from 'react-native';
 import ReanimatedSwipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import { GestureDetector } from 'react-native-gesture-handler';
 
 import { createPanGuard, getSwipeHitSlop } from '@/lib/swipe-gesture';
 import { cn } from '@/lib/utils';
@@ -25,11 +24,14 @@ export const SwipeableItem = React.forwardRef<SwipeableItemRef, SwipeableItemPro
 
     return (
       <View className={cn('overflow-hidden', className)}>
-        <GestureDetector gesture={panGuard}>
-          <ReanimatedSwipeable ref={internalRef} hitSlop={swipeHitSlop} {...handlers} {...rest}>
-            {children}
-          </ReanimatedSwipeable>
-        </GestureDetector>
+        <ReanimatedSwipeable
+          ref={internalRef}
+          hitSlop={swipeHitSlop}
+          simultaneousHandlers={panGuard as any}
+          {...handlers}
+          {...rest}>
+          {children}
+        </ReanimatedSwipeable>
       </View>
     );
   },
