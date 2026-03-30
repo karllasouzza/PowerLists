@@ -1,16 +1,22 @@
-import { useState } from 'react';
-import { Animated, Dimensions, Platform } from 'react-native';
+import { Dimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withDelay,
+  withSequence,
+  runOnJS,
+} from 'react-native-reanimated';
 import BootSplash from 'react-native-bootsplash';
-
-const useNativeDriver = Platform.OS !== 'web';
 
 type Props = {
   onAnimationEnd: () => void;
 };
 
 export const AnimatedBootSplash = ({ onAnimationEnd }: Props) => {
-  const [opacity] = useState(() => new Animated.Value(1));
-  const [translateY] = useState(() => new Animated.Value(0));
+  const opacity = useSharedValue(1);
+  const translateY = useSharedValue(0);
 
   const { container, logo } = BootSplash.useHideAnimation({
     manifest: require('../../assets/bootsplash/manifest.json'),
@@ -23,31 +29,27 @@ export const AnimatedBootSplash = ({ onAnimationEnd }: Props) => {
     animate: () => {
       const { height } = Dimensions.get('window');
 
-      Animated.stagger(250, [
-        Animated.spring(translateY, {
-          useNativeDriver,
-          toValue: -50,
-        }),
-        Animated.spring(translateY, {
-          useNativeDriver,
-          toValue: height,
-        }),
-      ]).start();
+      translateY.value = withSequence(withSpring(-50), withDelay(250, withSpring(height)));
 
-      Animated.timing(opacity, {
-        useNativeDriver,
-        toValue: 0,
-        duration: 150,
-        delay: 350,
-      }).start(() => {
-        onAnimationEnd();
-      });
+      opacity.value = withDelay(
+        350,
+        withTiming(0, { duration: 150 }, (finished) => {
+          'worklet';
+          if (finished) runOnJS(onAnimationEnd)();
+        }),
+      );
     },
   });
 
+  const containerStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  const logoStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
+
   return (
-    <Animated.View {...container} style={[container.style, { opacity }]} className="bg-background!">
-      <Animated.Image {...logo} style={[logo.style, { transform: [{ translateY }] }]} />
+    <Animated.View
+      {...container}
+      style={[container.style, containerStyle]}
+      className="bg-background!">
+      <Animated.Image {...logo} style={[logo.style, logoStyle]} />
 
       {/* <Animated.Image {...brand} style={[brand.style, { opacity }]} /> */}
     </Animated.View>
