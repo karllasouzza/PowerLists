@@ -1,5 +1,11 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Pressable, Animated, BackHandler, TextInput, Platform } from 'react-native';
+import { View, Pressable, BackHandler, TextInput } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withDelay,
+} from 'react-native-reanimated';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
@@ -33,8 +39,8 @@ export const TopBar = ({
   const searchInputRef = useRef<TextInput>(null);
 
   // Animation values
-  const searchBarOpacity = useRef(new Animated.Value(0)).current;
-  const titleOpacity = useRef(new Animated.Value(1)).current;
+  const searchBarOpacity = useSharedValue(0);
+  const titleOpacity = useSharedValue(1);
 
   const handleCloseSearch = useCallback(() => {
     setIsSearchActive(false);
@@ -50,38 +56,18 @@ export const TopBar = ({
     searchInputRef.current?.focus();
   }, [onSearchChange]);
 
-  useEffect(() => {
-    const useNative = Platform.OS !== 'web';
+  const titleStyle = useAnimatedStyle(() => ({ opacity: titleOpacity.value }));
+  const searchBarStyle = useAnimatedStyle(() => ({ opacity: searchBarOpacity.value }));
 
+  useEffect(() => {
     if (isSearchActive) {
       searchInputRef.current?.focus();
 
-      Animated.parallel([
-        Animated.timing(searchBarOpacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: useNative,
-        }),
-        Animated.timing(titleOpacity, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: useNative,
-        }),
-      ]).start();
+      searchBarOpacity.value = withTiming(1, { duration: 200 });
+      titleOpacity.value = withTiming(0, { duration: 150 });
     } else {
-      Animated.parallel([
-        Animated.timing(searchBarOpacity, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: useNative,
-        }),
-        Animated.timing(titleOpacity, {
-          toValue: 1,
-          duration: 300,
-          delay: 100,
-          useNativeDriver: useNative,
-        }),
-      ]).start();
+      searchBarOpacity.value = withTiming(0, { duration: 200 });
+      titleOpacity.value = withDelay(100, withTiming(1, { duration: 300 }));
     }
 
     const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
@@ -96,7 +82,7 @@ export const TopBar = ({
   }, [isSearchActive, searchBarOpacity, titleOpacity, handleCloseSearch]);
 
   return (
-    <View className="z-40 w-full flex-row items-center justify-between px-4 py-3 border-b border-border">
+    <View className="z-40 flex-row justify-between items-center px-4 py-3 border-border border-b w-full">
       {/* Left Section */}
       <View className="flex-row items-center gap-3">
         {showBack && !isSearchActive && (
@@ -111,21 +97,16 @@ export const TopBar = ({
         )}
 
         {/* Title - always rendered, animated visibility */}
-        <Animated.View
-          style={{
-            opacity: titleOpacity,
-            display: isSearchActive ? 'none' : 'flex',
-          }}>
-          <Text className="text-xl font-bold text-foreground">{title}</Text>
+        <Animated.View style={[titleStyle, { display: isSearchActive ? 'none' : 'flex' }]}>
+          <Text className="font-bold text-foreground text-xl">{title}</Text>
         </Animated.View>
 
         {/* Search Input - always rendered, animated visibility */}
         <Animated.View
-          style={{
-            opacity: searchBarOpacity,
-            flexDirection: 'row',
-            display: isSearchActive ? 'flex' : 'none',
-          }}
+          style={[
+            searchBarStyle,
+            { flexDirection: 'row', display: isSearchActive ? 'flex' : 'none' },
+          ]}
           className="flex-row items-center gap-4">
           <Button
             variant="ghost"
@@ -135,13 +116,13 @@ export const TopBar = ({
             <Icon as={IconArrowLeft} size={24} className="text-foreground" />
           </Button>
 
-          <View className="flex-1 flex-row items-center gap-2 rounded-xl px-2 py-1">
+          <View className="flex-row flex-1 items-center gap-2 px-2 py-1 rounded-xl">
             <Input
               ref={searchInputRef}
               placeholder={searchPlaceholder}
               value={searchQuery}
               onChangeText={onSearchChange}
-              className="bg-muted/50 flex-1 border-0 shadow-none"
+              className="flex-1 bg-muted/50 shadow-none border-0"
             />
 
             {searchQuery.length > 0 && (
@@ -158,18 +139,14 @@ export const TopBar = ({
 
       {/* Right Section */}
       <Animated.View
-        style={{
-          opacity: titleOpacity,
-          display: isSearchActive ? 'none' : 'flex',
-          flexDirection: 'row',
-        }}
+        style={[titleStyle, { display: isSearchActive ? 'none' : 'flex', flexDirection: 'row' }]}
         className="flex-row items-center gap-2">
         {showSearch && (
           <Button
             variant="ghost"
             size="icon"
             onPress={handleOpenSearch}
-            className="bg-muted/50 rounded-full p-2 active:opacity-70"
+            className="bg-muted/50 active:opacity-70 p-2 rounded-full"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Icon as={IconSearch} size={20} className="text-foreground" />
           </Button>
