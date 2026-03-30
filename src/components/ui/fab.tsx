@@ -1,5 +1,12 @@
-import React, { useRef } from 'react';
-import { Animated, Pressable, PressableProps, Text, View } from 'react-native';
+import React from 'react';
+import { Pressable, PressableProps, Text, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
 import { LucideIcon } from 'lucide-react-native';
@@ -24,50 +31,40 @@ const Fab = React.forwardRef<View, FabProps>(
       labelClassName,
       onPressIn,
       onPressOut,
+      onPress,
       ...props
     },
     ref,
   ) => {
-    const scale = useRef(new Animated.Value(1)).current;
-    const opacity = useRef(new Animated.Value(1)).current;
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }));
 
     const handlePressIn = (e: any) => {
-      Animated.parallel([
-        Animated.timing(scale, {
-          toValue: 0.9,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 0.5,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      // Abre imediatamente, sem esperar animação
+      if (onPress) runOnJS(onPress)(e);
+
+      scale.value = withSpring(0.93, { damping: 20, stiffness: 400, mass: 0.5 });
+      opacity.value = withTiming(0.8, { duration: 60 });
+
       if (onPressIn) onPressIn(e);
     };
 
     const handlePressOut = (e: any) => {
-      Animated.parallel([
-        Animated.spring(scale, {
-          toValue: 1,
-          useNativeDriver: true,
-          friction: 5,
-          tension: 300,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
+      scale.value = withSpring(1, { damping: 15, stiffness: 300, mass: 0.5 });
+      opacity.value = withTiming(1, { duration: 80 });
+
       if (onPressOut) onPressOut(e);
     };
 
     return (
       <View
         ref={ref}
-        className={cn('absolute bottom-24 right-4 z-50', className)}
+        className={cn('right-4 bottom-24 z-50 absolute', className)}
         pointerEvents="box-none">
         <Pressable
           onPressIn={handlePressIn}
@@ -75,18 +72,15 @@ const Fab = React.forwardRef<View, FabProps>(
           className="shadow-2xl"
           {...props}>
           <Animated.View
-            style={{
-              transform: [{ scale }],
-              opacity,
-            }}
+            style={animatedStyle}
             className={cn(
-              'flex flex-row items-center justify-center rounded-3xl bg-primary border border-border p-4',
+              'flex flex-row justify-center items-center bg-primary p-4 border border-border rounded-3xl',
               buttonClassName,
             )}>
             <Icon as={icon} className={cn('size-6 text-primary-foreground', iconClassName)} />
             {label && (
               <Text
-                className={cn('ml-2 text-sm font-medium text-primary-foreground', labelClassName)}>
+                className={cn('ml-2 font-medium text-primary-foreground text-sm', labelClassName)}>
                 {label}
               </Text>
             )}
