@@ -2907,7 +2907,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-tabs@npm:^1.1.12":
+"@radix-ui/react-tabs@npm:^1.1.12, @radix-ui/react-tabs@npm:^1.1.13":
   version: 1.1.13
   resolution: "@radix-ui/react-tabs@npm:1.1.13"
   dependencies:
@@ -3827,13 +3827,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rn-primitives/tabs@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@rn-primitives/tabs@npm:1.2.0"
+"@rn-primitives/tabs@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@rn-primitives/tabs@npm:1.4.0"
   dependencies:
-    "@radix-ui/react-tabs": "npm:^1.1.12"
-    "@rn-primitives/slot": "npm:1.2.0"
-    "@rn-primitives/types": "npm:1.2.0"
+    "@radix-ui/react-tabs": "npm:^1.1.13"
+    "@rn-primitives/slot": "npm:1.4.0"
+    "@rn-primitives/types": "npm:1.4.0"
   peerDependencies:
     react: "*"
     react-native: "*"
@@ -3843,7 +3843,7 @@ __metadata:
       optional: true
     react-native-web:
       optional: true
-  checksum: 10c0/37375261815db905c1cc5d3eeadd3c10f9a0256f9e07ac16d256c355dd76c09949719c0cb17b24ba1f8e8b135e9c7d9e3d6b355e3233d403fb7b3ac71f322f62
+  checksum: 10c0/3530a64a0dfef4e511fb95c1ee206d9ddec29808b8b7716059bdb4122006120e2636ec5ae95c99ef1b02e07196183b993abcb19315b4691376d69bd4313c40c7
   languageName: node
   linkType: hard
 
@@ -10437,7 +10437,7 @@ __metadata:
     "@rn-primitives/select": "npm:^1.4.0"
     "@rn-primitives/separator": "npm:^1.2.0"
     "@rn-primitives/slot": "npm:^1.4.0"
-    "@rn-primitives/tabs": "npm:^1.2.0"
+    "@rn-primitives/tabs": "npm:^1.4.0"
     "@rn-primitives/toggle": "npm:^1.2.0"
     "@rn-primitives/toggle-group": "npm:^1.2.0"
     "@rn-primitives/tooltip": "npm:^1.2.0"

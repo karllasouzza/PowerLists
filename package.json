@@ -33,7 +33,7 @@
     "@rn-primitives/select": "^1.4.0",
     "@rn-primitives/separator": "^1.2.0",
     "@rn-primitives/slot": "^1.4.0",
-    "@rn-primitives/tabs": "^1.2.0",
+    "@rn-primitives/tabs": "^1.4.0",
     "@rn-primitives/toggle": "^1.2.0",
     "@rn-primitives/toggle-group": "^1.2.0",
     "@rn-primitives/tooltip": "^1.2.0",
