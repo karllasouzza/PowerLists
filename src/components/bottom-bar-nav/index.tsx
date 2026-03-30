@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { View, Pressable } from 'react-native';
 import ReanimatedAnimated, {
@@ -47,7 +47,7 @@ const NavItem = ({ screen, isActive, onPress }: NavItemProps) => {
   return (
     <Pressable
       onPress={onPress}
-      className="relative flex flex-row justify-center items-center gap-2 px-4 w-max h-full">
+      className="relative flex flex-col justify-center items-center gap-1 px-4 w-max h-full">
       <ReanimatedAnimated.View style={animatedStyle} className="flex justify-center items-center">
         <Icon
           as={showFilled ? screen.icon.filled : screen.icon.default}
@@ -58,7 +58,14 @@ const NavItem = ({ screen, isActive, onPress }: NavItemProps) => {
         />
       </ReanimatedAnimated.View>
 
-      {isActive && <Text className="text-bottom-bar-accent font-medium">{screen.label}</Text>}
+      <Text
+        variant="small"
+        className={cn(
+          'text-bottom-bar-foreground',
+          isActive && 'font-semibold! text-bottom-bar-accent',
+        )}>
+        {screen.label}
+      </Text>
     </Pressable>
   );
 };
@@ -75,15 +82,22 @@ interface BottomNavigationProps {
 
 const BottomNavigation = ({ currentSegment, screens }: BottomNavigationProps) => {
   const router = useRouter();
+  const [optimisticSegment, setOptimisticSegment] = useState(currentSegment);
+
+  // Sync back when the real segment changes (e.g. back navigation)
+  useEffect(() => {
+    setOptimisticSegment(currentSegment);
+  }, [currentSegment]);
 
   return (
     <View className="right-0 bottom-4 left-0 z-50 absolute flex justify-center items-center px-4">
       <View className="relative flex flex-row items-center gap-4 bg-bottom-bar shadow-2xl border border-border rounded-3xl h-16">
         {screens.map((screen) => {
-          const isActive = screen.name === currentSegment;
+          const isActive = screen.name === optimisticSegment;
 
           const handlePress = () => {
-            if (screen.name !== currentSegment) {
+            if (screen.name !== optimisticSegment) {
+              setOptimisticSegment(screen.name);
               router.navigate(screen.href as any);
             }
           };
