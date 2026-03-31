@@ -71,7 +71,9 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
         // 'system' passes null to native AppearanceModule which crashes on Android RN 0.83+.
         // Use the current OS value as a fallback so NativeWind resets to the actual system scheme.
         setSystemColorScheme(
-          scheme === 'system' ? ((Appearance.getColorScheme() ?? 'light') as 'light' | 'dark') : scheme,
+          scheme === 'system'
+            ? ((Appearance.getColorScheme() ?? 'light') as 'light' | 'dark')
+            : scheme,
         );
 
         if (scheme === 'system') {
