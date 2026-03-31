@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { View } from 'react-native';
+import { View, Appearance } from 'react-native';
 import { useColorScheme } from 'nativewind';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
@@ -55,7 +55,11 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
     const backgroundColor = storedBackgroundColor ?? '--color-background';
 
     setUserPreferences({ colorScheme, theme, backgroundColor });
-    setSystemColorScheme(colorScheme === 'system' ? 'system' : colorScheme);
+    // 'system' maps to null in Appearance.setColorScheme, which crashes on Android RN 0.83+.
+    // For system mode, resolve the current OS scheme to avoid the null call.
+    if (colorScheme !== 'system') {
+      setSystemColorScheme(colorScheme);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -64,7 +68,11 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
       try {
         if (!['light', 'dark', 'system'].includes(scheme)) throw new Error('Invalid color scheme');
 
-        setSystemColorScheme(scheme);
+        // 'system' passes null to native AppearanceModule which crashes on Android RN 0.83+.
+        // Use the current OS value as a fallback so NativeWind resets to the actual system scheme.
+        setSystemColorScheme(
+          scheme === 'system' ? ((Appearance.getColorScheme() ?? 'light') as 'light' | 'dark') : scheme,
+        );
 
         if (scheme === 'system') {
           setUserPreferences((prev) => ({ ...prev, colorScheme: 'system' }));

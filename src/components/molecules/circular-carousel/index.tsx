@@ -4,12 +4,12 @@ import { CircularCarouselItemProps, CircularCarouselProps } from './types';
 import { BlurView, type BlurViewProps } from 'expo-blur';
 import Animated, {
   interpolate,
+  useAnimatedReaction,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
   Extrapolation,
   useAnimatedProps,
-  useDerivedValue,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
@@ -111,20 +111,18 @@ const CircularCarousel = <ItemT,>({
   onIndexChange,
 }: CircularCarouselProps<ItemT>) => {
   const scrollX = useSharedValue(0);
-  const previousIndex = useSharedValue(-1);
   const itemWidthWithSpacing = itemWidth + spacing;
 
-  useDerivedValue(() => {
-    const currentIndex = Math.round(scrollX.value / itemWidthWithSpacing);
-
-    if (currentIndex !== previousIndex.value && previousIndex.value !== -1) {
-      if (onIndexChange) {
-        scheduleOnRN<[number], void>(onIndexChange, currentIndex);
+  useAnimatedReaction(
+    () => Math.round(scrollX.value / itemWidthWithSpacing),
+    (currentIndex, prevIndex) => {
+      if (prevIndex !== null && currentIndex !== prevIndex) {
+        if (onIndexChange) {
+          scheduleOnRN<[number], void>(onIndexChange, currentIndex);
+        }
       }
-    }
-
-    previousIndex.value = currentIndex;
-  }, []);
+    },
+  );
 
   const onScroll = useAnimatedScrollHandler<Record<string, unknown>>({
     onScroll: (event) => {
