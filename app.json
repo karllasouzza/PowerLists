@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "icon": "./assets/adaptive-icon.png",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "experiments": {
       "tsconfigPaths": true
     },
@@ -35,7 +34,13 @@
       ],
       "expo-router",
       "expo-asset",
-      ["expo-build-properties"],
+      [
+        "expo-build-properties",
+        {
+          "buildReactNativeFromSource": true,
+          "useHermesV1": true
+        }
+      ],
       [
         "react-native-edge-to-edge",
         {
@@ -45,7 +50,8 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-image"
     ],
     "ios": {
       "supportsTablet": true,
@@ -70,7 +76,6 @@
           "category": ["BROWSABLE", "DEFAULT"]
         }
       ],
-      "edgeToEdgeEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
