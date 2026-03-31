@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { TextInput, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,6 +19,11 @@ import { Label } from '@/components/ui/label';
 import { updateListItem, listItems$ } from '@/data/states/list-items';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import type { ListItem } from '@/features/list_items/types';
+import {
+  formatBRL,
+  parseBRLToNumber,
+  numberToBRLInput,
+} from '@/features/list_items/utils/currency';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -27,15 +32,6 @@ const itemFormSchema = z.object({
 });
 
 type ItemFormData = z.infer<typeof itemFormSchema>;
-
-const parsePrice = (val: string): number => {
-  try {
-    const d = new Decimal(val.replace(',', '.') || '0');
-    return d.isNaN() || d.isNegative() ? 0 : d.toDecimalPlaces(2).toNumber();
-  } catch {
-    return 0;
-  }
-};
 
 const parseAmount = (val: string): number => {
   try {
@@ -62,6 +58,7 @@ export function ItemUpdateModal({
   accentForegroundClassName,
 }: ItemUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const titleRef = useRef<TextInput>(null);
 
   const listItemsRaw = useValue(listItems$);
   const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
@@ -85,9 +82,11 @@ export function ItemUpdateModal({
     if (open) {
       reset({
         title: currentItem?.title || '',
-        price: currentItem?.price != null ? String(currentItem.price) : '',
+        price: currentItem?.price != null ? numberToBRLInput(currentItem.price) : '',
         amount: currentItem?.amount != null ? String(currentItem.amount) : '1',
       });
+      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      return () => clearTimeout(timer);
     }
   }, [open, currentItem?.title, currentItem?.price, currentItem?.amount, reset]);
 
@@ -99,7 +98,7 @@ export function ItemUpdateModal({
       const success = await updateListItem({
         id: itemId,
         title: data.title,
-        price: parsePrice(data.price || '0'),
+        price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
         isChecked: currentItem.isChecked ?? false,
       });
@@ -115,7 +114,7 @@ export function ItemUpdateModal({
         <AppModalHandle />
         <AppModalHeader title="Editar item" />
 
-        <View className="gap-4 px-6 pb-2">
+        <View className="gap-6 px-6 pb-2">
           <View className="gap-2">
             <Label nativeID="title">Nome do item</Label>
             <Controller
@@ -123,10 +122,12 @@ export function ItemUpdateModal({
               name="title"
               render={({ field: { onChange, value } }) => (
                 <Input
+                  ref={titleRef}
                   placeholder="Meu item..."
                   value={value}
                   onChangeText={onChange}
                   aria-labelledby="title"
+                  returnKeyType="next"
                 />
               )}
             />
@@ -137,15 +138,15 @@ export function ItemUpdateModal({
 
           <View className="flex-row gap-4">
             <View className="flex-1 gap-2">
-              <Label nativeID="price">Preco</Label>
+              <Label nativeID="price">Preço</Label>
               <Controller
                 control={control}
                 name="price"
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    placeholder="0.00"
+                    placeholder="R$ 0,00"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(formatBRL(text))}
                     keyboardType="numeric"
                     aria-labelledby="price"
                   />
