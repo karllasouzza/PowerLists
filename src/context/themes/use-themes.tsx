@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { View, Appearance } from 'react-native';
 import { useColorScheme } from 'nativewind';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { z } from 'zod';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { mmkvStorage } from '@/data/storage';
 import { FocusAwareBars } from '@/components/focus-aware-bars';
@@ -11,17 +10,14 @@ import { themes, rawColors } from './theme-config';
 import { ThemeContext } from './theme-context';
 import { ThemeProviderProps } from './types';
 
-const UserPreferencesSchema = z.object({
-  theme: z
-    .enum(Object.keys(themes) as [keyof typeof themes, ...(keyof typeof themes)[]])
-    .default('default'),
-  colorScheme: z.enum(['light', 'dark', 'system']).default('system'),
-  backgroundColor: z.string().default('--color-background'),
-});
-
-type UserPreferences = z.infer<typeof UserPreferencesSchema>;
+type UserPreferences = {
+  theme: keyof typeof themes;
+  colorScheme: 'light' | 'dark' | 'system';
+  backgroundColor: string;
+};
 
 export default function ThemeProvider({ children }: ThemeProviderProps) {
+  const insets = useSafeAreaInsets();
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({
     theme: 'default',
     colorScheme: 'system',
@@ -169,15 +165,19 @@ export default function ThemeProvider({ children }: ThemeProviderProps) {
       <FocusAwareBars
         colorScheme={userPreferences?.colorScheme === 'system' ? 'auto' : effectiveColorScheme}
       />
-      <SafeAreaView
+      <View
         style={{
           flex: 1,
           backgroundColor: backgroundColorConverted,
+          paddingTop: insets.top,
+          paddingRight: insets.right,
+          paddingBottom: insets.bottom,
+          paddingLeft: insets.left,
         }}>
         <View className="h-full w-full" style={themeVars}>
           {children}
         </View>
-      </SafeAreaView>
+      </View>
     </ThemeContext.Provider>
   );
 }

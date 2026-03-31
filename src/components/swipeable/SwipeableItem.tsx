@@ -27,7 +27,7 @@ export const SwipeableItem = React.forwardRef<SwipeableItemRef, SwipeableItemPro
         <ReanimatedSwipeable
           ref={internalRef}
           hitSlop={swipeHitSlop}
-          simultaneousHandlers={panGuard as any}
+          simultaneousWithExternalGesture={panGuard}
           {...handlers}
           {...rest}>
           {children}

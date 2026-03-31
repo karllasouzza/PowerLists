@@ -1,5 +1,5 @@
 import { ObservablePersistPlugin, PersistMetadata, PersistOptions } from '@legendapp/state/sync';
-import { createMMKV } from 'react-native-mmkv';
+import { MMKV } from 'react-native-mmkv';
 
 // Types
 interface Change {
@@ -16,15 +16,21 @@ interface JsonObject {
 type JsonArray = JsonValue[];
 
 // Constants
-const MMKV_ID = process.env.EXPO_PUBLIC_MMKV_ID;
-const MMKV_ENCRYPTION_KEY = process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY;
+const MMKV_ID = process.env.EXPO_PUBLIC_MMKV_ID ?? process.env.MMKV_ID ?? 'powerlists-storage';
+const MMKV_ENCRYPTION_KEY =
+  process.env.EXPO_PUBLIC_MMKV_ENCRYPTION_KEY ?? process.env.MMKV_ENCRYPTION_KEY;
 const METADATA_SUFFIX = '__metadata';
 
 // Storage instance
-export const storage = createMMKV({
+const mmkvConfig: ConstructorParameters<typeof MMKV>[0] = {
   id: MMKV_ID,
-  encryptionKey: MMKV_ENCRYPTION_KEY,
-});
+};
+
+if (MMKV_ENCRYPTION_KEY) {
+  mmkvConfig.encryptionKey = MMKV_ENCRYPTION_KEY;
+}
+
+export const storage = new MMKV(mmkvConfig);
 
 /**
  * Clears all data from MMKV storage
@@ -47,7 +53,7 @@ export const getAllStorageKeys = (): string[] => {
  */
 export const deleteStorageKeys = (keys: string[]): void => {
   for (const key of keys) {
-    storage.remove(key);
+    storage.delete(key);
   }
   console.info(`[Storage] Deleted ${keys.length} keys`);
 };
@@ -128,7 +134,7 @@ export const mmkvStorage = {
   },
   getItem: (key: string): string | null => storage.getString(key) ?? null,
   removeItem: (key: string): void => {
-    storage.remove(key);
+    storage.delete(key);
   },
 } as const;
 
@@ -175,11 +181,11 @@ export const MMKVPersistPluginWrapper: ObservablePersistPlugin = {
 
   deleteTable(table: string, config: PersistOptions): void {
     const key = buildKey(table, config);
-    storage.remove(key);
+    storage.delete(key);
   },
 
   deleteMetadata(table: string, config: PersistOptions): void {
     const key = buildMetadataKey(table, config);
-    storage.remove(key);
+    storage.delete(key);
   },
 };
