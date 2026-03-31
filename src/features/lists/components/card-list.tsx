@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Pressable, View } from 'react-native';
 import { IconShoppingCart, IconEdit, IconTrash } from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
-import { useValue } from '@legendapp/state/react';
+import { useSelector } from '@legendapp/state/react';
 
 import { List } from '@/data/types';
 import type { ListItem } from '@/features/list_items';
@@ -29,11 +29,10 @@ function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
   const router = useRouter();
   const swipeableRef = useRef<SwipeableItemRef>(null);
 
-  const listItemsRaw = useValue(listItems$);
-  const items = useMemo(() => {
-    const raw = Object.values(listItemsRaw || {}).filter((item) => item.list_id === list.id);
+  const items = useSelector(() => {
+    const raw = Object.values(listItems$.get() ?? {}).filter((item) => item.list_id === list.id);
     return convertFromSupabaseFormat(raw) as ListItem[];
-  }, [listItemsRaw, list.id]);
+  });
   const cardIcon = iconMap[list.icon] ?? IconShoppingCart;
   const totalPrice = calculateTotal(items);
   const { backgroundClassName, foregroundClassName } = getAccentColorCardClasses(list.accentColor);
@@ -57,21 +56,21 @@ function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
 
   const renderRightActions = useCallback(
     () => (
-      <View className="h-full flex-row" style={{ width: ACTIONS_TOTAL_WIDTH }}>
+      <View className="flex-row h-full" style={{ width: ACTIONS_TOTAL_WIDTH }}>
         <Pressable
           onPress={handleEdit}
-          className="items-center justify-center bg-secondary"
+          className="justify-center items-center bg-secondary"
           style={{ width: ACTION_WIDTH }}>
           <Icon as={IconEdit} size={20} className="text-secondary-foreground" />
-          <Text className="mt-1 text-xs font-semibold text-secondary-foreground">Editar</Text>
+          <Text className="mt-1 font-semibold text-secondary-foreground text-xs">Editar</Text>
         </Pressable>
 
         <Pressable
           onPress={handleDelete}
-          className="items-center justify-center bg-destructive"
+          className="justify-center items-center bg-destructive"
           style={{ width: ACTION_WIDTH }}>
           <Icon as={IconTrash} size={20} className="text-destructive-foreground" />
-          <Text className="mt-1 text-xs font-semibold text-destructive-foreground">Deletar</Text>
+          <Text className="mt-1 font-semibold text-destructive-foreground text-xs">Deletar</Text>
         </Pressable>
       </View>
     ),
@@ -89,16 +88,16 @@ function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
       <Pressable onPress={handlePress} className="flex-row items-center gap-3 bg-card px-4 py-4">
         <View
           className={cn(
-            'size-[50px] rounded-full overflow-hidden flex items-center justify-center',
+            'flex justify-center items-center rounded-full size-[50px] overflow-hidden',
             backgroundClassName,
           )}>
           <Icon as={cardIcon} size={24} className={foregroundClassName} />
         </View>
-        <View className="flex-1 flex-col items-start justify-center">
-          <Text variant="p" className="tracking-normal mt-0">
+        <View className="flex-col flex-1 justify-center items-start">
+          <Text variant="p" className="mt-0 tracking-normal">
             {list.title}
           </Text>
-          <Text variant="p" className="tracking-normal font-bold mt-1">
+          <Text variant="p" className="mt-1 font-bold tracking-normal">
             {totalPrice}
           </Text>
         </View>

@@ -5,6 +5,7 @@ import { observer } from '@legendapp/state/react';
 
 import type { List } from '@/data/types';
 import { CardList } from '@/features/lists/components/card-list';
+import { CardListSkeletonList } from '@/features/lists/components/card-list-skeleton';
 import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
@@ -21,6 +22,7 @@ const HomeScreen = observer(() => {
     searchQuery,
     setSearchQuery,
     lists,
+    isLoading,
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,
@@ -45,7 +47,7 @@ const HomeScreen = observer(() => {
   }, []);
 
   return (
-    <View className="flex h-full w-full flex-1 items-center bg-background p-0!">
+    <View className="flex flex-1 items-center bg-background p-0! w-full h-full">
       <TopBar
         title="Minhas Listas"
         showSearch={true}
@@ -54,17 +56,21 @@ const HomeScreen = observer(() => {
         searchPlaceholder="Procurando por algo?"
       />
 
-      <LegendList
-        data={lists}
-        renderItem={({ item }) => renderList(item)}
-        estimatedItemSize={LIST_CARD_ESTIMATED_ITEM_SIZE}
-        drawDistance={LIST_CARD_DRAW_DISTANCE}
-        className="flex h-full w-full flex-1"
-        keyExtractor={(item) => item.id}
-        extraData={searchQuery}
-        recycleItems
-        onScrollBeginDrag={handleListScrollStart}
-      />
+      {isLoading ? (
+        <CardListSkeletonList />
+      ) : (
+        <LegendList
+          data={lists}
+          renderItem={({ item }) => renderList(item)}
+          estimatedItemSize={LIST_CARD_ESTIMATED_ITEM_SIZE}
+          drawDistance={LIST_CARD_DRAW_DISTANCE}
+          className="flex flex-1 w-full h-full"
+          keyExtractor={(item) => item.id}
+          extraData={searchQuery}
+          recycleItems
+          onScrollBeginDrag={handleListScrollStart}
+        />
+      )}
 
       <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />
 

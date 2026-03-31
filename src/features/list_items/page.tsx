@@ -12,7 +12,7 @@ import type { ListItem } from './types';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
 import { Fab } from '@/components/ui/fab';
-import { ListItemsContent, ListItemsFooter, ListItemsSortBar } from './components';
+import { ListItemsContent, ListItemsFooter, ListItemsSortBar, ListItemSkeletonList } from './components';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();
@@ -66,7 +66,22 @@ const ListItemsScreen = observer(() => {
     ],
   );
 
-  if (!currentList?.id) return null;
+  if (!currentList?.id) {
+    return (
+      <View className="flex-1 bg-background">
+        <TopBar
+          title="Lista"
+          showBack={true}
+          onBack={() => router.back()}
+          showSearch={false}
+          searchQuery=""
+          onSearchChange={() => {}}
+          searchPlaceholder="Buscar itens..."
+        />
+        <ListItemSkeletonList />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-background">

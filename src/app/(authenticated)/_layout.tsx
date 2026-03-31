@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Stack, useSegments, usePathname } from 'expo-router';
-import {
-  IconHome,
-  IconHomeFilled,
-  IconUser,
-  IconUserFilled,
-} from '@tabler/icons-react-native';
+import { IconHome, IconHomeFilled, IconUser, IconUserFilled } from '@tabler/icons-react-native';
 
 import BottomNavigation from '@/components/bottom-bar-nav';
 

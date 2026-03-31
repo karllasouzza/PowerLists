@@ -13,6 +13,7 @@ export const useListPageLogics = () => {
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [activeListId, setActiveListId] = useState<string>();
   const lists = useValue(lists$.get());
+  const isLoading = lists === null || lists === undefined;
   const listFormatted = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
 
   const filteredLists = useMemo(
@@ -36,6 +37,7 @@ export const useListPageLogics = () => {
 
   return {
     lists: filteredLists,
+    isLoading,
 
     onSearch,
     setOnSearch,
