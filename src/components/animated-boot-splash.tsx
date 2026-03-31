@@ -23,9 +23,6 @@ export const AnimatedBootSplash = ({ onAnimationEnd }: Props) => {
 
     logo: require('../../assets/bootsplash/logo.png'),
 
-    statusBarTranslucent: true,
-    navigationBarTranslucent: true,
-
     animate: () => {
       const { height } = Dimensions.get('window');
 

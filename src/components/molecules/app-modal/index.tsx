@@ -10,6 +10,7 @@ import {
   FadeOut,
   SlideInDown,
   SlideOutDown,
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -132,22 +133,24 @@ function AppModalContent({
 function AppModalHandle({ className, ...props }: ViewProps) {
   const dragCtx = React.useContext(AppModalDragContext);
 
+  // Extract SharedValue and callback individually so the gesture worklet captures
+  // each as a proper shareable — avoids freezing a plain wrapper object.
+  const translateY = dragCtx?.translateY;
+  const close = dragCtx?.close;
+
   const gesture = Gesture.Pan()
-    .runOnJS(true)
     .onUpdate((e) => {
-      if (!dragCtx) return;
-      dragCtx.translateY.value = Math.max(0, e.translationY);
+      if (!translateY) return;
+      translateY.value = Math.max(0, e.translationY);
     })
     .onEnd((e) => {
-      if (!dragCtx) return;
+      if (!translateY || !close) return;
       const shouldClose = e.translationY > 80 || e.velocityY > 600;
       if (shouldClose) {
-        // Don't reset translateY here — let SlideOutDown compose with the current
-        // drag offset so the modal continues sliding down without snapping back.
-        return dragCtx.close();
+        runOnJS(close)();
+      } else {
+        translateY.value = withSpring(0, { damping: 20, stiffness: 200 });
       }
-
-      return (dragCtx.translateY.value = withSpring(0, { damping: 20, stiffness: 200 }));
     });
 
   const handleBar = (
