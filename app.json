@@ -35,13 +35,6 @@
       "expo-router",
       "expo-asset",
       [
-        "expo-build-properties",
-        {
-          "buildReactNativeFromSource": true,
-          "useHermesV1": true
-        }
-      ],
-      [
         "react-native-edge-to-edge",
         {
           "android": {
@@ -50,8 +43,7 @@
           }
         }
       ],
-      "expo-font",
-      "expo-image"
+      "expo-font"
     ],
     "ios": {
       "supportsTablet": true,
