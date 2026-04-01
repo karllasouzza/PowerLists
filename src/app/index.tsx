@@ -1,19 +1,12 @@
-import { useEffect } from 'react';
-import { useRouter } from 'expo-router';
-import AuthScreen from '@/features/auth/page';
-import { useSlideContext } from '@/context/slides-context';
+import { Redirect } from 'expo-router';
+import { OnboardingScreen, useOnboardingFirstAccess } from '@/features/onboarding';
 
 export default function IndexScreen() {
-  const { isFirstAccess } = useSlideContext();
-  const router = useRouter();
+  const { isFirstAccess, completeOnboarding } = useOnboardingFirstAccess();
 
-  useEffect(() => {
-    if (isFirstAccess) {
-      router.replace('/onboarding');
-    }
-  }, [isFirstAccess, router]);
+  if (!isFirstAccess) {
+    return <Redirect href="/auth" />;
+  }
 
-  if (isFirstAccess) return null;
-
-  return <AuthScreen />;
+  return <OnboardingScreen onComplete={completeOnboarding} />;
 }

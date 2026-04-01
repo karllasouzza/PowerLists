@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, View, useWindowDimensions } from 'react-native';
-import { Text } from '../ui/text';
+
+import { Text } from '@/components/ui/text';
 import { SlideItemProps } from './types';
 
 export const OnboardingContainerItem = ({ item }: SlideItemProps) => {

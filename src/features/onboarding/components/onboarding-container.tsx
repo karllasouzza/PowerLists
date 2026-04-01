@@ -9,26 +9,26 @@ import { cn } from '@/lib/utils';
 const SLIDE_PAGES: ISlide[] = [
   {
     content: {
-      img: require('../../../assets/Images/Slides/Illustration_1.png'),
-      title: 'Sua lista de compras, só que mais inteligente.',
+      img: require('/assets/Images/Slides/Illustration_1.png'),
+      title: 'Esqueça o papel!',
       subtitle:
-        'Deixe o papel no passado. Crie listas digitais, adicione os preços e saiba exatamente quanto vai gastar antes de chegar ao caixa.',
+        'Monte listas digitais, adicione preços e saiba na hora quanto vai gastar — sem surpresas na hora de pagar.',
     },
   },
   {
     content: {
-      img: require('../../../assets/Images/Slides/Illustration_2.png'),
-      title: 'Organize tudo em um só lugar.',
+      img: require('/assets/Images/Slides/Illustration_2.png'),
+      title: 'Tudo organizado e sempre à mão!',
       subtitle:
-        'Adicione itens, defina quantidades e compartilhe suas listas com a família ou amigos com facilidade.',
+        'Adicione itens, defina quantidades e compartilhe facilmente com quem você faz compras. Sincronize listas em tempo real com sua família ou amigos.',
     },
   },
   {
     content: {
-      img: require('../../../assets/Images/Slides/Illustration_3.png'),
-      title: 'Economize mais em cada compra.',
+      img: require('/assets/Images/Slides/Illustration_3.png'),
+      title: 'Mais economia com menos esforço!',
       subtitle:
-        'Acompanhe seus gastos, compare preços e tome decisões mais inteligentes na hora de comprar.',
+        'Monitore seus gastos, compare preços e descubra oportunidades de economia a cada compra. Faça escolhas inteligentes e aproveite mais.',
     },
   },
 ];
