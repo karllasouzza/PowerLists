@@ -22,6 +22,7 @@ import {
 } from '@expo-google-fonts/lora';
 
 import ThemeProvider from '@/context/themes/use-themes';
+import { SlideProvider } from '@/context/slides-context';
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
@@ -60,20 +61,23 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
         <ThemeProvider>
-          <Stack screenOptions={{ contentStyle: { backgroundColor: 'transparent' } }}>
-            <Stack.Protected guard={!user}>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="login" options={{ headerShown: false }} />
-              <Stack.Screen name="create-account" options={{ headerShown: false }} />
-              <Stack.Screen name="request-password-recovery" options={{ headerShown: false }} />
-              <Stack.Screen name="password-recovery" options={{ headerShown: false }} />
-            </Stack.Protected>
-            <Stack.Protected guard={!!user}>
-              <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-            </Stack.Protected>
-          </Stack>
-          <PortalHost />
-          <Toaster />
+          <SlideProvider>
+            <Stack screenOptions={{ contentStyle: { backgroundColor: 'transparent' } }}>
+              <Stack.Protected guard={!user}>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="create-account" options={{ headerShown: false }} />
+                <Stack.Screen name="request-password-recovery" options={{ headerShown: false }} />
+                <Stack.Screen name="password-recovery" options={{ headerShown: false }} />
+              </Stack.Protected>
+              <Stack.Protected guard={!!user}>
+                <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
+              </Stack.Protected>
+            </Stack>
+            <PortalHost />
+            <Toaster />
+          </SlideProvider>
           {(isLoading || !fontsLoaded || visible) && (
             <AnimatedBootSplash onAnimationEnd={() => setVisible(false)} />
           )}
