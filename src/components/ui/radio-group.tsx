@@ -14,6 +14,9 @@ const RadioGroupItem = React.forwardRef<
   RadioGroupPrimitive.ItemRef,
   React.ComponentProps<typeof RadioGroupPrimitive.Item> & { hideIndicator?: boolean }
 >(function RadioGroupItem({ className, children, hideIndicator = false, ...props }, ref) {
+  const hasChildren = children !== undefined && children !== null;
+  const primitiveChildren = children as unknown as React.ReactNode;
+
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
@@ -28,9 +31,10 @@ const RadioGroupItem = React.forwardRef<
         className,
       )}
       {...props}>
-      {typeof children === 'function' ? null : children}
-      {!hideIndicator && !children && (
+      {!hideIndicator && !hasChildren ? (
         <RadioGroupPrimitive.Indicator className="bg-primary size-2 rounded-full" />
+      ) : (
+        primitiveChildren
       )}
     </RadioGroupPrimitive.Item>
   );

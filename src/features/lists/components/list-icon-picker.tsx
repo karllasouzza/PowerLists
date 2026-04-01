@@ -41,7 +41,7 @@ export function ListIconPicker({ value, onChange }: ListIconPickerProps) {
                   ? 'border-primary bg-primary'
                   : 'border-border dark:bg-input/30 bg-transparent',
               )}
-              accessibilityLabel={`Icone ${iconName}`}>
+              accessibilityLabel={`Ícone ${iconName}`}>
               <Icon
                 as={IconComponent}
                 size={20}
