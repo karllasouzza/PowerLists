@@ -15,9 +15,9 @@ export function AccountSection({ onManageProfile, onPasswordSecurity }: AccountS
         Conta
       </Text>
       <View className="rounded-2xl border border-border bg-card">
-        <SettingsRow icon={IconUserEdit} label="Gerenciar Perfil" onPress={onManageProfile} />
+        <SettingsRow icon={IconUserEdit} label="Editar Perfil" onPress={onManageProfile} />
         <View className="mx-5 border-t border-border" />
-        <SettingsRow icon={IconKey} label="Senha e Segurança" onPress={onPasswordSecurity} />
+        <SettingsRow icon={IconKey} label="Alterar Senha" onPress={onPasswordSecurity} />
       </View>
     </View>
   );

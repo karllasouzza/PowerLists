@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { IconMask } from '@tabler/icons-react-native';
+import { IconFolder } from '@tabler/icons-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -66,7 +66,7 @@ export default function AuthScreen() {
           </View>
 
           <Button variant="ghost" className="h-12 w-full" onPress={handleGuest}>
-            <Icon as={IconMask} className="text-secondary-foreground" size={20} />
+            <Icon as={IconFolder} className="text-secondary-foreground" size={20} />
             <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
           </Button>
         </View>
