@@ -55,7 +55,7 @@ function AppModalOverlay({
     <FullWindowOverlay>
       <DialogPrimitive.Overlay
         className={cn(
-          'absolute bottom-0 left-0 right-0 top-0 z-50 flex justify-end bg-black/50 shadow-lg',
+          'absolute bottom-0 left-0 right-0 top-0 z-50 flex justify-end bg-black/50',
           Platform.select({
             web: 'animate-in fade-in-0 fixed cursor-default [&>*]:cursor-auto',
           }),
