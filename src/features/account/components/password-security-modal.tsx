@@ -71,7 +71,7 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
     <AppModal open={open} onOpenChange={handleClose}>
       <AppModalContent>
         <AppModalHandle />
-        <AppModalHeader title="Senha e Segurança" />
+        <AppModalHeader title="Alterar Senha" />
         <View className="gap-4 px-6 pb-2">
           <View className="gap-1.5">
             <Label nativeID="current-password-label">Senha atual</Label>
