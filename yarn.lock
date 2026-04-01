@@ -10027,17 +10027,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lucide-react-native@npm:^0.555.0":
-  version: 0.555.0
-  resolution: "lucide-react-native@npm:0.555.0"
-  peerDependencies:
-    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
-    react-native: "*"
-    react-native-svg: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0
-  checksum: 10c0/3e3f839556173fd46c96d89f7825432240252fc44e476d4613a83da52c4ea4783f6486229677c0de1661c59f974bf9ced20be42c9e8a4df222256e42b9f76f5f
-  languageName: node
-  linkType: hard
-
 "make-dir@npm:^4.0.0":
   version: 4.0.0
   resolution: "make-dir@npm:4.0.0"
@@ -11679,7 +11668,6 @@ __metadata:
     globals: "npm:^16.5.0"
     humps: "npm:^2.0.1"
     jest: "npm:~29.7.0"
-    lucide-react-native: "npm:^0.555.0"
     nativewind: "npm:^4.1.0"
     prettier: "npm:^3.8.1"
     prettier-plugin-tailwindcss: "npm:^0.5.11"
