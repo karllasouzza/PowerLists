@@ -5836,13 +5836,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"button@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "button@npm:1.1.1"
-  checksum: 10c0/24e022707dc110cad045f6a14507cd6d75226aa628c1ac758eceb51e414c8b854a2f0a317080a12902f62e57b4d90d7778ca1513f5592e89cc5470d47c79ef83
-  languageName: node
-  linkType: hard
-
 "bytes@npm:3.1.2":
   version: 3.1.2
   resolution: "bytes@npm:3.1.2"
@@ -7372,23 +7365,6 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: 10c0/6f3df301031a93cb808d4791add574608a5f0cef42555068ad4026bef7094401d7947758a06ccccc9f2c546627932bfde9cf8dbee07167af35df40af89e0a6fe
-  languageName: node
-  linkType: hard
-
-"expo-camera@npm:~17.0.10":
-  version: 17.0.10
-  resolution: "expo-camera@npm:17.0.10"
-  dependencies:
-    invariant: "npm:^2.2.4"
-  peerDependencies:
-    expo: "*"
-    react: "*"
-    react-native: "*"
-    react-native-web: "*"
-  peerDependenciesMeta:
-    react-native-web:
-      optional: true
-  checksum: 10c0/7b43443f5a158845e7a5333f0bd5ddbf05315df9e5fc1ded1bed620d0b82a373147cf0f1b9a73d53a517b9ecf7e5588c15032c503c0eb57484aab8aa70e96127
   languageName: node
   linkType: hard
 
@@ -11691,7 +11667,6 @@ __metadata:
     "@zoontek/react-native-navigation-bar": "npm:^1.0.2"
     babel-plugin-module-resolver: "npm:^5.0.2"
     baseline-browser-mapping: "npm:^2.9.19"
-    button: "npm:^1.1.1"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     decimal.js: "npm:^10.6.0"
@@ -11702,7 +11677,6 @@ __metadata:
     expo: "npm:^54.0.0"
     expo-blur: "npm:~15.0.8"
     expo-build-properties: "npm:~1.0.10"
-    expo-camera: "npm:~17.0.10"
     expo-constants: "npm:~18.0.13"
     expo-dev-client: "npm:~6.0.20"
     expo-font: "npm:~14.0.11"
