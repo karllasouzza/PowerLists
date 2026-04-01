@@ -5,41 +5,17 @@ import { Toaster } from 'sonner-native';
 import BootSplash from 'react-native-bootsplash';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import {
-  useFonts,
-  Poppins_300Light,
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-  Poppins_700Bold,
-} from '@expo-google-fonts/poppins';
-import {
-  Lora_400Regular,
-  Lora_500Medium,
-  Lora_600SemiBold,
-  Lora_700Bold,
-} from '@expo-google-fonts/lora';
 
 import ThemeProvider from '@/context/themes/use-themes';
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
+import { useAppFonts } from '@/utils/fonts';
 export default function RootLayout() {
   const [visible, setVisible] = useState(true);
 
-  const [fontsLoaded] = useFonts({
-    Poppins_300Light,
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
-    Poppins_700Bold,
-    Lora_400Regular,
-    Lora_500Medium,
-    Lora_600SemiBold,
-    Lora_700Bold,
-  });
-
   const { isLoading, user, fetchUserDataAsync } = useAuth();
+  const fontsLoaded = useAppFonts();
 
   useEffect(() => {
     fetchUserDataAsync();
@@ -50,7 +26,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (!isLoading && fontsLoaded) {
       BootSplash.hide({ fade: true });
-      setVisible(false);
     }
   }, [isLoading, fontsLoaded]);
 
