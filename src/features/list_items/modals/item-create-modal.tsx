@@ -122,22 +122,6 @@ export function ItemCreateModal({
 
           <View className="flex-row gap-4">
             <View className="flex-1 gap-2">
-              <Label nativeID="price">Preço</Label>
-              <Controller
-                control={control}
-                name="price"
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder="R$ 0,00"
-                    value={value}
-                    onChangeText={(text) => onChange(formatBRL(text))}
-                    keyboardType="numeric"
-                    aria-labelledby="price"
-                  />
-                )}
-              />
-            </View>
-            <View className="flex-1 gap-2">
               <Label nativeID="amount">Quantidade</Label>
               <Controller
                 control={control}
@@ -149,6 +133,22 @@ export function ItemCreateModal({
                     onChangeText={onChange}
                     keyboardType="numeric"
                     aria-labelledby="amount"
+                  />
+                )}
+              />
+            </View>
+            <View className="flex-1 gap-2">
+              <Label nativeID="price">Preço</Label>
+              <Controller
+                control={control}
+                name="price"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    placeholder="R$ 0,00"
+                    value={value}
+                    onChangeText={(text) => onChange(formatBRL(text))}
+                    keyboardType="numeric"
+                    aria-labelledby="price"
                   />
                 )}
               />

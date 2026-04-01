@@ -87,7 +87,8 @@ export function ItemUpdateModal({
         price: currentItem?.price != null ? numberToBRLInput(currentItem.price) : '',
         amount: currentItem?.amount != null ? String(currentItem.amount) : '1',
       });
-      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      const focusRef = currentItem?.price === 0 ? priceRef : titleRef;
+      const timer = setTimeout(() => focusRef.current?.focus(), 300);
       return () => clearTimeout(timer);
     }
   }, [open, currentItem?.title, currentItem?.price, currentItem?.amount, reset]);
@@ -136,7 +137,7 @@ export function ItemUpdateModal({
                   onChangeText={onChange}
                   aria-labelledby="title"
                   returnKeyType="next"
-                  onSubmitEditing={() => priceRef.current?.focus()}
+                  onSubmitEditing={() => amountRef.current?.focus()}
                   submitBehavior="newline"
                 />
               )}
@@ -147,26 +148,6 @@ export function ItemUpdateModal({
           </View>
 
           <View className="flex-row gap-4">
-            <View className="flex-1 gap-2">
-              <Label nativeID="price">Preço</Label>
-              <Controller
-                control={control}
-                name="price"
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    ref={priceRef}
-                    placeholder="R$ 0,00"
-                    value={value}
-                    onChangeText={(text) => onChange(formatBRL(text))}
-                    keyboardType="numeric"
-                    aria-labelledby="price"
-                    returnKeyType="next"
-                    onSubmitEditing={() => amountRef.current?.focus()}
-                    submitBehavior="newline"
-                  />
-                )}
-              />
-            </View>
             <View className="flex-1 gap-2">
               <Label nativeID="amount">Quantidade</Label>
               <Controller
@@ -180,6 +161,26 @@ export function ItemUpdateModal({
                     onChangeText={onChange}
                     keyboardType="numeric"
                     aria-labelledby="amount"
+                    returnKeyType="next"
+                    onSubmitEditing={() => priceRef.current?.focus()}
+                    submitBehavior="newline"
+                  />
+                )}
+              />
+            </View>
+            <View className="flex-1 gap-2">
+              <Label nativeID="price">Preço</Label>
+              <Controller
+                control={control}
+                name="price"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    ref={priceRef}
+                    placeholder="R$ 0,00"
+                    value={value}
+                    onChangeText={(text) => onChange(formatBRL(text))}
+                    keyboardType="numeric"
+                    aria-labelledby="price"
                     returnKeyType="done"
                     onSubmitEditing={submitIfValid}
                     submitBehavior="blurAndSubmit"
