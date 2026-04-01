@@ -20,7 +20,7 @@ export function ListIconPicker({ value, onChange }: ListIconPickerProps) {
       nestedScrollEnabled
       keyboardShouldPersistTaps="handled"
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 4 }}>
+      contentContainerClassName="px-1">
       <RadioGroup
         value={value}
         onValueChange={onChange}
