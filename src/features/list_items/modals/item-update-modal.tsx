@@ -197,7 +197,7 @@ export function ItemUpdateModal({
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
           onConfirm={submitForm}
-          confirmLabel="Salvar"
+          confirmLabel="Editar Item"
           confirmButtonClassName={accentBgClassName}
           confirmLabelClassName={accentForegroundClassName}
           isLoading={isSubmitting}

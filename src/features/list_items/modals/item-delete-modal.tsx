@@ -55,7 +55,7 @@ export function ItemDeleteModal({ open, itemId, onOpenChange }: ItemDeleteModalP
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
           onConfirm={handleDelete}
-          confirmLabel="Deletar"
+          confirmLabel="Deletar item"
           confirmVariant="destructive"
           isLoading={isSubmitting}
           isConfirmDisabled={!itemId}
