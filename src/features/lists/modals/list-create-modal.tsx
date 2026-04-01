@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ScrollView, TextInput, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -42,6 +42,7 @@ type ListCreateModalProps = {
 
 export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const titleRef = useRef<TextInput>(null);
 
   const {
     control,
@@ -62,6 +63,13 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
     onOpenChange(false);
     reset({ title: '', icon: 'cart', color: DEFAULT_ACCENT_COLOR });
   };
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
 
   const onSubmit = async (data: ListFormData) => {
     setIsSubmitting(true);
@@ -84,60 +92,64 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
         <AppModalHeader title="Nova lista" />
 
         <ScrollView className="max-h-[60vh] px-6" keyboardShouldPersistTaps="handled">
-          <View className="mb-4 gap-2">
-            <Label nativeID="title">Nome da lista</Label>
-            <Controller
-              control={control}
-              name="title"
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  placeholder="Minha lista..."
-                  value={value}
-                  onChangeText={onChange}
-                  aria-labelledby="title"
-                />
+          <View className="gap-6 pb-2">
+            <View className="gap-2">
+              <Label nativeID="title">Nome da lista</Label>
+              <Controller
+                control={control}
+                name="title"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    ref={titleRef}
+                    placeholder="Minha lista..."
+                    value={value}
+                    onChangeText={onChange}
+                    aria-labelledby="title"
+                    returnKeyType="done"
+                  />
+                )}
+              />
+              {errors.title && (
+                <Text className="text-sm text-destructive">{errors.title.message}</Text>
               )}
-            />
-            {errors.title && (
-              <Text className="text-sm text-destructive">{errors.title.message}</Text>
-            )}
-          </View>
+            </View>
 
-          <View className="mb-2 gap-2">
-            <Label>Icone</Label>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View className="flex-row gap-4 p-1">
-                {AVAILABLE_ICONS.map((iconName) => {
-                  const IconComponent = iconMap[iconName];
-                  const isSelected = selectedIcon === iconName;
-                  return (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      key={iconName}
-                      onPress={() => setValue('icon', iconName)}
-                      className={cn(
-                        'items-center justify-center rounded-full border',
-                        isSelected ? 'border-primary bg-primary' : 'border-border bg-transparent',
-                      )}>
-                      <Icon
-                        as={IconComponent}
-                        size={20}
-                        className={isSelected ? 'text-primary-foreground' : 'text-foreground'}
-                      />
-                    </Button>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
+            <View className="gap-2">
+              <Label>Ícone</Label>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View className="flex-row gap-4 p-1">
+                  {AVAILABLE_ICONS.map((iconName) => {
+                    const IconComponent = iconMap[iconName];
+                    const isSelected = selectedIcon === iconName;
+                    return (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        key={iconName}
+                        onPress={() => setValue('icon', iconName)}
+                        className={cn(
+                          'items-center justify-center rounded-full border',
+                          isSelected ? 'border-primary bg-primary' : 'border-border bg-transparent',
+                        )}>
+                        <Icon
+                          as={IconComponent}
+                          size={20}
+                          className={isSelected ? 'text-primary-foreground' : 'text-foreground'}
+                        />
+                      </Button>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            </View>
 
-          <View className="mb-2 gap-2">
-            <Label>Cor da lista</Label>
-            <ListAccentColorPicker
-              value={selectedColor}
-              onChange={(color) => setValue('color', color)}
-            />
+            <View className="gap-2">
+              <Label>Cor da lista</Label>
+              <ListAccentColorPicker
+                value={selectedColor}
+                onChange={(color) => setValue('color', color)}
+              />
+            </View>
           </View>
         </ScrollView>
 

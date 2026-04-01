@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { TextInput, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { createNewListItem } from '@/data/states/list-items';
+import { formatBRL, parseBRLToNumber } from '@/features/list_items/utils/currency';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -24,15 +25,6 @@ const itemFormSchema = z.object({
 });
 
 type ItemFormData = z.infer<typeof itemFormSchema>;
-
-const parsePrice = (val: string): number => {
-  try {
-    const d = new Decimal(val.replace(',', '.') || '0');
-    return d.isNaN() || d.isNegative() ? 0 : d.toDecimalPlaces(2).toNumber();
-  } catch {
-    return 0;
-  }
-};
 
 const parseAmount = (val: string): number => {
   try {
@@ -59,6 +51,7 @@ export function ItemCreateModal({
   accentForegroundClassName,
 }: ItemCreateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const titleRef = useRef<TextInput>(null);
 
   const {
     control,
@@ -70,6 +63,13 @@ export function ItemCreateModal({
     defaultValues: { title: '', price: '', amount: '1' },
   });
 
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
   const closeModal = () => {
     onOpenChange(false);
     reset({ title: '', price: '', amount: '1' });
@@ -80,7 +80,7 @@ export function ItemCreateModal({
     try {
       const success = await createNewListItem({
         title: data.title,
-        price: parsePrice(data.price || '0'),
+        price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
         listId,
         profileId: '',
@@ -98,7 +98,7 @@ export function ItemCreateModal({
         <AppModalHandle />
         <AppModalHeader title="Novo item" />
 
-        <View className="gap-4 px-6 pb-2">
+        <View className="gap-6 px-6 pb-2">
           <View className="gap-2">
             <Label nativeID="title">Nome do item</Label>
             <Controller
@@ -106,10 +106,12 @@ export function ItemCreateModal({
               name="title"
               render={({ field: { onChange, value } }) => (
                 <Input
+                  ref={titleRef}
                   placeholder="Meu item..."
                   value={value}
                   onChangeText={onChange}
                   aria-labelledby="title"
+                  returnKeyType="next"
                 />
               )}
             />
@@ -120,15 +122,15 @@ export function ItemCreateModal({
 
           <View className="flex-row gap-4">
             <View className="flex-1 gap-2">
-              <Label nativeID="price">Preco</Label>
+              <Label nativeID="price">Preço</Label>
               <Controller
                 control={control}
                 name="price"
                 render={({ field: { onChange, value } }) => (
                   <Input
-                    placeholder="0.00"
+                    placeholder="R$ 0,00"
                     value={value}
-                    onChangeText={onChange}
+                    onChangeText={(text) => onChange(formatBRL(text))}
                     keyboardType="numeric"
                     aria-labelledby="price"
                   />
