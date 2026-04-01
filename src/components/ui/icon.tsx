@@ -31,7 +31,7 @@ cssInterop(IconImpl, {
  * @example
  * ```tsx
  * import { IconArrowRight } from '@tabler/icons-react-native';
- * import { Icon } from '@/registry/components/ui/icon';
+ * import { Icon } from '@/components/ui/icon';
  *
  * <Icon as={IconArrowRight} className="text-red-500" size={16} />
  * ```
