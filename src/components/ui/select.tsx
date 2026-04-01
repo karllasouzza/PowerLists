@@ -3,11 +3,7 @@ import { NativeOnlyAnimatedView } from '@/components/ui/native-only-animated-vie
 import { TextClassContext } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import * as SelectPrimitive from '@rn-primitives/select';
-import {
-  IconCheck,
-  IconChevronDown,
-  IconChevronUp,
-} from '@tabler/icons-react-native';
+import { IconCheck, IconChevronDown, IconChevronUp } from '@tabler/icons-react-native';
 import * as React from 'react';
 import { Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { FadeIn, FadeOut } from 'react-native-reanimated';
