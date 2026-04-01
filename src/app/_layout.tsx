@@ -73,7 +73,7 @@ export default function RootLayout() {
           </Stack>
           <PortalHost />
           <Toaster />
-          {(isLoading || !fontsLoaded || visible) && (
+          {(!fontsLoaded || visible) && (
             <AnimatedBootSplash onAnimationEnd={() => setVisible(false)} />
           )}
         </ThemeProvider>
