@@ -176,7 +176,7 @@ export function ItemCreateModal({
         <AppModalFooter
           onCancel={closeModal}
           onConfirm={handleSubmit(onSubmit)}
-          confirmLabel="Salvar"
+          confirmLabel="Criar Item"
           confirmButtonClassName={accentBgClassName}
           confirmLabelClassName={accentForegroundClassName}
           isLoading={isSubmitting}

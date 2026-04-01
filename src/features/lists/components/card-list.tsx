@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import { Pressable, View } from 'react-native';
-import { IconShoppingCart, IconEdit, IconTrash } from '@tabler/icons-react-native';
+import { IconShoppingCart } from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
 import { useSelector } from '@legendapp/state/react';
 
@@ -12,12 +12,10 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
 import { calculateTotal } from '@/features/list_items';
+import { CardListRightActions } from '@/features/lists/components/card-list-right-actions';
 import { getAccentColorCardClasses } from '@/features/lists/utils/accent-colors';
 import { iconMap } from '@/features/lists/utils/icon-map';
 import { cn } from '@/lib/utils';
-
-const ACTION_WIDTH = 84;
-const ACTIONS_TOTAL_WIDTH = ACTION_WIDTH * 2;
 
 interface CardListProps {
   list: List;
@@ -44,37 +42,20 @@ function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
     });
   };
 
-  const handleEdit = useCallback(() => {
+  const closeSwipeable = useCallback(() => {
     swipeableRef.current?.close();
-    onEdit(list.id);
-  }, [list.id, onEdit]);
-
-  const handleDelete = useCallback(() => {
-    swipeableRef.current?.close();
-    onDelete(list.id);
-  }, [list.id, onDelete]);
+  }, []);
 
   const renderRightActions = useCallback(
     () => (
-      <View className="flex-row h-full" style={{ width: ACTIONS_TOTAL_WIDTH }}>
-        <Pressable
-          onPress={handleEdit}
-          className="justify-center items-center bg-secondary"
-          style={{ width: ACTION_WIDTH }}>
-          <Icon as={IconEdit} size={20} className="text-secondary-foreground" />
-          <Text className="mt-1 font-semibold text-secondary-foreground text-xs">Editar</Text>
-        </Pressable>
-
-        <Pressable
-          onPress={handleDelete}
-          className="justify-center items-center bg-destructive"
-          style={{ width: ACTION_WIDTH }}>
-          <Icon as={IconTrash} size={20} className="text-destructive-foreground" />
-          <Text className="mt-1 font-semibold text-destructive-foreground text-xs">Deletar</Text>
-        </Pressable>
-      </View>
+      <CardListRightActions
+        listId={list.id}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        closeSwipeable={closeSwipeable}
+      />
     ),
-    [handleDelete, handleEdit],
+    [closeSwipeable, list.id, onDelete, onEdit],
   );
 
   return (
@@ -88,7 +69,7 @@ function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
       <Pressable onPress={handlePress} className="flex-row items-center gap-3 bg-card px-4 py-4">
         <View
           className={cn(
-            'flex justify-center items-center rounded-full size-[50px] overflow-hidden',
+            'flex justify-center items-center rounded-lg size-[50px] overflow-hidden',
             backgroundClassName,
           )}>
           <Icon as={cardIcon} size={24} className={foregroundClassName} />

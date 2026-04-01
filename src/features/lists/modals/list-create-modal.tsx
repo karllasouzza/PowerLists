@@ -141,7 +141,7 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
         <AppModalFooter
           onCancel={closeModal}
           onConfirm={submitForm}
-          confirmLabel="Salvar"
+          confirmLabel="Criar Lista"
           isLoading={isSubmitting}
         />
       </AppModalContent>

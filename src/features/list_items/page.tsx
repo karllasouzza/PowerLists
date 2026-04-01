@@ -12,7 +12,13 @@ import type { ListItem } from './types';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
 import { Fab } from '@/components/ui/fab';
-import { ListItemsContent, ListItemsFooter, ListItemsSortBar, ListItemSkeletonList } from './components';
+import {
+  ListItemsContent,
+  ListItemsFooter,
+  ListItemsSortBar,
+  ListItemSkeletonList,
+} from './components';
+import Decimal from 'decimal.js';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();
@@ -48,7 +54,7 @@ const ListItemsScreen = observer(() => {
         id={item.id}
         status={item.isChecked}
         title={item.title}
-        price={formatCurrency(item.price ?? 0)}
+        price={formatCurrency(new Decimal(item.price).mul(item.amount ?? 0).toNumber() ?? 0)}
         amount={String(item.amount ?? 0)}
         accentBgClassName={accentBgClassName}
         accentForegroundClassName={accentForegroundClassName}
