@@ -11,6 +11,7 @@ import { AnimatedBootSplash } from '@/components/animated-boot-splash';
 import { ErrorBoundary } from '@/components/error-boundary';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
+import { initSessionStore } from '@/data/session-store';
 import { useAppFonts } from '@/utils/fonts';
 export default function RootLayout() {
   const [visible, setVisible] = useState(true);
@@ -19,6 +20,7 @@ export default function RootLayout() {
   const fontsLoaded = useAppFonts();
 
   useEffect(() => {
+    initSessionStore();
     fetchUserDataAsync();
     // Intentionally run only once on mount to avoid repeated state updates
     // eslint-disable-next-line react-hooks/exhaustive-deps

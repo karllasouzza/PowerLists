@@ -17,7 +17,8 @@ export const profiles$ = observable(
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'profiles', retrySync: true },
     retry: {
-      infinite: true,
+      times: 10,
+      delay: 1000,
     },
   }),
 );

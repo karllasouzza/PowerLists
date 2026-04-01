@@ -21,6 +21,10 @@ export const lists$ = observable(
     filter: (select: any) => select.eq('profile_id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'lists', retrySync: true },
+    retry: {
+      times: 10,
+      delay: 1000,
+    },
     realtime: {
       get filter() {
         return `profile_id=eq.${getCurrentUserId()}`;

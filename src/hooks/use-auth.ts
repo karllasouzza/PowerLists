@@ -126,15 +126,17 @@ export function useAuth() {
     signUpWithPassword: async ({
       email,
       password,
+      fullName,
     }: {
       email: string;
       password: string;
+      fullName: string;
     }): Promise<void> => {
       try {
         auth$.isLoading.set(true);
         const previousUser = auth$.user.get();
 
-        const result = await createSupabaseUser({ email, password });
+        const result = await createSupabaseUser({ email, password, fullName });
         if (!result.user) throw new Error(result.error || 'Signup failed');
 
         const { data: sessionData } = await supabase.auth.getSession();

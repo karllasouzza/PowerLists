@@ -26,7 +26,8 @@ export const listItems$ = observable(
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'list_items', retrySync: true },
     retry: {
-      infinite: true,
+      times: 10,
+      delay: 1000,
     },
     realtime: {
       get filter() {
