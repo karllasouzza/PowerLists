@@ -137,19 +137,17 @@ export const updateProfile = async ({
 
     const profileId = currentProfile.id;
 
-    // Update in observable using snake_case - this will trigger sync to Supabase
-    profiles$[profileId].name.set(name);
+    const updates = convertToSupabaseFormat({
+      name,
+      avatarUrl: avatarUrl || null,
+      bio: bio || null,
+      updatedAt: new Date().toISOString(),
+    });
 
-    if (avatarUrl !== undefined) {
-      profiles$[profileId].avatar_url.set(avatarUrl || null);
-    }
-
-    if (bio !== undefined) {
-      profiles$[profileId].bio.set(bio || null);
-    }
-
-    // Set updated_at timestamp
-    profiles$[profileId].updated_at.set(new Date().toISOString());
+    // Merge updates with current profile to maintain all required fields
+    const currentProfileRaw = profiles$[profileId].get();
+    const mergedUpdates = { ...currentProfileRaw, ...updates };
+    profiles$[profileId].set(mergedUpdates);
 
     const updatedProfileRaw = profiles$[profileId].get();
     const updatedProfile = convertFromSupabaseFormat(updatedProfileRaw) as ProfileType;

@@ -16,6 +16,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { z } from 'zod';
+import { ProfileType } from '@/data/types';
 
 const schema = z.object({
   name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
@@ -66,6 +67,8 @@ export function ManageProfileModal({
       const nameChanged = data.name !== currentName;
       const emailChanged = data.email !== currentEmail;
 
+      console.log('Submitting form with data:', data);
+
       if (emailChanged && !data.currentPassword) {
         setError('currentPassword', { message: 'Informe a senha atual para alterar o e-mail' });
         return;
@@ -78,8 +81,10 @@ export function ManageProfileModal({
           : Promise.resolve({ error: null }),
       ]);
 
-      const profileResult = results[0] as { profile: unknown };
+      const profileResult = results[0] as { profile: ProfileType | null };
       const emailResult = results[1] as { error: string | null };
+
+      console.log('Profile update result:', profileResult);
 
       if (emailResult.error) {
         showToast({

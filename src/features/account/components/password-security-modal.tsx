@@ -80,7 +80,7 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
               name="currentPassword"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="••••••••"
+                  placeholder=""
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -100,7 +100,7 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
               name="newPassword"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="••••••••"
+                  placeholder=""
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}
@@ -120,7 +120,7 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
               name="confirmPassword"
               render={({ field: { onChange, onBlur, value } }) => (
                 <Input
-                  placeholder="••••••••"
+                  placeholder=""
                   value={value}
                   onChangeText={onChange}
                   onBlur={onBlur}

@@ -32,10 +32,19 @@ export async function fetchOrRestoreUser(): Promise<UserOperationResult> {
 export async function createSupabaseUser({
   email,
   password,
+  fullName,
 }: CreateUserParams): Promise<UserOperationResult> {
   if (!email || !password) throw new Error('Email and password are required');
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+      },
+    },
+  });
   if (error) throw error;
   if (!data.user) throw new Error('User not created');
 
