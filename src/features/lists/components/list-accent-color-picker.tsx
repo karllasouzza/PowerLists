@@ -23,7 +23,7 @@ export function ListAccentColorPicker({ value, onChange }: ListAccentColorPicker
       nestedScrollEnabled
       keyboardShouldPersistTaps="handled"
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={{ paddingHorizontal: 4 }}>
+      contentContainerClassName="px-1">
       <RadioGroup
         value={selectedColor}
         onValueChange={(nextValue) => onChange(getAccentColorToken(nextValue))}
