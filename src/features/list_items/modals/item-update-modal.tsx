@@ -59,6 +59,8 @@ export function ItemUpdateModal({
 }: ItemUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const titleRef = useRef<TextInput>(null);
+  const priceRef = useRef<TextInput>(null);
+  const amountRef = useRef<TextInput>(null);
 
   const listItemsRaw = useValue(listItems$);
   const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
@@ -108,6 +110,12 @@ export function ItemUpdateModal({
     }
   };
 
+  const submitForm = handleSubmit(onSubmit);
+
+  const submitIfValid = () => {
+    if (Object.keys(errors).length === 0) submitForm();
+  };
+
   return (
     <AppModal open={open} onOpenChange={onOpenChange}>
       <AppModalContent>
@@ -128,6 +136,8 @@ export function ItemUpdateModal({
                   onChangeText={onChange}
                   aria-labelledby="title"
                   returnKeyType="next"
+                  onSubmitEditing={() => priceRef.current?.focus()}
+                  submitBehavior="newline"
                 />
               )}
             />
@@ -144,11 +154,15 @@ export function ItemUpdateModal({
                 name="price"
                 render={({ field: { onChange, value } }) => (
                   <Input
+                    ref={priceRef}
                     placeholder="R$ 0,00"
                     value={value}
                     onChangeText={(text) => onChange(formatBRL(text))}
                     keyboardType="numeric"
                     aria-labelledby="price"
+                    returnKeyType="next"
+                    onSubmitEditing={() => amountRef.current?.focus()}
+                    submitBehavior="newline"
                   />
                 )}
               />
@@ -160,11 +174,15 @@ export function ItemUpdateModal({
                 name="amount"
                 render={({ field: { onChange, value } }) => (
                   <Input
+                    ref={amountRef}
                     placeholder="1"
                     value={value}
                     onChangeText={onChange}
                     keyboardType="numeric"
                     aria-labelledby="amount"
+                    returnKeyType="done"
+                    onSubmitEditing={submitIfValid}
+                    submitBehavior="blurAndSubmit"
                   />
                 )}
               />
@@ -174,7 +192,7 @@ export function ItemUpdateModal({
 
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
-          onConfirm={handleSubmit(onSubmit)}
+          onConfirm={submitForm}
           confirmLabel="Salvar"
           confirmButtonClassName={accentBgClassName}
           confirmLabelClassName={accentForegroundClassName}
