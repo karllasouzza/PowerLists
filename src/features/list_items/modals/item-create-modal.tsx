@@ -17,6 +17,7 @@ import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { createNewListItem } from '@/data/states/list-items';
 import { formatBRL, parseBRLToNumber } from '@/features/list_items/utils/currency';
+import { showToast } from '@/services';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -87,6 +88,12 @@ export function ItemCreateModal({
         isChecked: false,
       });
       if (success) closeModal();
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'Erro ao salvar item',
+        subtitle: 'Não foi possível criar o item. Tente novamente.',
+      });
     } finally {
       setIsSubmitting(false);
     }
