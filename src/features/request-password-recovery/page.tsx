@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
 import { View } from 'react-native';
-import { IconLoader2 } from '@tabler/icons-react-native';
+import { IconLoader2, IconMail } from '@tabler/icons-react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail } from 'lucide-react-native';
-
 import { useCountdown } from '@/hooks/use-countdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -148,7 +146,7 @@ export default function PasswordRecoveryScreen() {
                 size={20}
               />
             )}
-            <Icon as={Mail} className="mr-2 text-primary-foreground" size={20} />
+            <Icon as={IconMail} className="mr-2 text-primary-foreground" size={20} />
             <Text variant="large" className="font-bold">
               {isBlocked
                 ? `Aguarde ${formattedTime} para reenviar`

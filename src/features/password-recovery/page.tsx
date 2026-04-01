@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { IconEye, IconEyeClosed, IconLoader2 } from '@tabler/icons-react-native';
+import { IconEye, IconEyeClosed, IconLoader2, IconMail } from '@tabler/icons-react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -10,7 +10,6 @@ import { Text } from '@/components/ui/text';
 
 import { PasswordRecoverySchema } from '.';
 import { PasswordRecoverySchemaType } from './types';
-import { Mail } from 'lucide-react-native';
 import { Icon } from '@/components/ui/icon';
 import { Label } from '@/components/ui/label';
 import { Image } from 'expo-image';
@@ -154,7 +153,7 @@ export default function PasswordRecoveryScreen() {
                 size={20}
               />
             )}
-            <Icon as={Mail} className="mr-2 text-primary-foreground" size={20} />
+            <Icon as={IconMail} className="mr-2 text-primary-foreground" size={20} />
             <Text variant="large" className="font-bold">
               Enviar email de recuperação
             </Text>
