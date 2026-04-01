@@ -13,22 +13,19 @@ import {
   AppModalFooter,
 } from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
-import { Icon } from '@/components/ui/icon';
 import { ListAccentColorPicker } from '@/features/lists/components/list-accent-color-picker';
+import { ListIconPicker } from '@/features/lists/components/list-icon-picker';
 import { handleEditList } from '@/features/lists/utils/list-operations';
 import {
   DEFAULT_ACCENT_COLOR,
   LIST_ACCENT_COLOR_TOKENS,
   getAccentColorToken,
 } from '@/features/lists/utils/accent-colors';
-import { iconMap } from '@/features/lists/utils/icon-map';
 import { lists$ } from '@/data/states/lists';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { List } from '@/data/types';
-import { cn } from '@/lib/utils';
 
 const listFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -37,8 +34,6 @@ const listFormSchema = z.object({
 });
 
 type ListFormData = z.infer<typeof listFormSchema>;
-
-const AVAILABLE_ICONS = Object.keys(iconMap);
 
 type ListUpdateModalProps = {
   open: boolean;
@@ -104,6 +99,12 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
     [listId, onOpenChange],
   );
 
+  const onInvalid = useCallback(() => {
+    titleRef.current?.focus();
+  }, []);
+
+  const submitForm = handleSubmit(onSubmit, onInvalid);
+
   return (
     <AppModal open={open} onOpenChange={onOpenChange}>
       <AppModalContent>
@@ -125,6 +126,7 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
                     onChangeText={onChange}
                     aria-labelledby="title"
                     returnKeyType="done"
+                    onSubmitEditing={submitForm}
                   />
                 )}
               />
@@ -134,36 +136,12 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
             </View>
 
             <View className="gap-2">
-              <Label>Ícone</Label>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View className="flex-row gap-4 p-1">
-                  {AVAILABLE_ICONS.map((iconName) => {
-                    const IconComponent = iconMap[iconName];
-                    const isSelected = selectedIcon === iconName;
-                    return (
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        key={iconName}
-                        onPress={() => setValue('icon', iconName)}
-                        className={cn(
-                          'items-center justify-center rounded-full border',
-                          isSelected ? 'border-primary bg-primary' : 'border-border bg-transparent',
-                        )}>
-                        <Icon
-                          as={IconComponent}
-                          size={20}
-                          className={isSelected ? 'text-primary-foreground' : 'text-foreground'}
-                        />
-                      </Button>
-                    );
-                  })}
-                </View>
-              </ScrollView>
+              <Label nativeID="icon">Ícone</Label>
+              <ListIconPicker value={selectedIcon} onChange={(icon) => setValue('icon', icon)} />
             </View>
 
             <View className="gap-2">
-              <Label>Cor da lista</Label>
+              <Label nativeID="color">Cor da lista</Label>
               <ListAccentColorPicker
                 value={selectedColor}
                 onChange={(color) => setValue('color', color)}
@@ -174,7 +152,7 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
 
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
-          onConfirm={handleSubmit(onSubmit)}
+          onConfirm={submitForm}
           confirmLabel="Salvar"
           isLoading={isSubmitting}
           isConfirmDisabled={!listId}
