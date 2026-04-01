@@ -103,6 +103,13 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
     titleRef.current?.focus();
   }, []);
 
+  const haveChanges =
+    watch('title') !== (currentList?.title || '') ||
+    watch('icon') !== (currentList?.icon || 'cart') ||
+    watch('color') !== getAccentColorToken(currentList?.accentColor);
+
+  const isConfirmDisabled = !listId || !haveChanges;
+
   const submitForm = handleSubmit(onSubmit, onInvalid);
 
   return (
@@ -153,9 +160,9 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
           onConfirm={submitForm}
-          confirmLabel="Salvar"
+          confirmLabel="Salvar Alterações"
           isLoading={isSubmitting}
-          isConfirmDisabled={!listId}
+          isConfirmDisabled={isConfirmDisabled}
         />
       </AppModalContent>
     </AppModal>
