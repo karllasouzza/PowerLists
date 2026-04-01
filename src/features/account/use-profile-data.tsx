@@ -5,8 +5,8 @@ import { useValue } from '@legendapp/state/react';
 
 const useProfileData = () => {
   const { user, signOut } = useAuth();
-  const profiles = useValue(profiles$.get());
-  const profile = profiles[user!.id!] || null;
+  const profiles = useValue(profiles$);
+  const profile = (user?.id ? profiles[user.id] : null) ?? null;
   const { theme, colorScheme, setTheme, setColorScheme } = useTheme();
 
   return { user, signOut, profile, theme, colorScheme, setTheme, setColorScheme };
