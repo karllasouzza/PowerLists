@@ -105,7 +105,7 @@ function AppModalContent({
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1, justifyContent: 'flex-end' }}>
           {/* Backdrop: tapping the dark area closes the modal */}
-          <Pressable style={{ flex: 1 }} onPress={close} />
+          <Pressable className="flex-1" onPress={close} />
           {/* Outer: entering/exiting animation only — no style transform here */}
           <NativeOnlyAnimatedView
             entering={SlideInDown.duration(300).springify().damping(32).stiffness(180).mass(0.8)}
