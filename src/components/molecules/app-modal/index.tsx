@@ -116,7 +116,7 @@ function AppModalContent({
               <AppModalDragContext.Provider value={{ translateY, close }}>
                 <DialogPrimitive.Content
                   className={cn(
-                    'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden border border-b-0 border-border',
+                    'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden',
                     Platform.select({
                       web: 'animate-in slide-in-from-bottom duration-300',
                     }),

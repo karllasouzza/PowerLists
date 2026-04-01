@@ -59,6 +59,8 @@ export function ItemUpdateModal({
 }: ItemUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const titleRef = useRef<TextInput>(null);
+  const priceRef = useRef<TextInput>(null);
+  const amountRef = useRef<TextInput>(null);
 
   const listItemsRaw = useValue(listItems$);
   const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
@@ -85,7 +87,8 @@ export function ItemUpdateModal({
         price: currentItem?.price != null ? numberToBRLInput(currentItem.price) : '',
         amount: currentItem?.amount != null ? String(currentItem.amount) : '1',
       });
-      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      const focusRef = currentItem?.price === 0 ? priceRef : titleRef;
+      const timer = setTimeout(() => focusRef.current?.focus(), 300);
       return () => clearTimeout(timer);
     }
   }, [open, currentItem?.title, currentItem?.price, currentItem?.amount, reset]);
@@ -108,6 +111,8 @@ export function ItemUpdateModal({
     }
   };
 
+  const submitForm = handleSubmit(onSubmit);
+
   return (
     <AppModal open={open} onOpenChange={onOpenChange}>
       <AppModalContent>
@@ -128,6 +133,8 @@ export function ItemUpdateModal({
                   onChangeText={onChange}
                   aria-labelledby="title"
                   returnKeyType="next"
+                  onSubmitEditing={() => amountRef.current?.focus()}
+                  submitBehavior="newline"
                 />
               )}
             />
@@ -138,33 +145,41 @@ export function ItemUpdateModal({
 
           <View className="flex-row gap-4">
             <View className="flex-1 gap-2">
+              <Label nativeID="amount">Quantidade</Label>
+              <Controller
+                control={control}
+                name="amount"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    ref={amountRef}
+                    placeholder="1"
+                    value={value}
+                    onChangeText={onChange}
+                    keyboardType="numeric"
+                    aria-labelledby="amount"
+                    returnKeyType="next"
+                    onSubmitEditing={() => priceRef.current?.focus()}
+                    submitBehavior="newline"
+                  />
+                )}
+              />
+            </View>
+            <View className="flex-1 gap-2">
               <Label nativeID="price">Preço</Label>
               <Controller
                 control={control}
                 name="price"
                 render={({ field: { onChange, value } }) => (
                   <Input
+                    ref={priceRef}
                     placeholder="R$ 0,00"
                     value={value}
                     onChangeText={(text) => onChange(formatBRL(text))}
                     keyboardType="numeric"
                     aria-labelledby="price"
-                  />
-                )}
-              />
-            </View>
-            <View className="flex-1 gap-2">
-              <Label nativeID="amount">Qtd</Label>
-              <Controller
-                control={control}
-                name="amount"
-                render={({ field: { onChange, value } }) => (
-                  <Input
-                    placeholder="1"
-                    value={value}
-                    onChangeText={onChange}
-                    keyboardType="numeric"
-                    aria-labelledby="amount"
+                    returnKeyType="done"
+                    onSubmitEditing={submitForm}
+                    submitBehavior="blurAndSubmit"
                   />
                 )}
               />
@@ -174,7 +189,7 @@ export function ItemUpdateModal({
 
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
-          onConfirm={handleSubmit(onSubmit)}
+          onConfirm={submitForm}
           confirmLabel="Salvar"
           confirmButtonClassName={accentBgClassName}
           confirmLabelClassName={accentForegroundClassName}
