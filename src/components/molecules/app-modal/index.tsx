@@ -55,7 +55,7 @@ function AppModalOverlay({
     <FullWindowOverlay>
       <DialogPrimitive.Overlay
         className={cn(
-          'absolute bottom-0 left-0 right-0 top-0 z-50 flex justify-end bg-black/50',
+          'absolute bottom-0 left-0 right-0 top-0 z-50 flex justify-end bg-black/50 shadow-lg',
           Platform.select({
             web: 'animate-in fade-in-0 fixed cursor-default [&>*]:cursor-auto',
           }),
@@ -116,7 +116,7 @@ function AppModalContent({
               <AppModalDragContext.Provider value={{ translateY, close }}>
                 <DialogPrimitive.Content
                   className={cn(
-                    'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden border border-b-0 border-border',
+                    'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden',
                     Platform.select({
                       web: 'animate-in slide-in-from-bottom duration-300',
                     }),
