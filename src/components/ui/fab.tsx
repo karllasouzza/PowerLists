@@ -64,7 +64,7 @@ const Fab = React.forwardRef<View, FabProps>(
     return (
       <View
         ref={ref}
-        className={cn('right-4 bottom-24 z-50 absolute', className)}
+        className={cn('right-4 bottom-6 z-50 absolute', className)}
         pointerEvents="box-none">
         <Pressable
           onPressIn={handlePressIn}
