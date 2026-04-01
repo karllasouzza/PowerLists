@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { IconEye, IconEyeClosed, IconLoader2 } from '@tabler/icons-react-native';
+import { IconEye, IconEyeClosed, IconLoader2, IconLogin } from '@tabler/icons-react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -15,7 +15,6 @@ import { Label } from '@/components/ui/label';
 import { Icon } from '@/components/ui/icon';
 import { Image } from 'expo-image';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { LogIn } from 'lucide-react-native';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 
@@ -148,7 +147,7 @@ export default function LoginScreen() {
             disabled={isLoading}>
             <Icon
               key={isLoading ? 'loader' : 'login'}
-              as={isLoading ? IconLoader2 : LogIn}
+              as={isLoading ? IconLoader2 : IconLogin}
               className={cn('mr-2 text-primary-foreground', isLoading && 'animate-spin')}
               size={20}
             />
