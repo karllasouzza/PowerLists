@@ -1,7 +1,7 @@
 import React from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView } from 'react-native';
 
-import { Button } from '@/components/ui/button';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { cn } from '@/lib/utils';
 import {
   getAccentColorToken,
@@ -18,31 +18,35 @@ export function ListAccentColorPicker({ value, onChange }: ListAccentColorPicker
   const selectedColor = getAccentColorToken(value);
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      <View className="flex-row gap-3 p-1">
+    <ScrollView
+      horizontal
+      nestedScrollEnabled
+      keyboardShouldPersistTaps="handled"
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={{ paddingHorizontal: 4 }}>
+      <RadioGroup
+        value={selectedColor}
+        onValueChange={(nextValue) => onChange(getAccentColorToken(nextValue))}
+        className="flex-row gap-3"
+        aria-labelledby="color">
         {LIST_ACCENT_COLOR_OPTIONS.map((option) => {
           const isSelected = selectedColor === option.value;
 
           return (
-            <Button
+            <RadioGroupItem
               key={option.value}
-              variant="outline"
-              size="icon"
-              onPress={() => onChange(option.value)}
+              value={option.value}
+              hideIndicator
               className={cn(
-                'items-center justify-center rounded-full border-2',
-                isSelected ? 'border-foreground bg-background' : 'border-border bg-background',
-              )}>
-              <View
-                className={cn(
-                  'size-7 rounded-full border border-border/50',
-                  option.swatchClassName,
-                )}
-              />
-            </Button>
+                'size-8 rounded-full border-2',
+                option.swatchClassName,
+                isSelected ? 'border-foreground' : 'border-border/50',
+              )}
+              accessibilityLabel={`Cor ${option.label}`}
+            />
           );
         })}
-      </View>
+      </RadioGroup>
     </ScrollView>
   );
 }
