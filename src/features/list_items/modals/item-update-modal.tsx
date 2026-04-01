@@ -113,10 +113,6 @@ export function ItemUpdateModal({
 
   const submitForm = handleSubmit(onSubmit);
 
-  const submitIfValid = () => {
-    if (Object.keys(errors).length === 0) submitForm();
-  };
-
   return (
     <AppModal open={open} onOpenChange={onOpenChange}>
       <AppModalContent>
@@ -182,7 +178,7 @@ export function ItemUpdateModal({
                     keyboardType="numeric"
                     aria-labelledby="price"
                     returnKeyType="done"
-                    onSubmitEditing={submitIfValid}
+                    onSubmitEditing={submitForm}
                     submitBehavior="blurAndSubmit"
                   />
                 )}
