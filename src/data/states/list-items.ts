@@ -80,12 +80,20 @@ export const createNewListItem = async ({
 }: CreateListItemProps): Promise<CreateNewListItemResult> => {
   try {
     const currentUserId = getCurrentUserId();
-    if (!currentUserId) throw new Error('User not authenticated');
-    if (!title || amount === null || amount === undefined || !listId)
-      throw new Error('Missing required fields');
+    if (!currentUserId) {
+      console.error('Error creating item: User not authenticated');
+      return false;
+    }
+    if (!title || amount === null || amount === undefined || !listId) {
+      console.error('Error creating item: Missing required fields');
+      return false;
+    }
 
     const id = generateId();
-    if (!id) throw new Error('Failed to generate ID');
+    if (!id) {
+      console.error('Error creating item: Failed to generate ID');
+      return false;
+    }
 
     // Convert to snake_case for Supabase
     const payload = convertToSupabaseFormat({
@@ -101,7 +109,10 @@ export const createNewListItem = async ({
       deleted: null,
     }) as Database['public']['Tables']['list_items']['Row'];
 
-    if (!payload) throw new Error('Failed to convert to snake_case');
+    if (!payload) {
+      console.error('Error creating item: Failed to convert to snake_case');
+      return false;
+    }
 
     // Add to observable - this will trigger sync to Supabase
     listItems$[id].set(payload);
@@ -197,6 +208,6 @@ export const deleteListItem = async ({ itemId }: DeleteListItemProps): Promise<b
 
 export const resetListItemsStore = (): void => {
   listItems$?.set({} as Record<string, any>);
-  storage.remove('list_items');
-  storage.remove('list_items__metadata');
+  storage.delete('list_items');
+  storage.delete('list_items__metadata');
 };

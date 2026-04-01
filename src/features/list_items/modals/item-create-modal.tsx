@@ -87,8 +87,18 @@ export function ItemCreateModal({
         profileId: '',
         isChecked: false,
       });
-      if (success) closeModal();
-    } catch {
+      if (success) {
+        closeModal();
+        return;
+      }
+
+      showToast({
+        type: 'error',
+        title: 'Erro ao salvar item',
+        subtitle: 'Não foi possível criar o item. Tente novamente.',
+      });
+    } catch (error) {
+      console.error('Unexpected error while creating item:', error);
       showToast({
         type: 'error',
         title: 'Erro ao salvar item',
