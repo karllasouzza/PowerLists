@@ -1,85 +1,54 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { Stack, useSegments, usePathname } from 'expo-router';
-import { IconHome, IconHomeFilled, IconUser, IconUserFilled } from '@tabler/icons-react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { NativeTabs, Icon, Label, VectorIcon } from 'expo-router/unstable-native-tabs';
 
-import BottomNavigation from '@/components/bottom-bar-nav';
+import { useTheme } from '@/context/themes';
+import { rawColors } from '@/context/themes/theme-config';
 
-const SCREENS = [
-  {
-    name: 'index',
-    label: 'Listas',
-    href: '/',
-    icon: { default: IconHome, filled: IconHomeFilled },
-  },
-  {
-    name: 'account',
-    label: 'Conta',
-    href: '/account',
-    icon: { default: IconUser, filled: IconUserFilled },
-  },
-];
+const hsl = (raw: string) => {
+  const [h, s, l] = raw.split(' ');
+  return `hsl(${h}, ${s}, ${l})`;
+};
 
-const TAB_NAMES = new Set(SCREENS.map((s) => s.name));
-const TAB_INDEX_BY_NAME = SCREENS.reduce<Record<string, number>>((acc, screen, index) => {
-  acc[screen.name] = index;
-  return acc;
-}, {});
+const hsla = (raw: string, alpha: number) => {
+  const [h, s, l] = raw.split(' ');
+  return `hsla(${h}, ${s}, ${l}, ${alpha})`;
+};
 
 export default function AuthenticatedLayout() {
-  const segments = useSegments();
-  const pathname = usePathname();
-  const previousTabRef = useRef<string | null>(null);
+  const { theme, colorScheme } = useTheme();
 
-  const currentTab = useMemo(() => {
-    const allSegments = segments as string[];
-    const innerSegment = allSegments[1];
-    if (!innerSegment || innerSegment === '(authenticated)') return 'index';
-    if (TAB_NAMES.has(innerSegment)) return innerSegment;
-    return 'index';
-  }, [segments]);
-
-  const tabAnimation = useMemo(() => {
-    const previousTab = previousTabRef.current;
-
-    // Avoid transition animation on first mount and when there is no actual tab change.
-    if (!previousTab || previousTab === currentTab) return 'none';
-
-    const previousIndex = TAB_INDEX_BY_NAME[previousTab];
-    const currentIndex = TAB_INDEX_BY_NAME[currentTab];
-
-    if (previousIndex === undefined || currentIndex === undefined) return 'none';
-
-    return currentIndex > previousIndex ? 'slide_from_right' : 'slide_from_left';
-  }, [currentTab]);
-
-  useEffect(() => {
-    previousTabRef.current = currentTab;
-  }, [currentTab]);
-
-  // Hide the bottom bar when navigating into detail screens (e.g. lists/[id])
-  const showBottomBar = useMemo(() => {
-    return !pathname.includes('/lists/');
-  }, [pathname]);
+  const palette = rawColors[theme]?.[colorScheme] ?? rawColors.default[colorScheme];
+  const bg = hsl(palette['--color-bottom-bar']);
+  const tint = hsl(palette['--color-bottom-bar-accent']);
+  const fgMuted = hsla(palette['--color-bottom-bar-foreground'], 0.55);
 
   return (
-    <>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' },
-        }}>
-        <Stack.Screen
-          name="index"
-          options={{ animation: tabAnimation, animationTypeForReplace: 'push' }}
+    <NativeTabs
+      backgroundColor={bg}
+      tintColor={tint}
+      iconColor={{ default: fgMuted, selected: tint }}
+      labelStyle={{
+        default: { color: fgMuted },
+        selected: { color: tint, fontWeight: '600' },
+      }}>
+      <NativeTabs.Trigger name="index">
+        <Icon
+          src={{
+            default: <VectorIcon family={MaterialCommunityIcons} name="home-outline" />,
+            selected: <VectorIcon family={MaterialCommunityIcons} name="home" />,
+          }}
         />
-        <Stack.Screen
-          name="account"
-          options={{ animation: tabAnimation, animationTypeForReplace: 'push' }}
+        <Label>Listas</Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="account">
+        <Icon
+          src={{
+            default: <VectorIcon family={MaterialCommunityIcons} name="account-outline" />,
+            selected: <VectorIcon family={MaterialCommunityIcons} name="account" />,
+          }}
         />
-        <Stack.Screen name="lists" options={{ animation: 'slide_from_bottom' }} />
-      </Stack>
-
-      {showBottomBar && <BottomNavigation screens={SCREENS} currentSegment={currentTab} />}
-    </>
+        <Label>Conta</Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
