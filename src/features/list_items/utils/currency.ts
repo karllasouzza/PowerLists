@@ -30,7 +30,7 @@ export function parseBRLToNumber(value: string): number {
  * Example: 1234.56 → "R$ 1.234,56"
  */
 export function numberToBRLInput(value: number): string {
-  if (!value || value === 0) return '';
+  if (value == null || Number.isNaN(value)) return '';
   const cents = Math.round(value * 100);
   const reais = Math.floor(cents / 100);
   const centavos = String(cents % 100).padStart(2, '0');
