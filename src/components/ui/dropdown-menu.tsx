@@ -3,7 +3,12 @@ import { NativeOnlyAnimatedView } from '@/components/ui/native-only-animated-vie
 import { TextClassContext } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import * as DropdownMenuPrimitive from '@rn-primitives/dropdown-menu';
-import { Check, ChevronDown, ChevronRight, ChevronUp } from 'lucide-react-native';
+import {
+  IconCheck,
+  IconChevronDown,
+  IconChevronRight,
+  IconChevronUp,
+} from '@tabler/icons-react-native';
 import * as React from 'react';
 import {
   Platform,
@@ -42,7 +47,7 @@ function DropdownMenuSubTrigger({
     inset?: boolean;
   }) {
   const { open } = DropdownMenuPrimitive.useSubContext();
-  const icon = Platform.OS === 'web' ? ChevronRight : open ? ChevronUp : ChevronDown;
+  const icon = Platform.OS === 'web' ? IconChevronRight : open ? IconChevronUp : IconChevronDown;
   return (
     <TextClassContext.Provider
       value={cn(
@@ -199,7 +204,7 @@ function DropdownMenuCheckboxItem({
         <View className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
           <DropdownMenuPrimitive.ItemIndicator>
             <Icon
-              as={Check}
+              as={IconCheck}
               className={cn(
                 'text-foreground size-4',
                 Platform.select({ web: 'pointer-events-none' }),

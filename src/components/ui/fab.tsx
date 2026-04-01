@@ -9,10 +9,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { cn } from '@/lib/utils';
 import { Icon } from './icon';
-import { LucideIcon } from 'lucide-react-native';
+import type { Icon as TablerIcon } from '@tabler/icons-react-native';
 
 export interface FabProps extends PressableProps {
-  icon: LucideIcon;
+  icon: TablerIcon;
   label?: string;
   className?: string;
   buttonClassName?: string;
