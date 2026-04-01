@@ -115,7 +115,7 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
             </View>
 
             <View className="gap-2">
-              <Label>Icone</Label>
+              <Label>Ícone</Label>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-4 p-1">
                   {AVAILABLE_ICONS.map((iconName) => {
