@@ -12,13 +12,15 @@ const RadioGroup = React.forwardRef<
 
 const RadioGroupItem = React.forwardRef<
   RadioGroupPrimitive.ItemRef,
-  React.ComponentProps<typeof RadioGroupPrimitive.Item>
->(function RadioGroupItem({ className, ...props }, ref) {
+  React.ComponentProps<typeof RadioGroupPrimitive.Item> & { hideIndicator?: boolean }
+>(function RadioGroupItem({ className, children, hideIndicator = false, ...props }, ref) {
   return (
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        'border-input dark:bg-input/30 aspect-square size-4 shrink-0 items-center justify-center rounded-full border shadow-sm shadow-black/5',
+        hideIndicator
+          ? 'aspect-square size-4 shrink-0 items-center justify-center rounded-full border shadow-sm shadow-black/5'
+          : 'border-input dark:bg-input/30 aspect-square size-4 shrink-0 items-center justify-center rounded-full border shadow-sm shadow-black/5',
         Platform.select({
           web: 'focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive outline-none transition-all focus-visible:ring-[3px] disabled:cursor-not-allowed',
         }),
@@ -26,7 +28,10 @@ const RadioGroupItem = React.forwardRef<
         className,
       )}
       {...props}>
-      <RadioGroupPrimitive.Indicator className="bg-primary size-2 rounded-full" />
+      {typeof children === 'function' ? null : children}
+      {!hideIndicator && !children && (
+        <RadioGroupPrimitive.Indicator className="bg-primary size-2 rounded-full" />
+      )}
     </RadioGroupPrimitive.Item>
   );
 });
