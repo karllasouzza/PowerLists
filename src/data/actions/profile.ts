@@ -12,7 +12,18 @@ const reauthenticate = async (currentPassword: string): Promise<{ error: string 
     password: currentPassword,
   });
 
-  if (error) return { error: 'Senha atual incorreta' };
+  if (error) {
+    const isInvalidCredentials =
+      error.code === 'invalid_login' ||
+      error.code === 'invalid_password' ||
+      error.code === 'invalid_credentials';
+
+    if (isInvalidCredentials) {
+      return { error: 'Senha atual incorreta' };
+    }
+
+    return { error: 'Falha ao reautenticar. Tente novamente.' };
+  }
   return { error: null };
 };
 
