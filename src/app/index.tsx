@@ -1,10 +1,12 @@
-import AuthScreen from '@/features/auth/page';
-import { SlideProvider } from '@/context/slides-context';
+import { Redirect } from 'expo-router';
+import { OnboardingScreen, useOnboardingFirstAccess } from '@/features/onboarding';
 
 export default function IndexScreen() {
-  return (
-    <SlideProvider>
-      <AuthScreen />
-    </SlideProvider>
-  );
+  const { isFirstAccess, completeOnboarding } = useOnboardingFirstAccess();
+
+  if (!isFirstAccess) {
+    return <Redirect href="/auth" />;
+  }
+
+  return <OnboardingScreen onComplete={completeOnboarding} />;
 }

@@ -34,7 +34,7 @@ export default function AuthScreen() {
       <View className="w-full items-center justify-center">
         <View className="h-[300px] max-h-[300px] w-full items-center justify-center gap-2">
           <Image
-            source={require('../../../assets/new-icon-concept.png')}
+            source={require('/assets/adaptive-icon.png')}
             style={{ width: 250, height: 250 }}
             contentFit="contain"
           />

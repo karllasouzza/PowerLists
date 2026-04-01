@@ -59,7 +59,7 @@ export default function PasswordRecoveryScreen() {
       <View className="flex w-full items-center justify-center gap-6 p-6">
         <View className="w-full max-w-md items-center justify-center gap-2">
           <Image
-            source={require('../../../assets/new-icon-concept.png')}
+            source={require('/assets/adaptive-icon.png')}
             style={{ width: 150, height: 150 }}
             contentFit="contain"
           />
