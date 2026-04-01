@@ -168,7 +168,7 @@ export function ItemUpdateModal({
               />
             </View>
             <View className="flex-1 gap-2">
-              <Label nativeID="amount">Qtd</Label>
+              <Label nativeID="amount">Quantidade</Label>
               <Controller
                 control={control}
                 name="amount"
