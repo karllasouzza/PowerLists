@@ -31,22 +31,6 @@ export const LIST_ACCENT_COLOR_OPTIONS: readonly AccentColorOption[] = [
     cardForegroundClassName: 'text-primary-foreground',
   },
   {
-    value: 'secondary',
-    label: 'Secundaria',
-    swatchClassName: 'bg-secondary',
-    foregroundClassName: 'text-secondary-foreground',
-    cardClassName: 'bg-secondary',
-    cardForegroundClassName: 'text-secondary-foreground',
-  },
-  {
-    value: 'muted',
-    label: 'Neutra',
-    swatchClassName: 'bg-muted',
-    foregroundClassName: 'text-muted-foreground',
-    cardClassName: 'bg-muted',
-    cardForegroundClassName: 'text-muted-foreground',
-  },
-  {
     value: 'destructive',
     label: 'Perigo',
     swatchClassName: 'bg-destructive',
