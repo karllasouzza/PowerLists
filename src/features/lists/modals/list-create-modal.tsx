@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { ListAccentColorPicker } from '@/features/lists/components/list-accent-color-picker';
 import { ListIconPicker } from '@/features/lists/components/list-icon-picker';
 import { handleAddNewList } from '@/features/lists/utils/list-operations';
+import { showToast } from '@/services';
 import {
   DEFAULT_ACCENT_COLOR,
   LIST_ACCENT_COLOR_TOKENS,
@@ -75,6 +76,12 @@ export function ListCreateModal({ open, onOpenChange }: ListCreateModalProps) {
         color: data.color,
       });
       if (success) closeModal();
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'Erro ao salvar lista',
+        subtitle: 'Não foi possível criar a lista. Tente novamente.',
+      });
     } finally {
       setIsSubmitting(false);
     }

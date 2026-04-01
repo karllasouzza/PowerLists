@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import ThemeProvider from '@/context/themes/use-themes';
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
+import { ErrorBoundary } from '@/components/error-boundary';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
 import { useAppFonts } from '@/utils/fonts';

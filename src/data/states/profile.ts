@@ -191,6 +191,6 @@ export const deleteProfile = async (): Promise<boolean> => {
 export const resetProfilesStore = (): void => {
   profiles$?.set({} as Record<string, any>);
   // Clear persisted data from MMKV
-  storage.remove('profiles');
-  storage.remove('profiles__metadata');
+  storage.delete('profiles');
+  storage.delete('profiles__metadata');
 };

@@ -18,6 +18,7 @@ import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
 import { updateListItem, listItems$ } from '@/data/states/list-items';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { showToast } from '@/services';
 import type { ListItem } from '@/features/list_items/types';
 import {
   formatBRL,
@@ -106,6 +107,12 @@ export function ItemUpdateModal({
         isChecked: currentItem.isChecked ?? false,
       });
       if (success) onOpenChange(false);
+    } catch {
+      showToast({
+        type: 'error',
+        title: 'Erro ao salvar item',
+        subtitle: 'Não foi possível atualizar o item. Tente novamente.',
+      });
     } finally {
       setIsSubmitting(false);
     }
