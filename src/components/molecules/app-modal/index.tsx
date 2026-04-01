@@ -205,10 +205,7 @@ function AppModalFooter({
       <Button
         onPress={onConfirm}
         disabled={isDisabled}
-        className={cn(
-          'flex-1 items-center justify-center rounded-full py-3',
-          confirmButtonClassName,
-        )}
+        className={cn('flex-1 items-center justify-center', confirmButtonClassName)}
         variant={confirmVariant}>
         {isLoading && (
           <IconLoader2
