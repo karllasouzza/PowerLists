@@ -32,20 +32,14 @@ function ListItemLeftActionsComponent({
       <Button
         onPress={handleCheck}
         variant="secondary"
-        className={cn(
-          'justify-center h-full flex-col items-center w-full',
-          !status && accentBgClassName,
-        )}>
+        className={cn('justify-center h-full flex-col items-center w-full', accentBgClassName)}
+        style={{ opacity: status ? 0.7 : 1 }}>
         <Icon
           as={status ? IconSquareRoundedMinus : IconSquareRoundedCheck}
           size={24}
-          className={cn('text-secondary-foreground', !status && accentForegroundClassName)}
+          className={cn('text-secondary-foreground', accentForegroundClassName)}
         />
-        <Text
-          className={cn(
-            'font-semibold text-secondary-foreground',
-            !status && accentForegroundClassName,
-          )}>
+        <Text className={cn('font-semibold', accentForegroundClassName)}>
           {status ? 'Desmarcar' : 'Marcar'}
         </Text>
       </Button>

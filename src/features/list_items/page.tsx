@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
 import { IconPlus } from '@tabler/icons-react-native';
 
-import ListItemComponent from '@/features/list_items/components/list-item';
+import ListItemCard from '@/features/list_items/components/list-item-card';
 import { TopBar } from '@/components/top-bar';
 
 import { formatCurrency } from './utils';
@@ -18,7 +18,7 @@ import {
   ListItemsSortBar,
   ListItemSkeletonList,
 } from './components';
-import Decimal from 'decimal.js';
+import { Decimal } from 'decimal.js';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();
@@ -49,13 +49,13 @@ const ListItemsScreen = observer(() => {
 
   const renderItem = useCallback(
     (item: ListItem) => (
-      <ListItemComponent
+      <ListItemCard
         key={item.id}
         id={item.id}
         status={item.isChecked}
         title={item.title}
-        price={formatCurrency(new Decimal(item.price).mul(item.amount ?? 0).toNumber() ?? 0)}
-        amount={String(item.amount ?? 0)}
+        price={item.price ?? 0}
+        amount={item.amount ?? 0}
         accentBgClassName={accentBgClassName}
         accentForegroundClassName={accentForegroundClassName}
         checkHandle={() => handleToggleCheck(item.id, item.isChecked)}
@@ -122,6 +122,7 @@ const ListItemsScreen = observer(() => {
       />
 
       <Fab
+        className="!bottom-20"
         onPress={handleOpenAdd}
         icon={IconPlus}
         label="Adicionar Item"
