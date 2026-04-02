@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
-import { HatGlasses } from 'lucide-react-native';
+import { IconFolder } from '@tabler/icons-react-native';
 
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
@@ -34,7 +34,7 @@ export default function AuthScreen() {
       <View className="w-full items-center justify-center">
         <View className="h-[300px] max-h-[300px] w-full items-center justify-center gap-2">
           <Image
-            source={require('../../../assets/new-icon-concept.png')}
+            source={require('/assets/adaptive-icon.png')}
             style={{ width: 250, height: 250 }}
             contentFit="contain"
           />
@@ -66,7 +66,7 @@ export default function AuthScreen() {
           </View>
 
           <Button variant="ghost" className="h-12 w-full" onPress={handleGuest}>
-            <Icon as={HatGlasses} className="text-secondary-foreground" size={20} />
+            <Icon as={IconFolder} className="text-secondary-foreground" size={20} />
             <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
           </Button>
         </View>

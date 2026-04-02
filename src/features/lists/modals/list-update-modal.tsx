@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { ScrollView, TextInput, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -13,22 +13,19 @@ import {
   AppModalFooter,
 } from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
-import { Icon } from '@/components/ui/icon';
 import { ListAccentColorPicker } from '@/features/lists/components/list-accent-color-picker';
+import { ListIconPicker } from '@/features/lists/components/list-icon-picker';
 import { handleEditList } from '@/features/lists/utils/list-operations';
 import {
   DEFAULT_ACCENT_COLOR,
   LIST_ACCENT_COLOR_TOKENS,
   getAccentColorToken,
 } from '@/features/lists/utils/accent-colors';
-import { iconMap } from '@/features/lists/utils/icon-map';
 import { lists$ } from '@/data/states/lists';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { List } from '@/data/types';
-import { cn } from '@/lib/utils';
 
 const listFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -38,8 +35,6 @@ const listFormSchema = z.object({
 
 type ListFormData = z.infer<typeof listFormSchema>;
 
-const AVAILABLE_ICONS = Object.keys(iconMap);
-
 type ListUpdateModalProps = {
   open: boolean;
   listId?: string;
@@ -48,6 +43,7 @@ type ListUpdateModalProps = {
 
 export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const titleRef = useRef<TextInput>(null);
 
   const listsRaw = useValue(lists$);
   const lists = convertFromSupabaseFormat(Object.values(listsRaw || {})) as List[];
@@ -76,6 +72,8 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
         icon: currentList?.icon || 'cart',
         color: getAccentColorToken(currentList?.accentColor),
       });
+      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      return () => clearTimeout(timer);
     }
   }, [open, currentList?.title, currentList?.icon, currentList?.accentColor, reset]);
 
@@ -101,6 +99,19 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
     [listId, onOpenChange],
   );
 
+  const onInvalid = useCallback(() => {
+    titleRef.current?.focus();
+  }, []);
+
+  const haveChanges =
+    watch('title') !== (currentList?.title || '') ||
+    watch('icon') !== (currentList?.icon || 'cart') ||
+    watch('color') !== getAccentColorToken(currentList?.accentColor);
+
+  const isConfirmDisabled = !listId || !haveChanges;
+
+  const submitForm = handleSubmit(onSubmit, onInvalid);
+
   return (
     <AppModal open={open} onOpenChange={onOpenChange}>
       <AppModalContent>
@@ -108,69 +119,50 @@ export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalP
         <AppModalHeader title="Editar lista" />
 
         <ScrollView className="max-h-[60vh] px-6" keyboardShouldPersistTaps="handled">
-          <View className="mb-4 gap-2">
-            <Label nativeID="title">Nome da lista</Label>
-            <Controller
-              control={control}
-              name="title"
-              render={({ field: { onChange, value } }) => (
-                <Input
-                  placeholder="Minha lista..."
-                  value={value}
-                  onChangeText={onChange}
-                  aria-labelledby="title"
-                />
+          <View className="gap-6 pb-2">
+            <View className="gap-2">
+              <Label nativeID="title">Nome da lista</Label>
+              <Controller
+                control={control}
+                name="title"
+                render={({ field: { onChange, value } }) => (
+                  <Input
+                    ref={titleRef}
+                    placeholder="Minha lista..."
+                    value={value}
+                    onChangeText={onChange}
+                    aria-labelledby="title"
+                    returnKeyType="done"
+                    onSubmitEditing={submitForm}
+                  />
+                )}
+              />
+              {errors.title && (
+                <Text className="text-sm text-destructive">{errors.title.message}</Text>
               )}
-            />
-            {errors.title && (
-              <Text className="text-sm text-destructive">{errors.title.message}</Text>
-            )}
-          </View>
+            </View>
 
-          <View className="mb-2 gap-2">
-            <Label>Icone</Label>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View className="flex-row gap-4 p-1">
-                {AVAILABLE_ICONS.map((iconName) => {
-                  const IconComponent = iconMap[iconName];
-                  const isSelected = selectedIcon === iconName;
-                  return (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      key={iconName}
-                      onPress={() => setValue('icon', iconName)}
-                      className={cn(
-                        'items-center justify-center rounded-full border',
-                        isSelected ? 'border-primary bg-primary' : 'border-border bg-transparent',
-                      )}>
-                      <Icon
-                        as={IconComponent}
-                        size={20}
-                        className={isSelected ? 'text-primary-foreground' : 'text-foreground'}
-                      />
-                    </Button>
-                  );
-                })}
-              </View>
-            </ScrollView>
-          </View>
+            <View className="gap-2">
+              <Label nativeID="icon">Ícone</Label>
+              <ListIconPicker value={selectedIcon} onChange={(icon) => setValue('icon', icon)} />
+            </View>
 
-          <View className="mb-2 gap-2">
-            <Label>Cor da lista</Label>
-            <ListAccentColorPicker
-              value={selectedColor}
-              onChange={(color) => setValue('color', color)}
-            />
+            <View className="gap-2">
+              <Label nativeID="color">Cor da lista</Label>
+              <ListAccentColorPicker
+                value={selectedColor}
+                onChange={(color) => setValue('color', color)}
+              />
+            </View>
           </View>
         </ScrollView>
 
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
-          onConfirm={handleSubmit(onSubmit)}
-          confirmLabel="Salvar"
+          onConfirm={submitForm}
+          confirmLabel="Salvar Alterações"
           isLoading={isSubmitting}
-          isConfirmDisabled={!listId}
+          isConfirmDisabled={isConfirmDisabled}
         />
       </AppModalContent>
     </AppModal>

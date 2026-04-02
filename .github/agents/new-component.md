@@ -8,7 +8,7 @@ Add a new UI component to the PowerLists project following the established React
 - **@rn-primitives** — accessible primitive components (Pressable, Dialog, Checkbox, Select, Tabs, etc.)
 - **CVA** (`class-variance-authority`) — component variant definitions
 - **cn()** — class merging utility at `src/lib/utils.ts` (`clsx` + `tailwind-merge`)
-- **@tabler/icons-react-native** — primary icon library (+ `lucide-react-native` as secondary)
+- **@tabler/icons-react-native** — primary icon library
 - **Platform.select()** — web-specific classes (hover, focus-visible, aria attributes)
 - All imports use the `@/` path alias pointing to `src/`
 

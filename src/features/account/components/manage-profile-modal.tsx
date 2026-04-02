@@ -20,6 +20,7 @@ import { z } from 'zod';
 const schema = z.object({
   name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
   email: z.string().email('E-mail inválido'),
+  currentPassword: z.string().optional(),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -43,15 +44,19 @@ export function ManageProfileModal({
     control,
     handleSubmit,
     reset,
+    setError,
+    watch,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { name: currentName, email: currentEmail },
+    defaultValues: { name: currentName, email: currentEmail, currentPassword: '' },
   });
+
+  const watchedEmail = watch('email');
 
   useEffect(() => {
     if (open) {
-      reset({ name: currentName, email: currentEmail });
+      reset({ name: currentName, email: currentEmail, currentPassword: '' });
     }
   }, [open, currentName, currentEmail, reset]);
 
@@ -61,9 +66,16 @@ export function ManageProfileModal({
       const nameChanged = data.name !== currentName;
       const emailChanged = data.email !== currentEmail;
 
+      if (emailChanged && !data.currentPassword) {
+        setError('currentPassword', { message: 'Informe a senha atual para alterar o e-mail' });
+        return;
+      }
+
       const results = await Promise.all([
         nameChanged ? updateProfile({ name: data.name }) : Promise.resolve({ profile: null }),
-        emailChanged ? updateEmail(data.email) : Promise.resolve({ error: null }),
+        emailChanged
+          ? updateEmail(data.currentPassword!, data.email)
+          : Promise.resolve({ error: null }),
       ]);
 
       const profileResult = results[0] as { profile: unknown };
@@ -135,6 +147,28 @@ export function ManageProfileModal({
               <Text className="text-destructive text-xs">{errors.email.message}</Text>
             )}
           </View>
+          {watchedEmail !== currentEmail && (
+            <View className="gap-1.5">
+              <Label nativeID="current-password-label">Senha atual</Label>
+              <Controller
+                control={control}
+                name="currentPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <Input
+                    placeholder="••••••••"
+                    value={value}
+                    onChangeText={onChange}
+                    onBlur={onBlur}
+                    secureTextEntry
+                    aria-labelledby="current-password-label"
+                  />
+                )}
+              />
+              {errors.currentPassword && (
+                <Text className="text-destructive text-xs">{errors.currentPassword.message}</Text>
+              )}
+            </View>
+          )}
         </View>
         <AppModalFooter
           onCancel={() => onOpenChange(false)}

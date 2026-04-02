@@ -227,6 +227,6 @@ export const deleteList = async ({ id }: { id: string }): Promise<deleteListResu
 export const resetListStore = (): void => {
   resetListItemsStore();
   lists$?.set({} as Record<string, any>);
-  storage.remove('lists');
-  storage.remove('lists__metadata');
+  storage.delete('lists');
+  storage.delete('lists__metadata');
 };

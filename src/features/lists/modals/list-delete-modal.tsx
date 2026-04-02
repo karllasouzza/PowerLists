@@ -56,7 +56,7 @@ export function ListDeleteModal({ open, listId, onOpenChange }: ListDeleteModalP
         <AppModalFooter
           onCancel={() => onOpenChange(false)}
           onConfirm={handleDelete}
-          confirmLabel="Deletar"
+          confirmLabel="Deletar Lista"
           confirmVariant="destructive"
           isLoading={isSubmitting}
           isConfirmDisabled={!listId}

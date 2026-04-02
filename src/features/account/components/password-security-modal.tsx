@@ -18,6 +18,7 @@ import { z } from 'zod';
 
 const schema = z
   .object({
+    currentPassword: z.string().min(1, 'Informe a senha atual'),
     newPassword: z.string().min(6, 'Senha deve ter ao menos 6 caracteres'),
     confirmPassword: z.string(),
   })
@@ -43,7 +44,7 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { newPassword: '', confirmPassword: '' },
+    defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   });
 
   const handleClose = () => {
@@ -54,7 +55,7 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
   const onSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
-      const { error } = await updatePassword(data.newPassword);
+      const { error } = await updatePassword(data.currentPassword, data.newPassword);
       if (error) {
         showToast({ type: 'error', title: 'Erro ao atualizar senha', subtitle: error });
         return;
@@ -70,8 +71,28 @@ export function PasswordSecurityModal({ open, onOpenChange }: PasswordSecurityMo
     <AppModal open={open} onOpenChange={handleClose}>
       <AppModalContent>
         <AppModalHandle />
-        <AppModalHeader title="Senha e Segurança" />
+        <AppModalHeader title="Alterar Senha" />
         <View className="gap-4 px-6 pb-2">
+          <View className="gap-1.5">
+            <Label nativeID="current-password-label">Senha atual</Label>
+            <Controller
+              control={control}
+              name="currentPassword"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <Input
+                  placeholder="••••••••"
+                  value={value}
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  secureTextEntry
+                  aria-labelledby="current-password-label"
+                />
+              )}
+            />
+            {errors.currentPassword && (
+              <Text className="text-destructive text-xs">{errors.currentPassword.message}</Text>
+            )}
+          </View>
           <View className="gap-1.5">
             <Label nativeID="new-password-label">Nova senha</Label>
             <Controller

@@ -69,6 +69,7 @@ const HomeScreen = observer(() => {
           extraData={searchQuery}
           recycleItems
           onScrollBeginDrag={handleListScrollStart}
+          ListFooterComponent={<View className="h-20" />}
         />
       )}
 

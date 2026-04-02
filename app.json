@@ -24,14 +24,6 @@
           "faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
         }
       ],
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Permitir que $(PRODUCT_NAME) acesse sua câmera",
-          "microphonePermission": "Permitir que $(PRODUCT_NAME) acesse seu microfone",
-          "recordAudioAndroid": false
-        }
-      ],
       "expo-router",
       "expo-asset",
       [
@@ -72,7 +64,6 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["android.permission.CAMERA"],
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {

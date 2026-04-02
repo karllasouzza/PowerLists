@@ -74,7 +74,7 @@ export const createProfile = async ({
     const id = generateId();
 
     // Convert to snake_case for Supabase
-    const payload = convertFromSupabaseFormat({
+    const payload = convertToSupabaseFormat({
       id,
       userId: getCurrentUserId(),
       name,
@@ -152,7 +152,7 @@ export const updateProfile = async ({
     profiles$[profileId].updated_at.set(new Date().toISOString());
 
     const updatedProfileRaw = profiles$[profileId].get();
-    const updatedProfile = convertToSupabaseFormat(updatedProfileRaw) as ProfileType;
+    const updatedProfile = convertFromSupabaseFormat(updatedProfileRaw) as ProfileType;
 
     return { profile: updatedProfile };
   } catch (error) {
@@ -191,6 +191,6 @@ export const deleteProfile = async (): Promise<boolean> => {
 export const resetProfilesStore = (): void => {
   profiles$?.set({} as Record<string, any>);
   // Clear persisted data from MMKV
-  storage.remove('profiles');
-  storage.remove('profiles__metadata');
+  storage.delete('profiles');
+  storage.delete('profiles__metadata');
 };

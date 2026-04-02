@@ -2,7 +2,7 @@ import { NativeOnlyAnimatedView } from '@/components/ui/native-only-animated-vie
 import { cn } from '@/lib/utils';
 import * as DialogPrimitive from '@rn-primitives/dialog';
 import * as React from 'react';
-import { Platform, Pressable, View, type ViewProps } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, View, type ViewProps } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import {
   default as Animated,
@@ -101,30 +101,34 @@ function AppModalContent({
   return (
     <DialogPrimitive.Portal hostName={portalHost}>
       <AppModalOverlay>
-        {/* Backdrop: tapping the dark area closes the modal */}
-        <Pressable className="flex-1" onPress={close} />
-        {/* Outer: entering/exiting animation only — no style transform here */}
-        <NativeOnlyAnimatedView
-          entering={SlideInDown.duration(300).springify().damping(32).stiffness(180).mass(0.8)}
-          exiting={SlideOutDown.duration(220)}
-          className="w-full">
-          {/* Inner: drag offset only — no entering/exiting here */}
-          <Animated.View style={animatedStyle}>
-            <AppModalDragContext.Provider value={{ translateY, close }}>
-              <DialogPrimitive.Content
-                className={cn(
-                  'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden border border-b-0 border-border',
-                  Platform.select({
-                    web: 'animate-in slide-in-from-bottom duration-300',
-                  }),
-                  className,
-                )}
-                {...props}>
-                {children}
-              </DialogPrimitive.Content>
-            </AppModalDragContext.Provider>
-          </Animated.View>
-        </NativeOnlyAnimatedView>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'flex-end' }}>
+          {/* Backdrop: tapping the dark area closes the modal */}
+          <Pressable className="flex-1" onPress={close} />
+          {/* Outer: entering/exiting animation only — no style transform here */}
+          <NativeOnlyAnimatedView
+            entering={SlideInDown.duration(300).springify().damping(32).stiffness(180).mass(0.8)}
+            exiting={SlideOutDown.duration(220)}
+            className="w-full">
+            {/* Inner: drag offset only — no entering/exiting here */}
+            <Animated.View style={animatedStyle}>
+              <AppModalDragContext.Provider value={{ translateY, close }}>
+                <DialogPrimitive.Content
+                  className={cn(
+                    'bg-background z-50 w-full rounded-t-3xl pb-8 overflow-hidden',
+                    Platform.select({
+                      web: 'animate-in slide-in-from-bottom duration-300',
+                    }),
+                    className,
+                  )}
+                  {...props}>
+                  {children}
+                </DialogPrimitive.Content>
+              </AppModalDragContext.Provider>
+            </Animated.View>
+          </NativeOnlyAnimatedView>
+        </KeyboardAvoidingView>
       </AppModalOverlay>
     </DialogPrimitive.Portal>
   );
@@ -201,10 +205,7 @@ function AppModalFooter({
       <Button
         onPress={onConfirm}
         disabled={isDisabled}
-        className={cn(
-          'flex-1 items-center justify-center rounded-full py-3',
-          confirmButtonClassName,
-        )}
+        className={cn('flex-1 items-center justify-center', confirmButtonClassName)}
         variant={confirmVariant}>
         {isLoading && (
           <IconLoader2
