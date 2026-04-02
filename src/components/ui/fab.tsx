@@ -66,11 +66,7 @@ const Fab = React.forwardRef<View, FabProps>(
         ref={ref}
         className={cn('right-4 bottom-6 z-50 absolute', className)}
         pointerEvents="box-none">
-        <Pressable
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          className="shadow-2xl"
-          {...props}>
+        <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} {...props}>
           <Animated.View
             style={animatedStyle}
             className={cn(
