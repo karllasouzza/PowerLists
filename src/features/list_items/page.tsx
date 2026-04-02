@@ -7,7 +7,6 @@ import { IconPlus } from '@tabler/icons-react-native';
 import ListItemCard from '@/features/list_items/components/list-item-card';
 import { TopBar } from '@/components/top-bar';
 
-import { formatCurrency } from './utils';
 import type { ListItem } from './types';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
@@ -18,7 +17,6 @@ import {
   ListItemsSortBar,
   ListItemSkeletonList,
 } from './components';
-import { Decimal } from 'decimal.js';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();

@@ -10,7 +10,12 @@ type TabButtonProps = PressableProps & {
   label?: string;
 };
 
-export function TabButton({ isFocused = false, icon: IconComponent, ...props }: TabButtonProps) {
+export function TabButton({
+  isFocused = false,
+  icon: IconComponent,
+  label,
+  ...props
+}: TabButtonProps) {
   return (
     <Pressable {...props} style={{ flex: 1 }} className="items-center justify-center">
       <View
@@ -25,7 +30,7 @@ export function TabButton({ isFocused = false, icon: IconComponent, ...props }: 
         <Text
           variant="small"
           className={cn('text-xs', isFocused ? 'text-primary' : 'text-muted-foreground')}>
-          {props.label}
+          {label}
         </Text>
       </View>
     </Pressable>
