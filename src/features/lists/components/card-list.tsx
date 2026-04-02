@@ -37,7 +37,7 @@ function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
 
   const handlePress = () => {
     router.push({
-      pathname: '/(authenticated)/lists/[id]',
+      pathname: 'list',
       params: { id: list.id },
     });
   };
