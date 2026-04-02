@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
-import { IconPlus } from '@tabler/icons-react-native';
+import { IconPlus, IconRobot } from '@tabler/icons-react-native';
 
 import { TopBar } from '@/components/top-bar';
 import { Fab } from '@/components/ui/fab';
@@ -44,6 +44,13 @@ const ListItemsScreen = observer(() => {
     handleOpenUpdate,
     handleOpenDelete,
   } = useListItemsPageLogics();
+
+  const handleOpenAssistant = useCallback(() => {
+    router.push({
+      pathname: '/list/assistant',
+      params: { id: listId },
+    });
+  }, [listId, router]);
 
   const renderItem = useCallback(
     (item: ListItem) => (
@@ -120,9 +127,9 @@ const ListItemsScreen = observer(() => {
       />
 
       <Fab
-        className="!bottom-20"
-        onPress={handleOpenAdd}
-        icon={IconPlus}
+        className="!bottom-36"
+        onPress={handleOpenAssistant}
+        icon={IconRobot}
         buttonClassName={accentBgClassName}
         iconClassName={accentForegroundClassName}
         labelClassName={accentForegroundClassName}
