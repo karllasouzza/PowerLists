@@ -6,12 +6,14 @@ import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
 import { cn } from '@/lib/utils';
 import { ListItemRightActions } from '@/features/list_items/components/list-item-right-actions';
 import { ListItemLeftActions } from '@/features/list_items/components/list-item-left-actions';
+import { formatCurrency } from '../utils';
+import Decimal from 'decimal.js';
 
 interface ListItemProps {
   id: string;
   title: string;
-  price: string;
-  amount: string;
+  price: number;
+  amount: number;
   status: boolean;
   accentBgClassName: string;
   accentForegroundClassName: string;
@@ -20,7 +22,7 @@ interface ListItemProps {
   onDelete: (itemId: string) => void;
 }
 
-function ListItemComponent({
+function ListItemCard({
   id,
   title,
   price,
@@ -88,18 +90,38 @@ function ListItemComponent({
       renderRightActions={renderRightActions}
       onOpen={handleSwipeOpen}>
       <View className="min-h-[88px] h-max w-full flex-row items-center gap-3 bg-card p-3 overflow-hidden">
-        <View className="flex-1 justify-center gap-0.5">
-          <Text
-            className={cn(
-              'text-base font-semibold',
-              status ? 'text-muted-foreground line-through' : 'text-foreground',
-            )}
-            numberOfLines={1}>
-            {title}
-          </Text>
-          <Text className={cn('text-sm', status ? 'text-muted-foreground' : 'text-foreground')}>
-            {price} x {amount} und
-          </Text>
+        <View className="flex-1 flex-row justify-between">
+          <View className="flex-1 justify-center gap-0.5">
+            <Text
+              className={cn(
+                'text-base font-semibold',
+                status ? 'text-muted-foreground line-through' : 'text-foreground',
+              )}
+              numberOfLines={1}>
+              {title}
+            </Text>
+            <Text variant="muted" className="text-sm">
+              {amount} unidades
+            </Text>
+          </View>
+          <View className="justify-center items-end">
+            <View
+              className={cn(
+                'flex items-center justify-center font-bold p-1 rounded-full',
+                accentBgClassName,
+                accentForegroundClassName,
+              )}>
+              <Text
+                variant="small"
+                className={cn('font-bold !p-0 !m-0', accentForegroundClassName)}>
+                {formatCurrency(new Decimal(price).mul(amount ?? 0).toNumber() ?? 0)}
+              </Text>
+            </View>
+
+            <Text variant="muted" className="text-sm">
+              {formatCurrency(price)} und
+            </Text>
+          </View>
         </View>
       </View>
     </SwipeableItem>
@@ -115,6 +137,6 @@ const areListItemPropsEqual = (prev: ListItemProps, next: ListItemProps) =>
   prev.accentBgClassName === next.accentBgClassName &&
   prev.accentForegroundClassName === next.accentForegroundClassName;
 
-const ListItem = React.memo(ListItemComponent, areListItemPropsEqual);
+const ListItem = React.memo(ListItemCard, areListItemPropsEqual);
 
 export default ListItem;
