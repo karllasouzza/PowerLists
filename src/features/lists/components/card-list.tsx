@@ -4,18 +4,19 @@ import { IconShoppingCart } from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
 import { useSelector } from '@legendapp/state/react';
 
-import { List } from '@/data/types';
-import type { ListItem } from '@/features/list_items';
-import { listItems$ } from '@/data/states/list-items';
+import { cn } from '@/lib/utils';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { List, ListItem } from '@/data/types';
+import { listItems$ } from '@/data/states/list-items';
+
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
-import { calculateTotal } from '@/features/list_items';
-import { CardListRightActions } from '@/features/lists/components/card-list-right-actions';
-import { getAccentColorCardClasses } from '@/features/lists/utils/accent-colors';
+
 import { iconMap } from '@/features/lists/utils/icon-map';
-import { cn } from '@/lib/utils';
+import { calculateTotal } from '../utils/price-calcs';
+import { getAccentColorCardClasses } from '../utils/accent-colors';
+import { CardListRightActions } from './card-list-right-actions';
 
 interface CardListProps {
   list: List;

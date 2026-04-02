@@ -1,13 +1,14 @@
 import React, { useCallback, useRef } from 'react';
 import { View } from 'react-native';
+import { Decimal } from 'decimal.js';
 
 import { Text } from '@/components/ui/text';
 import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
 import { cn } from '@/lib/utils';
-import { ListItemRightActions } from '@/features/list_items/components/list-item-right-actions';
-import { ListItemLeftActions } from '@/features/list_items/components/list-item-left-actions';
+
+import { ListItemLeftActions } from './list-item-left-actions';
+import { ListItemRightActions } from './list-item-right-actions';
 import { formatCurrency } from '../utils';
-import Decimal from 'decimal.js';
 
 interface ListItemProps {
   id: string;

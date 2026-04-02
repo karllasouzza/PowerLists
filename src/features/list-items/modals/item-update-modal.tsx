@@ -6,6 +6,9 @@ import { z } from 'zod';
 import { Decimal } from 'decimal.js';
 import { useValue } from '@legendapp/state/react';
 
+import { showToast } from '@/services';
+import { updateListItem, listItems$ } from '@/data/states/list-items';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import {
   AppModal,
   AppModalContent,
@@ -16,15 +19,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
-import { updateListItem, listItems$ } from '@/data/states/list-items';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
-import { showToast } from '@/services';
-import type { ListItem } from '@/features/list_items/types';
-import {
-  formatBRL,
-  parseBRLToNumber,
-  numberToBRLInput,
-} from '@/features/list_items/utils/currency';
+import { ListItem } from '../types';
+import { numberToBRLInput, parseBRLToNumber, formatBRL } from '../utils';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),

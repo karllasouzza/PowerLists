@@ -4,21 +4,19 @@ import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
 import { IconPlus } from '@tabler/icons-react-native';
 
-import ListItemCard from '@/features/list_items/components/list-item-card';
 import { TopBar } from '@/components/top-bar';
-
-import { formatCurrency } from './utils';
-import type { ListItem } from './types';
-import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
-import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
 import { Fab } from '@/components/ui/fab';
+
+import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
+import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import {
   ListItemsContent,
   ListItemsFooter,
   ListItemsSortBar,
   ListItemSkeletonList,
 } from './components';
-import { Decimal } from 'decimal.js';
+import ListItemCard from './components/list-item-card';
+import type { ListItem } from './types';
 
 const ListItemsScreen = observer(() => {
   const router = useRouter();
@@ -125,7 +123,14 @@ const ListItemsScreen = observer(() => {
         className="!bottom-20"
         onPress={handleOpenAdd}
         icon={IconPlus}
-        label="Adicionar Item"
+        buttonClassName={accentBgClassName}
+        iconClassName={accentForegroundClassName}
+        labelClassName={accentForegroundClassName}
+      />
+      <Fab
+        className="!bottom-20"
+        onPress={handleOpenAdd}
+        icon={IconPlus}
         buttonClassName={accentBgClassName}
         iconClassName={accentForegroundClassName}
         labelClassName={accentForegroundClassName}

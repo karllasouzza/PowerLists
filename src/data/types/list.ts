@@ -1,4 +1,4 @@
-import { ListItem } from '@/features/list_items';
+import { ListItem } from './list-item';
 
 export interface List {
   id: string;

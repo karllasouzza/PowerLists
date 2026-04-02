@@ -5,6 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Decimal } from 'decimal.js';
 
+import { showToast } from '@/services';
+import { createNewListItem } from '@/data/states/list-items';
+import { Input } from '@/components/ui/input';
+import { Text } from '@/components/ui/text';
+import { Label } from '@/components/ui/label';
 import {
   AppModal,
   AppModalContent,
@@ -12,12 +17,8 @@ import {
   AppModalHeader,
   AppModalFooter,
 } from '@/components/molecules/app-modal';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-import { Label } from '@/components/ui/label';
-import { createNewListItem } from '@/data/states/list-items';
-import { formatBRL, parseBRLToNumber } from '@/features/list_items/utils/currency';
-import { showToast } from '@/services';
+
+import { parseBRLToNumber, formatBRL } from '../utils';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
