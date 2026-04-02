@@ -35,7 +35,14 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "react-native-vosk",
+        {
+          "models": ["assets/model-pt-br"],
+          "iOSMicrophonePermission": "Nous avons besoin d'accéder à votre microphone"
+        }
+      ]
     ],
     "ios": {
       "supportsTablet": true,
