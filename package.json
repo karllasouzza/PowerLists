@@ -37,7 +37,7 @@
     "@rn-primitives/tabs": "^1.2.0",
     "@rn-primitives/toggle": "^1.2.0",
     "@rn-primitives/toggle-group": "^1.2.0",
-    "@rn-primitives/tooltip": "^1.2.0",
+    "@rn-primitives/tooltip": "^1.4.0",
     "@supabase/supabase-js": "^2.84.0",
     "@tabler/icons-react-native": "^3.35.0",
     "class-variance-authority": "^0.7.1",
