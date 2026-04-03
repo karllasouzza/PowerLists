@@ -1,11 +1,9 @@
-import { useCallback } from 'react';
-import type { AudioPlayer } from 'expo-audio';
-
 import { createNewListItem } from '@/data/states/list-items';
 import { generateUUID } from '@/utils/generate-uuid';
-
-import type { AssistantAcknowledgmentMessage, ChatMessage } from '../types';
+import type { AudioPlayer } from 'expo-audio';
+import { useCallback } from 'react';
 import type { PlayAudio } from '../services/audio-queue';
+import type { AssistantAcknowledgmentMessage, ChatMessage } from '../types';
 
 interface CreationFlowPlayers {
   addingListItemPlayer: AudioPlayer;

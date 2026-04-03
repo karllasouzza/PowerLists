@@ -88,16 +88,15 @@ export const useVoiceAssistantLogics = (listId: string) => {
       return;
     }
 
-    // In manual mode, stop listening after each valid result
-    if (directModeRef.current === 'manual') {
-      stopSpeechRecognition();
-    }
+    stopSpeechRecognition();
 
-    // Step 1: append user transcript bubble
     setChatMessages((prev) => [...prev, { type: 'user', text: nextTranscript }]);
 
-    // Steps 2-6: acknowledgment card + create item + audio feedback
     void executeCreationFlow({ title, amount, listId });
+
+    if (directMode === 'auto') {
+      void handleStart('auto');
+    }
   });
 
   useSpeechRecognitionEvent('error', (event: SpeechErrorEvent) => {
@@ -153,6 +152,7 @@ export const useVoiceAssistantLogics = (listId: string) => {
 
   const handleStop = useCallback(() => {
     stopSpeechRecognition();
+    handleReset();
   }, []);
 
   const handleReset = useCallback(() => {
@@ -162,11 +162,8 @@ export const useVoiceAssistantLogics = (listId: string) => {
 
   const handleDirectModeChange = useCallback((value: 'manual' | 'auto') => {
     startAttemptRef.current += 1;
+    stopSpeechRecognition();
     setDirectMode(value);
-
-    if (value === 'manual') {
-      stopSpeechRecognition();
-    }
   }, []);
 
   useEffect(() => {
