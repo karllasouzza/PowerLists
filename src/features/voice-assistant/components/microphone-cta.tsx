@@ -1,6 +1,7 @@
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
-import { IconMicrophone, IconMicrophoneFilled } from '@tabler/icons-react-native';
+import { IconMicrophone, IconPlayerStopFilled } from '@tabler/icons-react-native';
+import { useEffect } from 'react';
 import { Pressable, View } from 'react-native';
 import Animated, {
   Easing,
@@ -10,7 +11,6 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated';
-import { useEffect } from 'react';
 
 import useAssistantAudios from '../hooks/use-assistant-audios';
 
@@ -69,7 +69,7 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
       <Animated.View
         className={cn(
           'absolute h-20 w-20 rounded-full',
-          (active || isAuto) && 'border border-primary-foreground',
+          (active || isAuto) && 'border border-red-500/70',
         )}
         style={ringStyle}
       />
@@ -80,14 +80,14 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
         }
         className={cn(
           'h-20 w-20 items-center justify-center border rounded-full',
-          active || isAuto ? 'border-primary-foreground' : 'border-muted',
+          active || isAuto ? 'border-red-500/70' : 'border-muted',
         )}
         onPress={handlePress}>
         <Animated.View style={iconStyle}>
           <Icon
-            as={active || isAuto ? IconMicrophoneFilled : IconMicrophone}
+            as={active || isAuto ? IconPlayerStopFilled : IconMicrophone}
             size={34}
-            className="text-primary-foreground"
+            className={cn(active || isAuto ? 'text-red-500/70' : 'text-muted')}
           />
         </Animated.View>
       </Pressable>

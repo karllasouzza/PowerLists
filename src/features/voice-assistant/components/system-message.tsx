@@ -1,5 +1,5 @@
-import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { View } from 'react-native';
 
 export const SystemMessageBubble = ({ text }: { text: string }) => {
   return (

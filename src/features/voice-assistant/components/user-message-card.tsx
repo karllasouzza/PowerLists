@@ -1,5 +1,5 @@
-import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { View } from 'react-native';
 import { UserMessage } from '../types';
 
 export const UserMessageCard = ({ text }: UserMessage) => {

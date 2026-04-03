@@ -1,7 +1,7 @@
-import { View } from 'react-native';
-import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { IconRobotFace } from '@tabler/icons-react-native';
+import { View } from 'react-native';
 
 export const AssistantMessage = ({ text }: { text: string }) => {
   return (

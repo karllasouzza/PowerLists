@@ -1,6 +1,6 @@
 import type { ChatMessage } from '../types';
-import { AssistantAcknowledgmentCard } from './assistant-acknowledgment-card';
 import { AssistantMessage } from './asistant-message';
+import { AssistantAcknowledgmentCard } from './assistant-acknowledgment-card';
 import { UserMessageCard } from './user-message-card';
 
 interface ChatMessageItemProps {

@@ -1,7 +1,7 @@
+import { Button } from '@/components/ui/button';
+import { Text } from '@/components/ui/text';
 import { View } from 'react-native';
 import { MicrophoneCta } from './microphone-cta';
-import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
 
 type VoiceAssistantFooterProps = {
   handleDirectModeChange: (mode: 'manual' | 'auto') => void;

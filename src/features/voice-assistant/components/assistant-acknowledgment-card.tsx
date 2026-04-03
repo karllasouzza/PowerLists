@@ -1,4 +1,3 @@
-import { View } from 'react-native';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import {
@@ -7,16 +6,17 @@ import {
   IconSquareRoundedCheck,
   IconX,
 } from '@tabler/icons-react-native';
+import { View } from 'react-native';
 
-import type { AssistantAcknowledgmentMessage } from '../types';
-import { useMemo, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import Animated, {
-  useSharedValue,
+  Easing,
   useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withTiming,
-  Easing,
 } from 'react-native-reanimated';
+import type { AssistantAcknowledgmentMessage } from '../types';
 
 type Props = Pick<AssistantAcknowledgmentMessage, 'text' | 'item'>;
 
