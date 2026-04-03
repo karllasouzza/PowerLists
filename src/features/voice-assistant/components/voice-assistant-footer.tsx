@@ -49,7 +49,7 @@ export const VoiceAssistantFooter = ({
     (
       <View className="w-full flex flex-col">
         <View className="w-full flex items-center justify-center">
-          <View className="bg-muted overflow-hidden  rounded-b-none !rounded-2xl px-4 py-3">
+          <View className="bg-muted overflow-hidden  rounded-b-none !rounded-3xl px-4 py-3">
             <Text className="text-sm text-center">
               {getFooterLabel({ transcript, recognizing, directMode, isFirstItem })}
             </Text>

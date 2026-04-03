@@ -23,9 +23,7 @@ export const useVoiceAssistantLogics = (listId: string) => {
   const [directMode, setDirectMode] = useState<'manual' | 'auto'>('manual');
   const directModeRef = useRef<'manual' | 'auto'>(directMode);
   const startAttemptRef = useRef(0);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { type: 'assistant', text: 'O que gostaria de adicionar na lista hoje?' },
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   const { current: playAudio } = useRef(createAudioQueue());
 
@@ -55,7 +53,17 @@ export const useVoiceAssistantLogics = (listId: string) => {
   }, [directMode]);
 
   useEffect(() => {
-    void playAudio(assistantCourtesyPlayer);
+    const initialize = async () => {
+      if (chatMessages.length === 0) {
+        setChatMessages([
+          { type: 'assistant', text: 'Olá, qual item gostaria de adicionar na lista hoje?' },
+        ]);
+        await playAudio(assistantCourtesyPlayer);
+      }
+    };
+
+    void initialize();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -60,8 +60,8 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
     <View className="size-36 relative items-center justify-center">
       <Animated.View
         className={cn(
-          'absolute h-20 w-20 rounded-full border',
-          active || isAuto ? 'border-success' : 'border-muted',
+          'absolute h-20 w-20 rounded-full',
+          (active || isAuto) && 'border border-primary-foreground',
         )}
         style={ringStyle}
       />
@@ -71,13 +71,13 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
           active || isAuto ? 'Parar reconhecimento de voz' : 'Iniciar reconhecimento de voz'
         }
         className={cn(
-          'h-20 w-20 items-center justify-center rounded-full border ',
-          active || isAuto ? 'bg-success border-primary/70' : 'bg-muted border-border',
+          'h-20 w-20 items-center justify-center border rounded-full',
+          active || isAuto ? 'border-primary-foreground' : 'border-muted',
         )}
         onPress={handlePress}>
         <Icon
           as={IconMicrophone}
-          className={cn(active || isAuto ? 'text-primary-foreground' : 'text-muted-foreground')}
+          className={cn(active || isAuto ? 'text-primary-foreground' : 'text-muted')}
           size={34}
         />
       </Pressable>
