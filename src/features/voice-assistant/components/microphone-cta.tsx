@@ -1,6 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { cn } from '@/lib/utils';
-import { IconMicrophone } from '@tabler/icons-react-native';
+import { IconMicrophone, IconMicrophoneFilled } from '@tabler/icons-react-native';
 import { Pressable, View } from 'react-native';
 import Animated, {
   Easing,
@@ -25,13 +25,14 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
   const ring = useSharedValue(0);
   const { startRecordingPlayer } = useAssistantAudios();
 
-  const handlePress = () => {
+  const handlePress = async () => {
     if (active) {
-      onStop();
+      await onStop();
     } else {
-      onPress();
+      await onPress();
     }
-    startRecordingPlayer.play();
+
+    await startRecordingPlayer.play();
   };
 
   useEffect(() => {
@@ -39,20 +40,27 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
       ring.value = withRepeat(
         withTiming(1, { duration: 1600, easing: Easing.out(Easing.quad) }),
         -1,
-        false,
+        true,
       );
     } else {
-      ring.value = withTiming(0, { duration: 300 });
+      ring.value = withTiming(0, { duration: 300, easing: Easing.out(Easing.quad) });
     }
   }, [active, isAuto, ring]);
 
   const ringStyle = useAnimatedStyle(() => {
     const scale = interpolate(ring.value, [0, 1], [1, 1.7]);
-    const opacity = interpolate(ring.value, [0, 1], [0.4, 0]);
+    const opacity = interpolate(ring.value, [0, 1], [0.7, 0]);
 
     return {
       transform: [{ scale }],
       opacity,
+    };
+  });
+
+  const iconStyle = useAnimatedStyle(() => {
+    const scale = interpolate(ring.value, [0, 1], [1, 1.12]);
+    return {
+      transform: [{ scale }],
     };
   });
 
@@ -75,11 +83,13 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
           active || isAuto ? 'border-primary-foreground' : 'border-muted',
         )}
         onPress={handlePress}>
-        <Icon
-          as={IconMicrophone}
-          className={cn(active || isAuto ? 'text-primary-foreground' : 'text-muted')}
-          size={34}
-        />
+        <Animated.View style={iconStyle}>
+          <Icon
+            as={active || isAuto ? IconMicrophoneFilled : IconMicrophone}
+            size={34}
+            className="text-primary-foreground"
+          />
+        </Animated.View>
       </Pressable>
     </View>
   );

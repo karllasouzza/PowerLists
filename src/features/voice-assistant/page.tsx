@@ -1,5 +1,4 @@
 import { View } from 'react-native';
-import { useEffect, useRef } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LegendList } from '@legendapp/list';
 
@@ -21,43 +20,6 @@ export default function AssistantPage() {
     handleDirectModeChange,
   } = useVoiceAssistantLogics(listId ?? '');
 
-  const listRef = useRef<any>(null);
-
-  useEffect(() => {
-    const lastIndex = chatMessages.length - 1;
-    if (lastIndex < 0) return;
-
-    const list = listRef.current as any;
-    if (!list) return;
-
-    if (typeof list.scrollToIndex === 'function') {
-      try {
-        list.scrollToIndex(lastIndex);
-        return;
-      } catch {}
-    }
-
-    if (typeof list.scrollToItem === 'function') {
-      try {
-        list.scrollToItem(lastIndex);
-        return;
-      } catch {}
-    }
-
-    if (typeof list.scrollToEnd === 'function') {
-      try {
-        list.scrollToEnd?.({ animated: true });
-        return;
-      } catch {}
-    }
-
-    if (typeof list.scrollToOffset === 'function') {
-      try {
-        list.scrollToOffset({ offset: 999999, animated: true });
-      } catch {}
-    }
-  }, [chatMessages.length]);
-
   const handleMainAction = () => {
     if (recognizing) {
       handleStop();
@@ -71,7 +33,8 @@ export default function AssistantPage() {
     <View className="flex-1 w-full h-full bg-background">
       <TopBar title="Assistente de Voz" showBack onBack={() => router.back()} />
       <LegendList
-        ref={listRef}
+        initialScrollAtEnd
+        maintainScrollAtEnd
         data={chatMessages}
         estimatedItemSize={70}
         renderItem={({ item }) => <ChatMessageItem message={item} />}
@@ -80,7 +43,7 @@ export default function AssistantPage() {
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 20,
-          paddingBottom: 16,
+          paddingBottom: 20,
         }}
         ItemSeparatorComponent={() => <View className="h-3" />}
         scrollEnabled={true}

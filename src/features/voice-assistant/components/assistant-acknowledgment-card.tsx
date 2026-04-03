@@ -9,14 +9,21 @@ import {
 } from '@tabler/icons-react-native';
 
 import type { AssistantAcknowledgmentMessage } from '../types';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withTiming,
+  Easing,
+} from 'react-native-reanimated';
 
 type Props = Pick<AssistantAcknowledgmentMessage, 'text' | 'item'>;
 
 export const AssistantAcknowledgmentCard = ({ text, item }: Props) => {
   const itemStatusClass = useMemo(() => {
     return item.status === 'processing'
-      ? 'text-muted-foreground animate-pulse'
+      ? 'text-muted-foreground'
       : item.status === 'success'
         ? 'text-success'
         : 'text-destructive';
@@ -38,6 +45,24 @@ export const AssistantAcknowledgmentCard = ({ text, item }: Props) => {
     return IconRobotFace;
   }, [item.status]);
 
+  const spin = useSharedValue(0);
+
+  useEffect(() => {
+    if (item.status === 'processing') {
+      spin.value = withRepeat(
+        withTiming(360, { duration: 1000, easing: Easing.linear }),
+        -1,
+        false,
+      );
+    } else {
+      spin.value = withTiming(0, { duration: 200 });
+    }
+  }, [item.status, spin]);
+
+  const spinStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${spin.value}deg` }],
+  }));
+
   return (
     <View className="max-w-[84%] self-start flex flex-row gap-2 items-end">
       <View className="rounded-lg bg-muted flex items-center justify-center p-2">
@@ -58,7 +83,9 @@ export const AssistantAcknowledgmentCard = ({ text, item }: Props) => {
             </Text>
           </View>
 
-          <Icon as={IconComponent} size={26} className={itemStatusClass} />
+          <Animated.View style={spinStyle}>
+            <Icon as={IconComponent} size={26} className={itemStatusClass} />
+          </Animated.View>
         </View>
       </View>
     </View>
