@@ -38,6 +38,7 @@ export const stopSpeechRecognition = (): void => {
 };
 
 export const getTranscriptFromResultEvent = (event: SpeechResultEvent): string => {
+  if (!event.isFinal) return '';
   return event.results?.[0]?.transcript?.trim() ?? '';
 };
 
