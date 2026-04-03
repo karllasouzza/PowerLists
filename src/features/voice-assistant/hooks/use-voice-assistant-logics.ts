@@ -22,9 +22,12 @@ export const useVoiceAssistantLogics = (listId: string) => {
   const [directMode, setDirectMode] = useState<'manual' | 'auto'>('manual');
   const directModeRef = useRef<'manual' | 'auto'>(directMode);
   const startAttemptRef = useRef(0);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { type: 'assistant', text: 'O que gostaria de adicionar na lista hoje?' },
+  ]);
 
   const {
+    assistantCourtesyPlayer,
     addingListItemPlayer,
     successPlayer,
     assistantNewItemPlayer,
@@ -43,6 +46,11 @@ export const useVoiceAssistantLogics = (listId: string) => {
   useEffect(() => {
     directModeRef.current = directMode;
   }, [directMode]);
+
+  useEffect(() => {
+    requestAnimationFrame(() => assistantCourtesyPlayer.play());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useSpeechRecognitionEvent('start', () => {
     setRecognizing(true);
@@ -69,7 +77,9 @@ export const useVoiceAssistantLogics = (listId: string) => {
     setChatMessages((prev) => [...prev, { type: 'user', text: nextTranscript }]);
 
     // Steps 2-6: acknowledgment card + create item + audio feedback
-    void executeCreationFlow({ title, amount, listId });
+    requestAnimationFrame(() => {
+      void executeCreationFlow({ title, amount, listId });
+    });
   });
 
   useSpeechRecognitionEvent('error', (event: SpeechErrorEvent) => {

@@ -1,8 +1,9 @@
-import { View, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { useLocalSearchParams } from 'expo-router';
+import { LegendList } from '@legendapp/list';
 
-import { MicrophoneCta, TranscriptSection } from './components';
+import { ChatMessageItem, MicrophoneCta } from './components';
 import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
 import { Button } from '@/components/ui/button';
 
@@ -29,19 +30,20 @@ export default function AssistantPage() {
 
   return (
     <View className="flex-1 bg-background">
-      <ScrollView
+      <LegendList
         className="flex-1"
+        data={chatMessages}
+        estimatedItemSize={70}
+        renderItem={({ item }) => <ChatMessageItem message={item} />}
+        keyExtractor={(_, index) => String(index)}
+        extraData={chatMessages}
         contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'space-between',
           paddingHorizontal: 16,
           paddingTop: 20,
           paddingBottom: 16,
-        }}>
-        <View className="items-center gap-5 pt-3">
-          <TranscriptSection messages={chatMessages} recognizing={recognizing} />
-        </View>
-      </ScrollView>
+        }}
+        ItemSeparatorComponent={() => <View className="h-3" />}
+      />
       <View className="w-full flex items-center justify-center">
         <View className="max-w-[84%] bg-muted overflow-hidden  rounded-b-none !rounded-2xl px-4 py-3">
           <Text className="text-sm text-center">

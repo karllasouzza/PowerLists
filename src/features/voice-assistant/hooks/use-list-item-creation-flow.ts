@@ -37,7 +37,7 @@ export const useListItemCreationFlow = (
       };
 
       setChatMessages((prev) => [...prev, acknowledgmentMessage]);
-      players.addingListItemPlayer.play();
+      requestAnimationFrame(() => players.addingListItemPlayer.play());
 
       // Step 3: create the item
       const isSaved = await createNewListItem({
@@ -58,14 +58,14 @@ export const useListItemCreationFlow = (
               : msg,
           ),
         );
-        players.successPlayer.play();
+        requestAnimationFrame(() => players.successPlayer.play());
 
         // Step 4b: follow-up prompt
         setChatMessages((prev) => [
           ...prev,
           { type: 'assistant', text: 'Se quiser adicionar outro item, é só me falar' },
         ]);
-        players.assistantNewItemPlayer.play();
+        requestAnimationFrame(() => players.assistantNewItemPlayer.play());
       } else {
         // Step 5: error — update item status
         setChatMessages((prev) =>
@@ -75,17 +75,17 @@ export const useListItemCreationFlow = (
               : msg,
           ),
         );
-        players.errorPlayer.play();
+        requestAnimationFrame(() => players.errorPlayer.play());
 
-        // Step 6: append system error message + play error notification
+        // Step 6: append error message + play error notification
         setChatMessages((prev) => [
           ...prev,
           {
-            type: 'system',
+            type: 'assistant',
             text: 'Ocorreu um erro! Para tentar novamente, por favor acione novamente a gravação!',
           },
         ]);
-        players.errorNotificationPlayer.play();
+        requestAnimationFrame(() => players.errorNotificationPlayer.play());
       }
     },
     [setChatMessages, players],

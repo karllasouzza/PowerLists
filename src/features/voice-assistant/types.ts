@@ -21,16 +21,7 @@ export interface AssistantAcknowledgmentMessage {
   };
 }
 
-export interface SystemMessage {
-  type: 'system';
-  text: string;
-}
-
-export type ChatMessage =
-  | UserMessage
-  | AssistantMessage
-  | AssistantAcknowledgmentMessage
-  | SystemMessage;
+export type ChatMessage = UserMessage | AssistantMessage | AssistantAcknowledgmentMessage;
 
 export interface SpeechResult {
   transcript?: string;
