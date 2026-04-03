@@ -10,14 +10,18 @@ type Props = Pick<AssistantAcknowledgmentMessage, 'text' | 'item'>;
 export const AssistantAcknowledgmentCard = ({ text, item }: Props) => {
   return (
     <View className="max-w-[84%] self-start gap-2">
-      <View className="rounded-2xl rounded-bl-none bg-card px-4 py-3">
+      <View className="rounded-2xl rounded-bl-none bg-muted px-4 py-3">
         <Text className="text-sm text-foreground">{text}</Text>
       </View>
 
-      <View className="flex w-full flex-row items-center justify-between rounded-2xl border border-border bg-card p-3 py-4">
+      <View className="flex w-full flex-row items-center justify-between rounded-2xl border border-border bg-card p-4">
         <View className="flex flex-1 flex-col gap-1">
-          <Text className="flex-1 truncate text-sm font-medium text-foreground">{item.title}</Text>
-          <Text className="text-xs font-semibold text-muted-foreground">{item.amount} und</Text>
+          <Text variant="p" className="flex-1 truncate font-medium text-foreground m-0 p-0">
+            {item.title}
+          </Text>
+          <Text variant="small" className="text-muted-foreground m-0 p-0">
+            {item.amount} und
+          </Text>
         </View>
 
         <Icon
@@ -31,10 +35,10 @@ export const AssistantAcknowledgmentCard = ({ text, item }: Props) => {
           size={22}
           className={
             item.status === 'processing'
-              ? 'text-muted-foreground'
+              ? 'stroke-muted-foreground animate-spin'
               : item.status === 'success'
-                ? 'text-success'
-                : 'text-destructive'
+                ? 'stroke-primary!'
+                : 'stroke-destructive!'
           }
         />
       </View>

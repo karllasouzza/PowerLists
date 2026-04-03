@@ -35,12 +35,16 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
   };
 
   useEffect(() => {
-    ring.value = withRepeat(
-      withTiming(1, { duration: 1600, easing: Easing.out(Easing.quad) }),
-      -1,
-      false,
-    );
-  }, [ring]);
+    if (active || isAuto) {
+      ring.value = withRepeat(
+        withTiming(1, { duration: 1600, easing: Easing.out(Easing.quad) }),
+        -1,
+        false,
+      );
+    } else {
+      ring.value = withTiming(0, { duration: 300 });
+    }
+  }, [active, isAuto, ring]);
 
   const ringStyle = useAnimatedStyle(() => {
     const scale = interpolate(ring.value, [0, 1], [1, 1.7]);
@@ -53,22 +57,29 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
   });
 
   return (
-    <View className="w-52 relative items-center justify-center">
+    <View className="size-36 relative items-center justify-center">
       <Animated.View
-        className="absolute h-20 w-20 rounded-full border border-primary/60"
+        className={cn(
+          'absolute h-20 w-20 rounded-full border',
+          active || isAuto ? 'border-success' : 'border-muted',
+        )}
         style={ringStyle}
       />
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={
-          active ? 'Parar reconhecimento de voz' : 'Iniciar reconhecimento de voz'
+          active || isAuto ? 'Parar reconhecimento de voz' : 'Iniciar reconhecimento de voz'
         }
         className={cn(
-          'h-20 w-20 items-center justify-center rounded-full border border-primary/70 bg-primary',
-          active && 'bg-success',
+          'h-20 w-20 items-center justify-center rounded-full border ',
+          active || isAuto ? 'bg-success border-primary/70' : 'bg-muted border-border',
         )}
         onPress={handlePress}>
-        <Icon as={IconMicrophone} className="text-primary-foreground" size={34} />
+        <Icon
+          as={IconMicrophone}
+          className={cn(active || isAuto ? 'text-primary-foreground' : 'text-muted-foreground')}
+          size={34}
+        />
       </Pressable>
     </View>
   );

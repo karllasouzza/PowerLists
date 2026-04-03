@@ -1,11 +1,10 @@
 import { View } from 'react-native';
-import { Text } from '@/components/ui/text';
 import { useLocalSearchParams } from 'expo-router';
 import { LegendList } from '@legendapp/list';
 
-import { ChatMessageItem, MicrophoneCta } from './components';
+import { ChatMessageItem } from './components';
 import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
-import { Button } from '@/components/ui/button';
+import { VoiceAssistantFooter } from './components/voice-assistant-footer';
 
 export default function AssistantPage() {
   const { id: listId } = useLocalSearchParams<{ id: string }>();
@@ -44,38 +43,16 @@ export default function AssistantPage() {
         }}
         ItemSeparatorComponent={() => <View className="h-3" />}
       />
-      <View className="w-full flex items-center justify-center">
-        <View className="max-w-[84%] bg-muted overflow-hidden  rounded-b-none !rounded-2xl px-4 py-3">
-          <Text className="text-sm text-center">
-            {transcript
-              ? 'processando...'
-              : recognizing
-                ? 'ouvindo...'
-                : 'Ative o modo Direto ou toque no microfone.'}
-          </Text>
-        </View>
-      </View>
-      <View className="w-full flex flex-col gap-4 items-center overflow-hidden rounded-[28px] border border-border/40 bg-black p-4">
-        <View className="w-min flex-row gap-2 p-2 border border-border/50 rounded-lg justify-center">
-          <Button
-            variant={directMode === 'manual' ? 'default' : 'ghost'}
-            onPress={() => handleDirectModeChange('manual')}>
-            <Text>Manual</Text>
-          </Button>
-          <Button
-            variant={directMode === 'auto' ? 'default' : 'ghost'}
-            onPress={() => handleDirectModeChange('auto')}>
-            <Text>Automático</Text>
-          </Button>
-        </View>
 
-        <MicrophoneCta
-          active={recognizing}
-          onPress={handleMainAction}
-          onStop={handleStop}
-          isAuto={directMode === 'auto'}
-        />
-      </View>
+      <VoiceAssistantFooter
+        handleDirectModeChange={handleDirectModeChange}
+        transcript={transcript}
+        recognizing={recognizing}
+        directMode={directMode}
+        isFirstItem={chatMessages.length === 0}
+        handleMainAction={handleMainAction}
+        handleStop={handleStop}
+      />
     </View>
   );
 }
