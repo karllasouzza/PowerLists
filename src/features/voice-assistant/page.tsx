@@ -1,13 +1,22 @@
 import { View, ScrollView } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { useLocalSearchParams } from 'expo-router';
 
 import { MicrophoneCta, TranscriptSection } from './components';
 import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
 import { Button } from '@/components/ui/button';
 
 export default function AssistantPage() {
-  const { recognizing, transcript, directMode, handleStart, handleStop, handleDirectModeChange } =
-    useVoiceAssistantLogics();
+  const { id: listId } = useLocalSearchParams<{ id: string }>();
+  const {
+    recognizing,
+    transcript,
+    directMode,
+    chatMessages,
+    handleStart,
+    handleStop,
+    handleDirectModeChange,
+  } = useVoiceAssistantLogics(listId ?? '');
 
   const handleMainAction = () => {
     if (recognizing) {
@@ -30,7 +39,7 @@ export default function AssistantPage() {
           paddingBottom: 16,
         }}>
         <View className="items-center gap-5 pt-3">
-          <TranscriptSection transcript={transcript} recognizing={recognizing} />
+          <TranscriptSection messages={chatMessages} recognizing={recognizing} />
         </View>
       </ScrollView>
       <View className="w-full flex items-center justify-center">
