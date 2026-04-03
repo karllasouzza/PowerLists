@@ -10,6 +10,7 @@ import {
   startSpeechRecognition,
   stopSpeechRecognition,
 } from '../services/speech-recognition-service';
+import { createAudioQueue } from '../services/audio-queue';
 import { parseTranscript } from '../utils/parse-transcript';
 import type { ChatMessage, SpeechErrorEvent, SpeechResultEvent } from '../types';
 import useAssistantAudios from './use-assistant-audios';
@@ -26,6 +27,8 @@ export const useVoiceAssistantLogics = (listId: string) => {
     { type: 'assistant', text: 'O que gostaria de adicionar na lista hoje?' },
   ]);
 
+  const { current: playAudio } = useRef(createAudioQueue());
+
   const {
     assistantCourtesyPlayer,
     addingListItemPlayer,
@@ -35,20 +38,24 @@ export const useVoiceAssistantLogics = (listId: string) => {
     errorNotificationPlayer,
   } = useAssistantAudios();
 
-  const { executeCreationFlow } = useListItemCreationFlow(setChatMessages, {
-    addingListItemPlayer,
-    successPlayer,
-    assistantNewItemPlayer,
-    errorPlayer,
-    errorNotificationPlayer,
-  });
+  const { executeCreationFlow } = useListItemCreationFlow(
+    setChatMessages,
+    {
+      addingListItemPlayer,
+      successPlayer,
+      assistantNewItemPlayer,
+      errorPlayer,
+      errorNotificationPlayer,
+    },
+    playAudio,
+  );
 
   useEffect(() => {
     directModeRef.current = directMode;
   }, [directMode]);
 
   useEffect(() => {
-    requestAnimationFrame(() => assistantCourtesyPlayer.play());
+    void playAudio(assistantCourtesyPlayer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -73,13 +80,16 @@ export const useVoiceAssistantLogics = (listId: string) => {
       return;
     }
 
+    // In manual mode, stop listening after each valid result
+    if (directModeRef.current === 'manual') {
+      stopSpeechRecognition();
+    }
+
     // Step 1: append user transcript bubble
     setChatMessages((prev) => [...prev, { type: 'user', text: nextTranscript }]);
 
     // Steps 2-6: acknowledgment card + create item + audio feedback
-    requestAnimationFrame(() => {
-      void executeCreationFlow({ title, amount, listId });
-    });
+    void executeCreationFlow({ title, amount, listId });
   });
 
   useSpeechRecognitionEvent('error', (event: SpeechErrorEvent) => {

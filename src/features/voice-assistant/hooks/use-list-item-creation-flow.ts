@@ -5,6 +5,7 @@ import { createNewListItem } from '@/data/states/list-items';
 import { generateUUID } from '@/utils/generate-uuid';
 
 import type { AssistantAcknowledgmentMessage, ChatMessage } from '../types';
+import type { PlayAudio } from '../services/audio-queue';
 
 interface CreationFlowPlayers {
   addingListItemPlayer: AudioPlayer;
@@ -23,6 +24,7 @@ interface CreationFlowItem {
 export const useListItemCreationFlow = (
   setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   players: CreationFlowPlayers,
+  playAudio: PlayAudio,
 ) => {
   const executeCreationFlow = useCallback(
     async ({ title, amount, listId }: CreationFlowItem) => {
@@ -37,7 +39,7 @@ export const useListItemCreationFlow = (
       };
 
       setChatMessages((prev) => [...prev, acknowledgmentMessage]);
-      requestAnimationFrame(() => players.addingListItemPlayer.play());
+      await playAudio(players.addingListItemPlayer);
 
       // Step 3: create the item
       const isSaved = await createNewListItem({
@@ -58,14 +60,14 @@ export const useListItemCreationFlow = (
               : msg,
           ),
         );
-        requestAnimationFrame(() => players.successPlayer.play());
+        await playAudio(players.successPlayer);
 
         // Step 4b: follow-up prompt
         setChatMessages((prev) => [
           ...prev,
           { type: 'assistant', text: 'Se quiser adicionar outro item, é só me falar' },
         ]);
-        requestAnimationFrame(() => players.assistantNewItemPlayer.play());
+        await playAudio(players.assistantNewItemPlayer);
       } else {
         // Step 5: error — update item status
         setChatMessages((prev) =>
@@ -75,7 +77,7 @@ export const useListItemCreationFlow = (
               : msg,
           ),
         );
-        requestAnimationFrame(() => players.errorPlayer.play());
+        await playAudio(players.errorPlayer);
 
         // Step 6: append error message + play error notification
         setChatMessages((prev) => [
@@ -85,10 +87,10 @@ export const useListItemCreationFlow = (
             text: 'Ocorreu um erro! Para tentar novamente, por favor acione novamente a gravação!',
           },
         ]);
-        requestAnimationFrame(() => players.errorNotificationPlayer.play());
+        await playAudio(players.errorNotificationPlayer);
       }
     },
-    [setChatMessages, players],
+    [setChatMessages, players, playAudio],
   );
 
   return { executeCreationFlow };
