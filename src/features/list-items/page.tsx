@@ -1,21 +1,21 @@
+import { observer } from '@legendapp/state/react';
+import { IconRobotFace, IconPlus } from '@tabler/icons-react-native';
+import { useRouter } from 'expo-router';
 import React, { useCallback } from 'react';
 import { View } from 'react-native';
-import { useRouter } from 'expo-router';
-import { observer } from '@legendapp/state/react';
-import { IconPlus, IconMicrophone } from '@tabler/icons-react-native';
 
 import { TopBar } from '@/components/top-bar';
 import { Fab } from '@/components/ui/fab';
 
-import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
-import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import {
   ListItemsContent,
   ListItemsFooter,
-  ListItemsSortBar,
   ListItemSkeletonList,
+  ListItemsSortBar,
 } from './components';
 import ListItemCard from './components/list-item-card';
+import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
+import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import type { ListItem } from './types';
 
 const ListItemsScreen = observer(() => {
@@ -129,8 +129,8 @@ const ListItemsScreen = observer(() => {
       <Fab
         className="!bottom-36"
         onPress={handleOpenAssistant}
-        icon={IconMicrophone}
-        buttonClassName={'bg-blue-400'}
+        icon={IconRobotFace}
+        buttonClassName={'bg-violet-400 p-3'}
         iconClassName={accentForegroundClassName}
         labelClassName={accentForegroundClassName}
       />
