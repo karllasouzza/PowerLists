@@ -24,12 +24,18 @@ export const useVoiceAssistantLogics = (listId: string) => {
   const startAttemptRef = useRef(0);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const { addingListItemPlayer, successPlayer, errorPlayer, errorNotificationPlayer } =
-    useAssistantAudios();
+  const {
+    addingListItemPlayer,
+    successPlayer,
+    assistantNewItemPlayer,
+    errorPlayer,
+    errorNotificationPlayer,
+  } = useAssistantAudios();
 
   const { executeCreationFlow } = useListItemCreationFlow(setChatMessages, {
     addingListItemPlayer,
     successPlayer,
+    assistantNewItemPlayer,
     errorPlayer,
     errorNotificationPlayer,
   });

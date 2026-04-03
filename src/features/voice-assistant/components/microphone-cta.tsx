@@ -30,8 +30,8 @@ export const MicrophoneCta = ({ active, onPress, isAuto, onStop }: MicrophoneCta
       onStop();
     } else {
       onPress();
-      startRecordingPlayer.play();
     }
+    startRecordingPlayer.play();
   };
 
   useEffect(() => {

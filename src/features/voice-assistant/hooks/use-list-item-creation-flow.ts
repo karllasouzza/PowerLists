@@ -9,6 +9,7 @@ import type { AssistantAcknowledgmentMessage, ChatMessage } from '../types';
 interface CreationFlowPlayers {
   addingListItemPlayer: AudioPlayer;
   successPlayer: AudioPlayer;
+  assistantNewItemPlayer: AudioPlayer;
   errorPlayer: AudioPlayer;
   errorNotificationPlayer: AudioPlayer;
 }
@@ -49,7 +50,7 @@ export const useListItemCreationFlow = (
       });
 
       if (isSaved) {
-        // Step 4: success
+        // Step 4: success — update status
         setChatMessages((prev) =>
           prev.map((msg) =>
             msg.type === 'assistant-acknowledgment' && msg.id === acknowledgeId
@@ -58,6 +59,13 @@ export const useListItemCreationFlow = (
           ),
         );
         players.successPlayer.play();
+
+        // Step 4b: follow-up prompt
+        setChatMessages((prev) => [
+          ...prev,
+          { type: 'assistant', text: 'Se quiser adicionar outro item, é só me falar' },
+        ]);
+        players.assistantNewItemPlayer.play();
       } else {
         // Step 5: error — update item status
         setChatMessages((prev) =>
