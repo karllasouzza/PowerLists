@@ -1,5 +1,4 @@
 import { ExpoSpeechRecognitionModule, ExpoSpeechRecognitionOptions } from 'expo-speech-recognition';
-
 import type { SpeechErrorEvent, SpeechResultEvent } from '../types';
 
 const DEFAULT_SPEECH_OPTIONS: ExpoSpeechRecognitionOptions = {

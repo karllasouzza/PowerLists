@@ -46,13 +46,15 @@ export type PlayAudio = (player: AudioPlayer) => Promise<void>;
 
 export const createAudioQueue = (): PlayAudio => {
   let chain: Promise<void> = Promise.resolve();
+  let subsequentPlays = 0;
 
   return (player: AudioPlayer): Promise<void> => {
     chain = chain
       .then(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())))
       .then(() => playAndWait(player))
-      .catch(() => {
-        // Swallow errors to keep the chain alive for subsequent calls
+      .catch((error) => {
+        subsequentPlays++;
+        console.error('Error in audio queue:', error, 'Subsequent plays:', subsequentPlays);
       });
 
     return chain;
