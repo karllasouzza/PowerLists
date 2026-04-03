@@ -37,7 +37,7 @@ describe('speech-recognition-service', () => {
     expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith({
       lang: 'pt-BR',
       interimResults: true,
-      continuous: false,
+      continuous: true,
     });
   });
 
@@ -50,6 +50,7 @@ describe('speech-recognition-service', () => {
   it('extracts transcript from first result', () => {
     const transcript = getTranscriptFromResultEvent({
       results: [{ transcript: 'comprar arroz' }],
+      isFinal: true,
     });
 
     expect(transcript).toBe('comprar arroz');

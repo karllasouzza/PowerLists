@@ -1,11 +1,10 @@
-import { View } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { LegendList } from '@legendapp/list';
-
-import { ChatMessageItem } from './components';
-import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
-import { VoiceAssistantFooter } from './components/voice-assistant-footer';
 import { TopBar } from '@/components/top-bar';
+import { LegendList } from '@legendapp/list';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View } from 'react-native';
+import { ChatMessageItem } from './components';
+import { VoiceAssistantFooter } from './components/voice-assistant-footer';
+import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
 
 export default function AssistantPage() {
   const router = useRouter();
