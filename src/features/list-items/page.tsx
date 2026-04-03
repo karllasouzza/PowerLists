@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
-import { IconPlus, IconRobot } from '@tabler/icons-react-native';
+import { IconPlus, IconMicrophone } from '@tabler/icons-react-native';
 
 import { TopBar } from '@/components/top-bar';
 import { Fab } from '@/components/ui/fab';
@@ -129,8 +129,8 @@ const ListItemsScreen = observer(() => {
       <Fab
         className="!bottom-36"
         onPress={handleOpenAssistant}
-        icon={IconRobot}
-        buttonClassName={accentBgClassName}
+        icon={IconMicrophone}
+        buttonClassName={'bg-blue-400'}
         iconClassName={accentForegroundClassName}
         labelClassName={accentForegroundClassName}
       />
