@@ -37,13 +37,6 @@
       ],
       "expo-font",
       [
-        "react-native-vosk",
-        {
-          "models": ["assets/model-pt-br"],
-          "iOSMicrophonePermission": "Nous avons besoin d'accéder à votre microphone"
-        }
-      ],
-      [
         "expo-speech-recognition",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to use the microphone.",
