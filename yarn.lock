@@ -7326,6 +7326,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-audio@npm:~1.1.1":
+  version: 1.1.1
+  resolution: "expo-audio@npm:1.1.1"
+  peerDependencies:
+    expo: "*"
+    expo-asset: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/3ec687ca239b816097336808c9bd69995149166faf8dd74cb5fe732878843436178cbd1d901642779148df397562ffd36d207d217c801f16c300ab7df24d2208
+  languageName: node
+  linkType: hard
+
 "expo-blur@npm:~15.0.8":
   version: 15.0.8
   resolution: "expo-blur@npm:15.0.8"
@@ -7580,6 +7592,17 @@ __metadata:
   version: 1.0.5
   resolution: "expo-server@npm:1.0.5"
   checksum: 10c0/0da974f733235d457f7ce51e5452f48f203378687f821bdab7159617a491c0192251423a17a7a3a118486e1cbfffff5d5ad31aeeedcf2cfad6412a1bd7e86877
+  languageName: node
+  linkType: hard
+
+"expo-speech-recognition@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "expo-speech-recognition@npm:3.1.2"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/6561ec4a8deb5a9baf770032eebd9b89eeaeb0fc92762122e386456382a4f6aa640c72289befec05fc89715371d703c7f46acbe83a961593e969c17f0e376925
   languageName: node
   linkType: hard
 
@@ -11589,6 +11612,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-prettier: "npm:^5.5.5"
     expo: "npm:^54.0.0"
+    expo-audio: "npm:~1.1.1"
     expo-blur: "npm:~15.0.8"
     expo-constants: "npm:~18.0.13"
     expo-dev-client: "npm:~6.0.20"
@@ -11597,6 +11621,7 @@ __metadata:
     expo-linking: "npm:~8.0.11"
     expo-router: "npm:~6.0.23"
     expo-secure-store: "npm:~15.0.8"
+    expo-speech-recognition: "npm:^3.1.2"
     globals: "npm:^16.5.0"
     humps: "npm:^2.0.1"
     jest: "npm:~29.7.0"
