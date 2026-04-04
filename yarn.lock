@@ -3400,7 +3400,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-tooltip@npm:^1.2.7":
+"@radix-ui/react-tooltip@npm:^1.2.8":
   version: 1.2.8
   resolution: "@radix-ui/react-tooltip@npm:1.2.8"
   dependencies:
@@ -4329,14 +4329,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rn-primitives/tooltip@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "@rn-primitives/tooltip@npm:1.2.0"
+"@rn-primitives/tooltip@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@rn-primitives/tooltip@npm:1.4.0"
   dependencies:
-    "@radix-ui/react-tooltip": "npm:^1.2.7"
-    "@rn-primitives/hooks": "npm:1.3.0"
-    "@rn-primitives/slot": "npm:1.2.0"
-    "@rn-primitives/types": "npm:1.2.0"
+    "@radix-ui/react-tooltip": "npm:^1.2.8"
+    "@rn-primitives/hooks": "npm:1.4.0"
+    "@rn-primitives/slot": "npm:1.4.0"
+    "@rn-primitives/types": "npm:1.4.0"
   peerDependencies:
     "@rn-primitives/portal": "*"
     react: "*"
@@ -4347,7 +4347,7 @@ __metadata:
       optional: true
     react-native-web:
       optional: true
-  checksum: 10c0/f190b7af53f3af267a74315d544621e5b5e5dfd6ab9cec49d1b0bb8af9bc8ea1c6346ed824768248ce96191409fe13f153107a114134bf8981c1595806837a14
+  checksum: 10c0/e1a36afac2812886c92adff7abd2bcedc7c002356779380ce7499c96a553e03c00520f807f989f6b60088ac41ee2965db635bb05c35a5a52b1e9431c665a8417
   languageName: node
   linkType: hard
 
@@ -11752,7 +11752,7 @@ __metadata:
     "@rn-primitives/tabs": "npm:^1.4.0"
     "@rn-primitives/toggle": "npm:^1.2.0"
     "@rn-primitives/toggle-group": "npm:^1.2.0"
-    "@rn-primitives/tooltip": "npm:^1.2.0"
+    "@rn-primitives/tooltip": "npm:^1.4.0"
     "@supabase/supabase-js": "npm:^2.84.0"
     "@tabler/icons-react-native": "npm:^3.35.0"
     "@types/babel__plugin-transform-runtime": "npm:^7"
