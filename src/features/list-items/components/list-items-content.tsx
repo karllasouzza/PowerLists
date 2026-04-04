@@ -97,7 +97,7 @@ export function ListItemsContent({
       extraData={listExtraData}
       recycleItems
       onScrollBeginDrag={handleListScrollStart}
-      ListFooterComponent={<View className="h-28" />}
+      ListFooterComponent={<View className="h-44" />}
       ListEmptyComponent={() => (
         <ListItemsEmptyComponent
           accentBgClassName={accentBgClassName}
