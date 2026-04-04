@@ -9,15 +9,8 @@ import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
 export default function AssistantPage() {
   const router = useRouter();
   const { id: listId } = useLocalSearchParams<{ id: string }>();
-  const {
-    recognizing,
-    transcript,
-    directMode,
-    chatMessages,
-    handleStart,
-    handleStop,
-    handleDirectModeChange,
-  } = useVoiceAssistantLogics(listId ?? '');
+  const { recognizing, directMode, chatMessages, handleStart, handleStop, handleDirectModeChange } =
+    useVoiceAssistantLogics(listId ?? '');
 
   const handleMainAction = () => {
     if (recognizing) {
@@ -55,7 +48,6 @@ export default function AssistantPage() {
 
       <VoiceAssistantFooter
         handleDirectModeChange={handleDirectModeChange}
-        transcript={transcript}
         recognizing={recognizing}
         directMode={directMode}
         isFirstItem={chatMessages.length === 0}

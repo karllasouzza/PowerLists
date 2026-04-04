@@ -18,7 +18,6 @@ import { useListItemCreationFlow } from './use-list-item-creation-flow';
 
 export const useVoiceAssistantLogics = (listId: string) => {
   const [recognizing, setRecognizing] = useState(false);
-  const [transcript, setTranscript] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [directMode, setDirectMode] = useState<'manual' | 'auto'>('manual');
   const directModeRef = useRef<'manual' | 'auto'>(directMode);
@@ -164,7 +163,6 @@ export const useVoiceAssistantLogics = (listId: string) => {
   );
 
   const handleReset = useCallback(() => {
-    setTranscript('');
     setErrorMessage(null);
   }, []);
 
@@ -203,7 +201,6 @@ export const useVoiceAssistantLogics = (listId: string) => {
 
   return {
     recognizing,
-    transcript,
     errorMessage,
     directMode,
     chatMessages,
