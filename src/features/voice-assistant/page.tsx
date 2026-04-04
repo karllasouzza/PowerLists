@@ -28,9 +28,14 @@ export default function AssistantPage() {
     void handleStart();
   };
 
+  const handleBack = () => {
+    handleStop();
+    router.back();
+  };
+
   return (
     <View className="flex-1 w-full h-full bg-background">
-      <TopBar title="Assistente de Voz" showBack onBack={() => router.back()} />
+      <TopBar title="Assistente de Voz" showBack onBack={handleBack} />
       <LegendList
         initialScrollAtEnd
         maintainScrollAtEnd

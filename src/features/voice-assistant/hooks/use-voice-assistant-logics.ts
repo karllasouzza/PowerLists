@@ -115,11 +115,11 @@ export const useVoiceAssistantLogics = (listId: string) => {
     try {
       return await requestSpeechPermission();
     } catch {
-      const message = 'Permissao de microfone e obrigatoria para continuar.';
+      const message = 'Permissão de microfone e obrigatória para continuar.';
       setErrorMessage(message);
       showToast({
         type: 'warning',
-        title: 'Permissao necessaria',
+        title: 'Permissão necessária',
         subtitle: message,
       });
       return false;
@@ -180,6 +180,13 @@ export const useVoiceAssistantLogics = (listId: string) => {
       stopSpeechRecognition();
     };
   }, [directMode, handleStart]);
+
+  // Ensure speech recognition is stopped unconditionally when the hook/component unmounts
+  useEffect(() => {
+    return () => {
+      stopSpeechRecognition();
+    };
+  }, []);
 
   return {
     recognizing,
