@@ -80,7 +80,7 @@
     "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
+    "@babel/core": "^7.29.0",
     "@babel/plugin-transform-flow-strip-types": "^7.27.1",
     "@babel/plugin-transform-runtime": "^7.28.5",
     "@types/babel__plugin-transform-runtime": "^7",
