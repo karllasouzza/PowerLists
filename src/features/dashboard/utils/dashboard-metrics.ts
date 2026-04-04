@@ -385,7 +385,7 @@ export const buildDashboardSummary = (
   return {
     totalCheckedPrice: getTotalCheckedPrice(periodItems),
     pieSlices: buildPieSlices(lists, periodItems),
-    recentLists: buildRecentListCards(lists, items, 3),
+    recentLists: buildRecentListCards(lists, periodItems, 3),
     increases,
     decreases,
   };

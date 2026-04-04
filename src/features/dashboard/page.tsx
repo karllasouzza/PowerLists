@@ -75,7 +75,6 @@ function DashboardPage() {
   );
 
   const handleViewAllItemVariations = useCallback(() => {
-    console.log('handleViewAllItemVariations', { period });
     router.push({
       pathname: '/item-variations',
       params: { period },

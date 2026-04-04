@@ -25,7 +25,7 @@ export default function ItemPriceComparisonPage() {
   }, [averageDailyVariation]);
 
   const totalDeltaTitle =
-    variation?.changePercent && variation.changePercent >= 0
+    variation?.changePercent !== undefined && variation.changePercent >= 0
       ? 'Incremento no período'
       : 'Decremento no período';
 
