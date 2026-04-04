@@ -76,10 +76,10 @@ export const filterItemsByPeriod = (
   const nowDate = dayjs(now);
   const periodStart =
     period === 'week'
-      ? nowDate.startOf('isoWeek')
+      ? nowDate.subtract(7, 'day')
       : period === 'month'
-        ? nowDate.startOf('month')
-        : nowDate.startOf('year');
+        ? nowDate.subtract(30, 'day')
+        : nowDate.subtract(12, 'month');
 
   return items.filter((item) => {
     const itemDate = dayjs(resolveItemDate(item));
