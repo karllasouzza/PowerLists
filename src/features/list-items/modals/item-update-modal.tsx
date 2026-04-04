@@ -4,7 +4,11 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Decimal } from 'decimal.js';
+import { useValue } from '@legendapp/state/react';
 
+import { showToast } from '@/services';
+import { updateListItem, listItems$ } from '@/data/states/list-items';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import {
   AppModal,
   AppModalContent,
@@ -15,9 +19,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
-import { createNewListItem } from '@/data/states/list-items';
-import { formatBRL, parseBRLToNumber } from '@/features/list_items/utils/currency';
-import { showToast } from '@/services';
+import { ListItem } from '../types';
+import { numberToBRLInput, parseBRLToNumber, formatBRL } from '../utils';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -36,23 +39,29 @@ const parseAmount = (val: string): number => {
   }
 };
 
-type ItemCreateModalProps = {
+type ItemUpdateModalProps = {
   open: boolean;
-  listId: string;
+  itemId?: string;
   onOpenChange: (open: boolean) => void;
   accentBgClassName: string;
   accentForegroundClassName: string;
 };
 
-export function ItemCreateModal({
+export function ItemUpdateModal({
   open,
-  listId,
+  itemId,
   onOpenChange,
   accentBgClassName,
   accentForegroundClassName,
-}: ItemCreateModalProps) {
+}: ItemUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const titleRef = useRef<TextInput>(null);
+  const priceRef = useRef<TextInput>(null);
+  const amountRef = useRef<TextInput>(null);
+
+  const listItemsRaw = useValue(listItems$);
+  const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
+  const currentItem = allItems.find((item) => item.id === itemId);
 
   const {
     control,
@@ -61,59 +70,57 @@ export function ItemCreateModal({
     formState: { errors },
   } = useForm<ItemFormData>({
     resolver: zodResolver(itemFormSchema),
-    defaultValues: { title: '', price: '', amount: '1' },
+    defaultValues: {
+      title: '',
+      price: '',
+      amount: '1',
+    },
   });
 
   useEffect(() => {
     if (open) {
-      const timer = setTimeout(() => titleRef.current?.focus(), 300);
+      reset({
+        title: currentItem?.title || '',
+        price: currentItem?.price != null ? numberToBRLInput(currentItem.price) : '',
+        amount: currentItem?.amount != null ? String(currentItem.amount) : '1',
+      });
+      const focusRef = currentItem?.price === 0 ? priceRef : titleRef;
+      const timer = setTimeout(() => focusRef.current?.focus(), 300);
       return () => clearTimeout(timer);
     }
-  }, [open]);
-
-  const closeModal = () => {
-    onOpenChange(false);
-    reset({ title: '', price: '', amount: '1' });
-  };
+  }, [open, currentItem?.title, currentItem?.price, currentItem?.amount, reset]);
 
   const onSubmit = async (data: ItemFormData) => {
+    if (!itemId || !currentItem) return;
+
     setIsSubmitting(true);
     try {
-      const success = await createNewListItem({
+      const success = await updateListItem({
+        id: itemId,
         title: data.title,
         price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
-        listId,
-        profileId: '',
-        isChecked: false,
+        isChecked: currentItem.isChecked ?? false,
       });
-      if (success) {
-        closeModal();
-        return;
-      }
-
+      if (success) onOpenChange(false);
+    } catch {
       showToast({
         type: 'error',
         title: 'Erro ao salvar item',
-        subtitle: 'Não foi possível criar o item. Tente novamente.',
-      });
-    } catch (error) {
-      console.error('Unexpected error while creating item:', error);
-      showToast({
-        type: 'error',
-        title: 'Erro ao salvar item',
-        subtitle: 'Não foi possível criar o item. Tente novamente.',
+        subtitle: 'Não foi possível atualizar o item. Tente novamente.',
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const submitForm = handleSubmit(onSubmit);
+
   return (
     <AppModal open={open} onOpenChange={onOpenChange}>
       <AppModalContent>
         <AppModalHandle />
-        <AppModalHeader title="Novo item" />
+        <AppModalHeader title="Editar item" />
 
         <View className="gap-6 px-6 pb-2">
           <View className="gap-2">
@@ -129,6 +136,8 @@ export function ItemCreateModal({
                   onChangeText={onChange}
                   aria-labelledby="title"
                   returnKeyType="next"
+                  onSubmitEditing={() => amountRef.current?.focus()}
+                  submitBehavior="newline"
                 />
               )}
             />
@@ -145,11 +154,15 @@ export function ItemCreateModal({
                 name="amount"
                 render={({ field: { onChange, value } }) => (
                   <Input
+                    ref={amountRef}
                     placeholder="1"
                     value={value}
                     onChangeText={onChange}
                     keyboardType="numeric"
                     aria-labelledby="amount"
+                    returnKeyType="next"
+                    onSubmitEditing={() => priceRef.current?.focus()}
+                    submitBehavior="newline"
                   />
                 )}
               />
@@ -161,11 +174,15 @@ export function ItemCreateModal({
                 name="price"
                 render={({ field: { onChange, value } }) => (
                   <Input
+                    ref={priceRef}
                     placeholder="R$ 0,00"
                     value={value}
                     onChangeText={(text) => onChange(formatBRL(text))}
                     keyboardType="numeric"
                     aria-labelledby="price"
+                    returnKeyType="done"
+                    onSubmitEditing={submitForm}
+                    submitBehavior="blurAndSubmit"
                   />
                 )}
               />
@@ -174,12 +191,13 @@ export function ItemCreateModal({
         </View>
 
         <AppModalFooter
-          onCancel={closeModal}
-          onConfirm={handleSubmit(onSubmit)}
-          confirmLabel="Criar Item"
+          onCancel={() => onOpenChange(false)}
+          onConfirm={submitForm}
+          confirmLabel="Editar Item"
           confirmButtonClassName={accentBgClassName}
           confirmLabelClassName={accentForegroundClassName}
           isLoading={isSubmitting}
+          isConfirmDisabled={!itemId}
         />
       </AppModalContent>
     </AppModal>

@@ -7,7 +7,7 @@ import { TabButton } from '@/components/tab-button';
 
 export default function AuthenticatedLayout() {
   const pathname = usePathname();
-  const isListScreen = pathname === '/list';
+  const isListScreen = pathname.includes('/list');
 
   return (
     <Tabs className="flex bg-background">
