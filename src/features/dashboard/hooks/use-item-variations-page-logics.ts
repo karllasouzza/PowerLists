@@ -1,12 +1,12 @@
 import { useValue } from '@legendapp/state/react';
-import { useLocalSearchParams } from 'expo-router';
-import { useMemo } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 
 import { listItems$ } from '@/data/states/list-items';
 import type { ListItem } from '@/data/types';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 
-import type { DashboardPeriod } from '../types';
+import type { DashboardItemVariation, DashboardPeriod, VariationTab } from '../types';
 import {
   buildItemVariations,
   filterItemsByPeriod,
@@ -35,7 +35,9 @@ const normalizeItem = (item: Partial<ListItem>): ListItem => {
 };
 
 export const useItemVariationsPageLogics = () => {
+  const router = useRouter();
   const { period: periodParam } = useLocalSearchParams<{ period?: string }>();
+  const [tab, setTab] = useState<VariationTab>('decreases');
 
   const period = parsePeriodParam(periodParam);
   const listItemsState = useValue(listItems$.get());
@@ -55,11 +57,41 @@ export const useItemVariationsPageLogics = () => {
     return splitItemVariations(variations);
   }, [periodItems]);
 
+  const selectedItems = useMemo(
+    () => (tab === 'decreases' ? decreases : increases),
+    [tab, decreases, increases],
+  );
+
+  const handleTabChange = useCallback((value: string) => {
+    setTab(value as VariationTab);
+  }, []);
+
+  const handleOpenItemComparison = useCallback(
+    (item: DashboardItemVariation) => {
+      router.push({
+        pathname: '/item-comparison',
+        params: {
+          itemKey: item.key,
+          itemTitle: item.title,
+          period,
+        },
+      });
+    },
+    [period, router],
+  );
+
+  const handleBack = useCallback(() => {
+    router.back();
+  }, [router]);
+
   return {
+    tab,
     period,
     periodLabel: getPeriodLabel(period),
-    increases,
-    decreases,
+    selectedItems,
     isLoading,
+    handleTabChange,
+    handleOpenItemComparison,
+    handleBack,
   };
 };

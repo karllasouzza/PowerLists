@@ -1,6 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
-import { useRouter } from 'expo-router';
 
 import { TopBar } from '@/components/top-bar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,9 +7,6 @@ import { Text } from '@/components/ui/text';
 
 import { ItemVariationRow } from './components';
 import { useItemVariationsPageLogics } from './hooks/use-item-variations-page-logics';
-import type { DashboardItemVariation } from './types';
-
-type VariationTab = 'decreases' | 'increases';
 
 function ItemVariationsLoading() {
   return (
@@ -25,29 +20,15 @@ function ItemVariationsLoading() {
 }
 
 export default function ItemVariationsPage() {
-  const router = useRouter();
-  const [tab, setTab] = useState<VariationTab>('decreases');
-  const { period, periodLabel, increases, decreases, isLoading } = useItemVariationsPageLogics();
-
-  const handleOpenItemComparison = useCallback(
-    (item: DashboardItemVariation) => {
-      router.push({
-        pathname: '/item-comparison',
-        params: {
-          itemKey: item.key,
-          itemTitle: item.title,
-          period,
-        },
-      });
-    },
-    [period, router],
-  );
-
-  const selectedItems = useMemo(() => {
-    return tab === 'decreases' ? decreases : increases;
-  }, [decreases, increases, tab]);
-
-  const handleBack = () => router.back();
+  const {
+    tab,
+    periodLabel,
+    selectedItems,
+    isLoading,
+    handleTabChange,
+    handleOpenItemComparison,
+    handleBack,
+  } = useItemVariationsPageLogics();
 
   return (
     <View className="flex-1 bg-background">
@@ -57,7 +38,7 @@ export default function ItemVariationsPage() {
         <ItemVariationsLoading />
       ) : (
         <View className="flex-1 px-4 py-4">
-          <Tabs value={tab} onValueChange={(value) => setTab(value as VariationTab)}>
+          <Tabs value={tab} onValueChange={handleTabChange}>
             <TabsList className="h-11 w-full rounded-xl bg-muted/70">
               <TabsTrigger value="decreases" className="flex-1 rounded-lg">
                 <Text className="text-sm font-semibold">Quedas</Text>

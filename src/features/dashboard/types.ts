@@ -2,6 +2,8 @@ import type { List, ListItem } from '@/data/types';
 
 export type DashboardPeriod = 'all' | 'week' | 'month' | 'year';
 
+export type VariationTab = 'decreases' | 'increases';
+
 export type DashboardDatePoint = {
   dateKey: string;
   label: string;
