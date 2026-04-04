@@ -8,11 +8,9 @@ import { TabButton } from '@/components/tab-button';
 export default function AuthenticatedLayout() {
   const pathname = usePathname();
   const isListScreen = pathname === '/list' || pathname.startsWith('/list/');
-  const isItemComparisonScreen =
-    pathname === '/item-comparison' || pathname.startsWith('/item-comparison/');
   const isItemVariationsScreen =
     pathname === '/item-variations' || pathname.startsWith('/item-variations/');
-  const shouldHideTabs = isListScreen || isItemComparisonScreen || isItemVariationsScreen;
+  const shouldHideTabs = isListScreen || isItemVariationsScreen || isItemVariationsScreen;
 
   return (
     <Tabs className="flex bg-background">

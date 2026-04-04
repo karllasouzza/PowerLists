@@ -26,7 +26,7 @@ export default function ItemVariationsPage() {
     selectedItems,
     isLoading,
     handleTabChange,
-    handleOpenItemComparison,
+    handleOpenItemVariations,
     handleBack,
   } = useItemVariationsPageLogics();
 
@@ -56,7 +56,7 @@ export default function ItemVariationsPage() {
           <ScrollView className="mt-3 flex-1" contentContainerClassName="gap-2 pb-8">
             {selectedItems.length ? (
               selectedItems.map((item) => (
-                <ItemVariationRow key={item.key} item={item} onPress={handleOpenItemComparison} />
+                <ItemVariationRow key={item.key} item={item} onPress={handleOpenItemVariations} />
               ))
             ) : (
               <View className="rounded-xl border border-dashed border-border bg-card px-3 py-4">
