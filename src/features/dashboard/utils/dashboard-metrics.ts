@@ -256,10 +256,28 @@ const buildItemVariationWithoutDailySeries = (
     (a, b) => resolveItemDate(a).getTime() - resolveItemDate(b).getTime(),
   );
 
-  const prices = sortedByDate.map((item) => item.price ?? 0);
-  const firstUnitPrice = prices[0] ?? 0;
-  const previousUnitPrice = prices.length > 1 ? (prices[prices.length - 2] ?? null) : null;
-  const lastUnitPrice = prices[prices.length - 1] ?? 0;
+  // Group prices by day (same logic as buildDailySeries) so that multiple
+  // entries on the same day are averaged into a single data point.
+  const dailyPriceMap = sortedByDate.reduce((map, item) => {
+    const dateKey = getDateKey(resolveItemDate(item));
+    const bucket = map.get(dateKey) ?? { totalPrice: 0, sampleCount: 0 };
+    bucket.totalPrice += item.price ?? 0;
+    bucket.sampleCount += 1;
+    map.set(dateKey, bucket);
+    return map;
+  }, new Map<string, { totalPrice: number; sampleCount: number }>());
+
+  const dailyAveragePrices = [...dailyPriceMap.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, bucket]) => bucket.totalPrice / bucket.sampleCount);
+
+  const firstUnitPrice = dailyAveragePrices[0] ?? 0;
+  const lastUnitPrice = dailyAveragePrices[dailyAveragePrices.length - 1] ?? 0;
+  const previousUnitPrice =
+    dailyAveragePrices.length > 1
+      ? (dailyAveragePrices[dailyAveragePrices.length - 2] ?? null)
+      : null;
+
   const changePercent =
     firstUnitPrice > 0 ? ((lastUnitPrice - firstUnitPrice) / firstUnitPrice) * 100 : 0;
 
@@ -271,14 +289,15 @@ const buildItemVariationWithoutDailySeries = (
   const direction = recentDelta > 0.01 ? 'increase' : recentDelta < -0.01 ? 'decrease' : 'stable';
 
   const totalAmount = sortedByDate.reduce((acc, item) => acc + (item.amount ?? 0), 0);
-  const averageUnitPrice = prices.reduce((acc, price) => acc + price, 0) / prices.length;
+  const allPrices = sortedByDate.map((item) => item.price ?? 0);
+  const averageUnitPrice = allPrices.reduce((acc, price) => acc + price, 0) / allPrices.length;
 
   return {
     key,
     title: sortedByDate[0]?.title?.trim() || 'Item sem nome',
     totalAmount,
-    minUnitPrice: Math.min(...prices),
-    maxUnitPrice: Math.max(...prices),
+    minUnitPrice: Math.min(...allPrices),
+    maxUnitPrice: Math.max(...allPrices),
     averageUnitPrice,
     firstUnitPrice,
     previousUnitPrice,
