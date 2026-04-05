@@ -34,9 +34,7 @@ export function RecentListsSection({ cards, onViewAll, onPressCard }: RecentList
         </ScrollView>
       ) : (
         <View className="mx-4 rounded-2xl border border-dashed border-border bg-card px-4 py-5">
-          <Text className="text-sm text-muted-foreground">
-            Nenhuma lista encontrada para o período selecionado.
-          </Text>
+          <Text className="text-sm text-muted-foreground">Nenhuma lista encontrada.</Text>
         </View>
       )}
     </View>

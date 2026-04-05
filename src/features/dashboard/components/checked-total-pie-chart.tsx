@@ -68,9 +68,9 @@ export function CheckedTotalPieChart({
 
   return (
     <View className="rounded-b-2xl p-4">
-      <Text className="text-base font-semibold text-foreground">Total de itens comprados</Text>
+      <Text className="text-base font-semibold text-foreground">Total pago em compras</Text>
       <Text variant="muted" className="mt-1 text-xs">
-        Distribuição por lista
+        Distribuição dos valores por lista
       </Text>
 
       {chartData.length ? (
@@ -132,7 +132,7 @@ export function CheckedTotalPieChart({
         </View>
       ) : (
         <View className="mt-4 rounded-2xl border border-dashed border-border px-4 py-6">
-          <Text className="text-sm text-muted-foreground">Sem dados o suficiente...</Text>
+          <Text className="text-sm text-muted-foreground">Sem dados suficientes...</Text>
         </View>
       )}
 
