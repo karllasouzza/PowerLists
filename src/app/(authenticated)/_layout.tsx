@@ -10,7 +10,9 @@ export default function AuthenticatedLayout() {
   const isListScreen = pathname === '/list' || pathname.startsWith('/list/');
   const isItemVariationsScreen =
     pathname === '/item-variations' || pathname.startsWith('/item-variations/');
-  const shouldHideTabs = isListScreen || isItemVariationsScreen || isItemVariationsScreen;
+  const isItemComparisonScreen =
+    pathname === '/item-comparison' || pathname.startsWith('/item-comparison/');
+  const shouldHideTabs = isListScreen || isItemVariationsScreen || isItemComparisonScreen;
 
   return (
     <Tabs className="flex bg-background">
@@ -23,6 +25,11 @@ export default function AuthenticatedLayout() {
         <TabTrigger
           name="item-variations"
           href={'/item-variations' as Href}
+          style={{ display: 'none' }}
+        />
+        <TabTrigger
+          name="item-comparison"
+          href={'/item-comparison' as Href}
           style={{ display: 'none' }}
         />
 

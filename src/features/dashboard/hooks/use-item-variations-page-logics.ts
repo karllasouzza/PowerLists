@@ -66,10 +66,10 @@ export const useItemVariationsPageLogics = () => {
     setTab(value as VariationTab);
   }, []);
 
-  const handleOpenItemVariations = useCallback(
+  const handleOpenItemComparison = useCallback(
     (item: DashboardItemVariation) => {
       router.push({
-        pathname: '/item-variations',
+        pathname: '/item-comparison',
         params: {
           itemKey: item.key,
           itemTitle: item.title,
@@ -91,7 +91,7 @@ export const useItemVariationsPageLogics = () => {
     selectedItems,
     isLoading,
     handleTabChange,
-    handleOpenItemVariations,
+    handleOpenItemComparison,
     handleBack,
   };
 };

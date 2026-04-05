@@ -60,10 +60,10 @@ function DashboardPage() {
     [router],
   );
 
-  const handleOpenItemVariations = useCallback(
+  const handleOpenItemComparison = useCallback(
     (item: DashboardItemVariation) => {
       router.push({
-        pathname: '/item-variations',
+        pathname: '/item-comparison',
         params: {
           itemKey: item.key,
           itemTitle: item.title,
@@ -107,7 +107,7 @@ function DashboardPage() {
             increases={increases}
             decreases={decreases}
             onViewAll={handleViewAllItemVariations}
-            onPressItem={handleOpenItemVariations}
+            onPressItem={handleOpenItemComparison}
           />
         </ScrollView>
       )}
