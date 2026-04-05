@@ -1,12 +1,14 @@
 import { ListItem } from '@/data/types';
 import { Decimal } from 'decimal.js';
 
+const BRL_CURRENCY_FORMATTER = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
 export const formatCurrency = (value: number | Decimal): string => {
   const num = value instanceof Decimal ? value.toNumber() : value;
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  }).format(num);
+  return BRL_CURRENCY_FORMATTER.format(num);
 };
 
 export const parsePrice = (price: string): number => {
