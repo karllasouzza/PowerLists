@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { useTheme } from '@/context/themes';
+import { rawColors } from '@/context/themes/theme-config';
+import { getThemeColorHex } from '@/utils/tailwind-color';
+import { isAccentColorToken, DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 import { Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFont } from '@shopify/react-native-skia';
 import { Bar, CartesianChart } from 'victory-native';
@@ -31,6 +35,9 @@ export function CheckedTotalPieChart({
   const { width } = useWindowDimensions();
   const axisFont = useFont(Poppins_500Medium, 11);
 
+  const { theme: themeName, colorScheme } = useTheme();
+  const themeVars = rawColors[themeName][colorScheme];
+
   const formatCreatedAt = (date: Date) => {
     return new Intl.DateTimeFormat('pt-BR', {
       day: '2-digit',
@@ -41,14 +48,40 @@ export function CheckedTotalPieChart({
   const chartData = useMemo<ChartBar[]>(() => {
     return slices
       .filter((slice) => slice.y > 0)
-      .map((slice, index) => ({
-        key: slice.listId,
-        position: index + 1,
-        createdAtLabel: formatCreatedAt(slice.createdAt),
-        total: Number(slice.y.toFixed(2)),
-        color: slice.color,
-      }));
-  }, [slices]);
+      .map((slice, index) => {
+        const rawColor = slice.color ?? DEFAULT_ACCENT_COLOR;
+        let resolvedColor = String(rawColor);
+
+        // If the slice.color is an accent token, resolve it to a hex value using theme vars
+        if (isAccentColorToken(resolvedColor)) {
+          resolvedColor = getThemeColorHex({
+            themeVars,
+            varName: `--color-${resolvedColor}`,
+            fallback: '#4C8E4A',
+          });
+        }
+
+        return {
+          key: slice.listId,
+          position: index + 1,
+          createdAtLabel: formatCreatedAt(slice.createdAt),
+          total: Number(slice.y.toFixed(2)),
+          color: resolvedColor,
+        };
+      });
+  }, [slices, themeVars]);
+
+  const labelColor = getThemeColorHex({
+    themeVars,
+    varName: '--color-muted-foreground',
+    fallback: '#6E6E6E',
+  });
+
+  const lineColor = getThemeColorHex({
+    themeVars,
+    varName: '--color-border',
+    fallback: '#D6D6D6',
+  });
 
   const xTickValues = useMemo(() => {
     return chartData.map((item) => item.position);
@@ -85,10 +118,10 @@ export function CheckedTotalPieChart({
                 xAxis={{
                   tickValues: xTickValues,
                   tickCount: xTickValues.length,
-                  font: axisFont,
+                  ...(axisFont ? { font: axisFont } : {}),
                   labelOffset: 5,
-                  labelColor: '#6E6E6E',
-                  lineColor: '#D6D6D6',
+                  labelColor,
+                  lineColor,
                   formatXLabel: (value) => {
                     const numeric = Number(value);
                     if (Number.isNaN(numeric)) return '';
@@ -101,9 +134,9 @@ export function CheckedTotalPieChart({
                 yAxis={[
                   {
                     tickCount: 5,
-                    font: axisFont,
-                    labelColor: '#6E6E6E',
-                    lineColor: '#d6d6d6a2',
+                    ...(axisFont ? { font: axisFont } : {}),
+                    labelColor,
+                    lineColor,
                     formatYLabel: (value) => `R$ ${Number(value).toFixed(0)}`,
                   },
                 ]}>

@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 
 import type { List, ListItem } from '@/data/types';
+import { DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 
 import type {
   DashboardDatePoint,
@@ -13,8 +14,6 @@ import type {
 } from '../types';
 
 dayjs.extend(isoWeek);
-
-const PIE_COLORS = ['#4C8E4A', '#81B979', '#A8D39B', '#6CA862', '#2E6A32', '#DCEFD3', '#B1DBA9'];
 
 const EMPTY_DAILY_SERIES: DashboardDatePoint[] = [];
 
@@ -144,7 +143,9 @@ export const buildPieSlices = (lists: List[], periodItems: ListItem[]): Dashboar
         icon: list.icon,
         createdAt: resolveListDate(list),
         y: checkedTotal,
-        color: PIE_COLORS[index % PIE_COLORS.length],
+        // Keep color as the list's accent token (fallback to default token).
+        // The UI will resolve the token to an actual hex value according to the theme.
+        color: list.accentColor ?? DEFAULT_ACCENT_COLOR,
       };
     });
 };
