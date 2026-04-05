@@ -1,4 +1,4 @@
-import { OnboardingContainer } from './components';
+import OnboardingContainer from './components/onboarding-container';
 
 interface OnboardingScreenProps {
   onComplete: () => void;
