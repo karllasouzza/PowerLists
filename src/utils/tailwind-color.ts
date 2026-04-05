@@ -1,4 +1,5 @@
 import colors from 'tailwindcss/colors';
+import Color from 'color';
 
 /**
  * Converte uma string de cor no formato Tailwind para o valor correspondente.
@@ -193,6 +194,47 @@ export const resolveColor = (
     // Caso contrário, tenta como cor Tailwind (ex: 'blue-500')
     return getTailwindColor(colorInput);
   } catch {
+    return fallback;
+  }
+};
+
+/**
+ * Resolve uma variável de tema (ex: '--color-background') para um valor hexadecimal.
+ * Usa o pacote `color` para parsear diversos formatos e normalizar para `#rrggbb`.
+ */
+export const getThemeColorHex = ({
+  themeVars,
+  varName,
+  fallback = '#000000',
+}: {
+  themeVars: ThemeVars;
+  varName: string;
+  fallback?: string;
+}): string => {
+  try {
+    const raw = themeVars?.[varName];
+    if (!raw) return fallback;
+
+    const str = String(raw).trim();
+
+    // Direct hex / rgb / hsl strings
+    if (/^#/.test(str) || /^rgba?\(/i.test(str) || /^hsla?\(/i.test(str)) {
+      return Color(str).hex().toLowerCase();
+    }
+
+    // If raw is channel-only like '138 5% 38%', normalize into an hsl() string
+    const parts = str.match(/-?\d+\.?\d*%?/g);
+    if (parts && parts.length >= 3) {
+      let [h, s, l] = parts;
+      if (!/%$/.test(s)) s = `${s}%`;
+      if (!/%$/.test(l)) l = `${l}%`;
+      const hslString = `hsl(${h}, ${s}, ${l})`;
+      return Color(hslString).hex().toLowerCase();
+    }
+
+    // Fallback: let Color attempt to parse any remaining format
+    return Color(str).hex().toLowerCase();
+  } catch (err) {
     return fallback;
   }
 };

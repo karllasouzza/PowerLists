@@ -6,8 +6,8 @@ export interface ListItem {
   price: number | null;
   amount: number | null;
   isChecked: boolean;
-  createdAt?: string | null;
-  updatedAt?: string | null;
+  createdAt: string | Date;
+  updatedAt?: string | Date | null;
   deleted?: boolean | null;
 }
 

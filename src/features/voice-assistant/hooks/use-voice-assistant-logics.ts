@@ -18,7 +18,6 @@ import { useListItemCreationFlow } from './use-list-item-creation-flow';
 
 export const useVoiceAssistantLogics = (listId: string) => {
   const [recognizing, setRecognizing] = useState(false);
-  const [transcript, setTranscript] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [directMode, setDirectMode] = useState<'manual' | 'auto'>('manual');
   const directModeRef = useRef<'manual' | 'auto'>(directMode);
@@ -113,13 +112,26 @@ export const useVoiceAssistantLogics = (listId: string) => {
 
   const hasGranted = useCallback(async (): Promise<boolean> => {
     try {
-      return await requestSpeechPermission();
+      const granted = await requestSpeechPermission();
+
+      if (!granted) {
+        const message = 'Permissão de microfone é obrigatória para continuar.';
+        setErrorMessage(message);
+        showToast({
+          type: 'warning',
+          title: 'Permissão necessária',
+          subtitle: message,
+        });
+        return false;
+      }
+
+      return true;
     } catch {
-      const message = 'Permissao de microfone e obrigatoria para continuar.';
+      const message = 'Permissão de microfone é obrigatória para continuar.';
       setErrorMessage(message);
       showToast({
         type: 'warning',
-        title: 'Permissao necessaria',
+        title: 'Permissão necessária',
         subtitle: message,
       });
       return false;
@@ -150,15 +162,14 @@ export const useVoiceAssistantLogics = (listId: string) => {
     [hasGranted],
   );
 
+  const handleReset = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
+
   const handleStop = useCallback(() => {
     stopSpeechRecognition();
     handleReset();
-  }, []);
-
-  const handleReset = useCallback(() => {
-    setTranscript('');
-    setErrorMessage(null);
-  }, []);
+  }, [handleReset]);
 
   const handleDirectModeChange = useCallback((value: 'manual' | 'auto') => {
     startAttemptRef.current += 1;
@@ -181,9 +192,15 @@ export const useVoiceAssistantLogics = (listId: string) => {
     };
   }, [directMode, handleStart]);
 
+  // Ensure speech recognition is stopped unconditionally when the hook/component unmounts
+  useEffect(() => {
+    return () => {
+      stopSpeechRecognition();
+    };
+  }, []);
+
   return {
     recognizing,
-    transcript,
     errorMessage,
     directMode,
     chatMessages,

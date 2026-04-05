@@ -5,7 +5,6 @@ import { MicrophoneCta } from './microphone-cta';
 
 type VoiceAssistantFooterProps = {
   handleDirectModeChange: (mode: 'manual' | 'auto') => void;
-  transcript: string;
   recognizing: boolean;
   directMode: 'manual' | 'auto';
   isFirstItem: boolean;
@@ -14,17 +13,14 @@ type VoiceAssistantFooterProps = {
 };
 
 const getFooterLabel = ({
-  transcript,
   recognizing,
   directMode,
   isFirstItem,
 }: {
-  transcript: string;
   recognizing: boolean;
   directMode: 'manual' | 'auto';
   isFirstItem: boolean;
 }) => {
-  if (transcript) return 'processando...';
   if (recognizing) return 'ouvindo...';
   if (directMode === 'manual') {
     return isFirstItem
@@ -37,7 +33,6 @@ const getFooterLabel = ({
 
 export const VoiceAssistantFooter = ({
   handleDirectModeChange,
-  transcript,
   recognizing,
   directMode,
   isFirstItem,
@@ -45,38 +40,35 @@ export const VoiceAssistantFooter = ({
   handleStop,
 }: VoiceAssistantFooterProps) => {
   return (
-    console.log({ transcript, recognizing, directMode, isFirstItem }),
-    (
-      <View className="w-full flex flex-col">
-        <View className="w-full flex items-center justify-center">
-          <View className="bg-muted overflow-hidden  rounded-b-none !rounded-3xl px-4 py-3">
-            <Text className="text-sm text-center">
-              {getFooterLabel({ transcript, recognizing, directMode, isFirstItem })}
-            </Text>
-          </View>
-        </View>
-        <View className="w-full flex flex-col gap-10 items-center overflow-hidden rounded-t-3xl bg-primary p-4">
-          <View className="w-min flex-row gap-2 p-2 border border-border/50 rounded-lg justify-center">
-            <Button
-              variant={directMode === 'manual' ? 'secondary' : 'ghost'}
-              onPress={() => handleDirectModeChange('manual')}>
-              <Text>Manual</Text>
-            </Button>
-            <Button
-              variant={directMode === 'auto' ? 'secondary' : 'ghost'}
-              onPress={() => handleDirectModeChange('auto')}>
-              <Text>Automático</Text>
-            </Button>
-          </View>
-
-          <MicrophoneCta
-            active={recognizing}
-            onPress={handleMainAction}
-            onStop={handleStop}
-            isAuto={directMode === 'auto'}
-          />
+    <View className="w-full flex flex-col">
+      <View className="w-full flex items-center justify-center">
+        <View className="bg-muted overflow-hidden  rounded-b-none !rounded-3xl px-4 py-3">
+          <Text className="text-sm text-center">
+            {getFooterLabel({ recognizing, directMode, isFirstItem })}
+          </Text>
         </View>
       </View>
-    )
+      <View className="w-full flex flex-col gap-10 items-center overflow-hidden rounded-t-3xl bg-primary p-4">
+        <View className="w-min flex-row gap-2 p-2 border border-border/50 rounded-lg justify-center">
+          <Button
+            variant={directMode === 'manual' ? 'secondary' : 'ghost'}
+            onPress={() => handleDirectModeChange('manual')}>
+            <Text>Manual</Text>
+          </Button>
+          <Button
+            variant={directMode === 'auto' ? 'secondary' : 'ghost'}
+            onPress={() => handleDirectModeChange('auto')}>
+            <Text>Automático</Text>
+          </Button>
+        </View>
+
+        <MicrophoneCta
+          active={recognizing}
+          onPress={handleMainAction}
+          onStop={handleStop}
+          isAuto={directMode === 'auto'}
+        />
+      </View>
+    </View>
   );
 };

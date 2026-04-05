@@ -17,12 +17,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 };
 
 export const requestSpeechPermission = async (): Promise<boolean> => {
-  try {
-    const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
-    return Boolean(result.granted);
-  } catch {
-    return false;
-  }
+  const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+  return Boolean(result.granted);
 };
 
 export const startSpeechRecognition = (options?: ExpoSpeechRecognitionOptions): void => {

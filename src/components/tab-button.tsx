@@ -7,12 +7,14 @@ import { Text } from './ui/text';
 type TabButtonProps = PressableProps & {
   isFocused?: boolean;
   icon: TablerIcon;
+  focusedIcon?: TablerIcon;
   label?: string;
 };
 
 export function TabButton({
   isFocused = false,
   icon: IconComponent,
+  focusedIcon: FocusedIconComponent,
   label,
   ...props
 }: TabButtonProps) {
@@ -23,8 +25,11 @@ export function TabButton({
           'items-center justify-center gap-1 p-2 shrink-0 flex-col rounded-lg shadow-none pointer-events-none',
         )}>
         <Icon
-          as={IconComponent}
-          className={cn('stroke-2', isFocused ? 'stroke-primary' : 'stroke-muted-foreground')}
+          as={isFocused && FocusedIconComponent ? FocusedIconComponent : IconComponent}
+          className={cn(
+            'stroke-2',
+            isFocused ? 'stroke-muted stroke-1 fill-primary' : 'stroke-muted-foreground',
+          )}
           size={24}
         />
         <Text
