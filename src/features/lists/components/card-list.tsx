@@ -1,40 +1,36 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Pressable, View } from 'react-native';
 import { IconShoppingCart } from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
-import { useSelector } from '@legendapp/state/react';
 
 import { cn } from '@/lib/utils';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
-import { List, ListItem } from '@/data/types';
-import { listItems$ } from '@/data/states/list-items';
+import type { List } from '@/data/types';
 
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
 
 import { iconMap } from '@/features/lists/utils/icon-map';
-import { calculateTotal } from '../utils/price-calcs';
 import { getAccentColorCardClasses } from '../utils/accent-colors';
 import { CardListRightActions } from './card-list-right-actions';
 
 interface CardListProps {
   list: List;
+  totalPrice: string;
   onEdit: (listId: string) => void;
   onDelete: (listId: string) => void;
 }
 
-function CardListComponent({ list, onEdit, onDelete }: CardListProps) {
+function CardListComponent({ list, totalPrice, onEdit, onDelete }: CardListProps) {
   const router = useRouter();
   const swipeableRef = useRef<SwipeableItemRef>(null);
 
-  const items = useSelector(() => {
-    const raw = Object.values(listItems$.get() ?? {}).filter((item) => item.list_id === list.id);
-    return convertFromSupabaseFormat(raw) as ListItem[];
-  });
-  const cardIcon = iconMap[list.icon] ?? IconShoppingCart;
-  const totalPrice = calculateTotal(items);
-  const { backgroundClassName, foregroundClassName } = getAccentColorCardClasses(list.accentColor);
+  const cardIcon = useMemo(() => iconMap[list.icon] ?? IconShoppingCart, [list.icon]);
+
+  const { backgroundClassName, foregroundClassName } = useMemo(
+    () => getAccentColorCardClasses(list.accentColor),
+    [list.accentColor],
+  );
 
   const handlePress = () => {
     router.push({
@@ -93,6 +89,7 @@ const areCardListPropsEqual = (prev: CardListProps, next: CardListProps) =>
   prev.list.title === next.list.title &&
   prev.list.icon === next.list.icon &&
   prev.list.accentColor === next.list.accentColor &&
+  prev.totalPrice === next.totalPrice &&
   prev.onEdit === next.onEdit &&
   prev.onDelete === next.onDelete;
 
