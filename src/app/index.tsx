@@ -1,5 +1,6 @@
+import { useOnboardingFirstAccess } from '@/features/onboarding/hooks/use-onboarding-first-access';
+import OnboardingScreen from '@/features/onboarding/page';
 import { Redirect } from 'expo-router';
-import { OnboardingScreen, useOnboardingFirstAccess } from '@/features/onboarding';
 
 export default function IndexScreen() {
   const { isFirstAccess, completeOnboarding } = useOnboardingFirstAccess();
