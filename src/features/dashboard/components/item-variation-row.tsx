@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Text } from '@/components/ui/text';
 import { formatCurrency } from '@/utils/formatters';
@@ -10,7 +11,7 @@ type ItemVariationRowProps = {
   onPress: (item: DashboardItemVariation) => void;
 };
 
-export function ItemVariationRow({ item, onPress }: ItemVariationRowProps) {
+function ItemVariationRowComponent({ item, onPress }: ItemVariationRowProps) {
   const recentChangePercent =
     item.previousUnitPrice !== null && item.previousUnitPrice > 0
       ? ((item.lastUnitPrice - item.previousUnitPrice) / item.previousUnitPrice) * 100
@@ -45,3 +46,5 @@ export function ItemVariationRow({ item, onPress }: ItemVariationRowProps) {
     </Pressable>
   );
 }
+
+export const ItemVariationRow = memo(ItemVariationRowComponent);

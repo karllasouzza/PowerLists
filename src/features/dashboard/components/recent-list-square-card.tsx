@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { getAccentColorCardClasses } from '@/features/lists/utils/accent-colors';
@@ -14,7 +15,7 @@ type RecentListSquareCardProps = {
   onPress: (listId: string) => void;
 };
 
-export function RecentListSquareCard({ card, onPress }: RecentListSquareCardProps) {
+function RecentListSquareCardComponent({ card, onPress }: RecentListSquareCardProps) {
   const ListIcon = iconMap[card.icon] ?? IconShoppingCart;
   const { backgroundClassName, foregroundClassName } = getAccentColorCardClasses(card.accentColor);
 
@@ -42,3 +43,5 @@ export function RecentListSquareCard({ card, onPress }: RecentListSquareCardProp
     </Pressable>
   );
 }
+
+export const RecentListSquareCard = memo(RecentListSquareCardComponent);

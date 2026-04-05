@@ -1,6 +1,3 @@
-import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
-
 import type { List, ListItem } from '@/data/types';
 import { DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 
@@ -13,7 +10,7 @@ import type {
   DashboardSummary,
 } from '../types';
 
-dayjs.extend(isoWeek);
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 const EMPTY_DAILY_SERIES: DashboardDatePoint[] = [];
 
@@ -72,17 +69,21 @@ export const filterItemsByPeriod = (
 ): ListItem[] => {
   if (period === 'all') return items;
 
-  const nowDate = dayjs(now);
-  const periodStart =
+  const nowMs = now.getTime();
+  const periodStartMs =
     period === 'week'
-      ? nowDate.subtract(7, 'day')
+      ? nowMs - 7 * DAY_IN_MS
       : period === 'month'
-        ? nowDate.subtract(30, 'day')
-        : nowDate.subtract(12, 'month');
+        ? nowMs - 30 * DAY_IN_MS
+        : (() => {
+            const oneYearAgo = new Date(nowMs);
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            return oneYearAgo.getTime();
+          })();
 
   return items.filter((item) => {
-    const itemDate = dayjs(resolveItemDate(item));
-    return !itemDate.isBefore(periodStart) && !itemDate.isAfter(nowDate);
+    const itemDateMs = resolveItemDate(item).getTime();
+    return itemDateMs >= periodStartMs && itemDateMs <= nowMs;
   });
 };
 
@@ -397,4 +398,12 @@ export const getPeriodLabel = (period: DashboardPeriod): string => {
   if (period === 'week') return 'Últimos 7 dias';
   if (period === 'month') return 'Últimos 30 dias';
   return 'Últimos 12 meses';
+};
+
+export const parseDashboardPeriod = (value?: string): DashboardPeriod => {
+  if (value === 'all' || value === 'week' || value === 'month' || value === 'year') {
+    return value;
+  }
+
+  return 'all';
 };
