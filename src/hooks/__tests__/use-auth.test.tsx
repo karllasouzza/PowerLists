@@ -96,7 +96,7 @@ describe('useAuth', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('initializes auth state when no current user exists', async () => {
+  it('should initialize auth state when no current user exists', async () => {
     const auth = useAuth();
 
     const result = await auth.fetchUserDataAsync();
@@ -106,7 +106,7 @@ describe('useAuth', () => {
     expect(auth$.isLoading.get()).toBe(false);
   });
 
-  it('signs in successfully and migrates guest data', async () => {
+  it('should sign in successfully and migrate guest data', async () => {
     const previousGuest = {
       id: 'guest-1',
       is_guest: true,
@@ -141,7 +141,7 @@ describe('useAuth', () => {
     );
   });
 
-  it('returns false and shows error toast when sign in fails', async () => {
+  it('should return false and show error toast when sign in fails', async () => {
     (authActions.signInWithPassword as jest.Mock).mockImplementation(async () => ({
       user: null,
       error: 'invalid credentials',
@@ -159,7 +159,7 @@ describe('useAuth', () => {
     );
   });
 
-  it('signs out and clears user, session, and storage', async () => {
+  it('should sign out and clear user, session, and storage', async () => {
     auth$.user.set({
       id: 'user-1',
       is_guest: false,
@@ -177,7 +177,7 @@ describe('useAuth', () => {
     expect(auth$.session.get()).toBeNull();
   });
 
-  it('updates password when resetPassword succeeds', async () => {
+  it('should update password when resetPassword succeeds', async () => {
     const auth = useAuth();
 
     const result = await auth.resetPassword({ password: 'new-password-123' });

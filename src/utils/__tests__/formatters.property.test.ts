@@ -23,14 +23,14 @@ const toBrPrice = (cents: number): string => {
 };
 
 describe('formatters', () => {
-  it('parsePrice lida com cenarios reais de entrada', () => {
+  it('should handle real-world input scenarios for parsePrice', () => {
     expect(parsePrice('12,34')).toBe(12.34);
     expect(parsePrice('0,01')).toBe(0.01);
     expect(parsePrice('-12,34')).toBe(0);
     expect(parsePrice('')).toBe(0);
   });
 
-  it('parseAmount lida com cenarios reais de entrada', () => {
+  it('should handle real-world input scenarios for parseAmount', () => {
     expect(parseAmount('10')).toBe(10);
     expect(parseAmount('0')).toBe(1);
     expect(parseAmount('-2')).toBe(1);
@@ -38,7 +38,7 @@ describe('formatters', () => {
     expect(parseAmount('')).toBe(1);
   });
 
-  it('calculateTotal soma corretamente em cenario de compra real', () => {
+  it('should calculate total correctly in a real purchase scenario', () => {
     const items: PriceAmount[] = [
       { price: 12.5, amount: 4 },
       { price: 0.99, amount: 3 },
@@ -50,7 +50,7 @@ describe('formatters', () => {
     expect(calculateTotal(items)).toBe(expected);
   });
 
-  it('parsePrice preserva precisao de centavos para entradas decimais', () => {
+  it('should preserve cent precision for decimal inputs in parsePrice', () => {
     assert(
       property(centsArb, (cents) => {
         const parsed = parsePrice(toBrPrice(cents));
@@ -60,7 +60,7 @@ describe('formatters', () => {
     );
   });
 
-  it('parseAmount sempre retorna inteiro maior ou igual a 1', () => {
+  it('should always return an integer greater than or equal to 1 for parseAmount', () => {
     assert(
       property(integer({ min: -10_000, max: 10_000 }), (input) => {
         const parsed = parseAmount(String(input));
@@ -71,7 +71,7 @@ describe('formatters', () => {
     );
   });
 
-  it('calculateTotal bate com oraculo Decimal para lotes aleatorios', () => {
+  it('should match Decimal oracle for random batches', () => {
     assert(
       property(array(priceAmountArb, { minLength: 0, maxLength: 50 }), (items) => {
         const expectedTotal = items

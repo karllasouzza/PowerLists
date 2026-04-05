@@ -4,7 +4,7 @@ import { Decimal } from 'decimal.js';
 import { assert, integer, property } from 'fast-check';
 
 describe('currency', () => {
-  it('trata cenarios reais de mascara e parse BRL', () => {
+  it('should handle real-world BRL masking and parsing scenarios', () => {
     expect(formatBRL('12345')).toBe('R$ 123,45');
     expect(formatBRL('R$ 12a34')).toBe('R$ 12,34');
     expect(formatBRL('')).toBe('');
@@ -17,7 +17,7 @@ describe('currency', () => {
     expect(numberToBRLInput(0)).toBe('R$ 0,00');
   });
 
-  it('formatBRL seguido de parseBRLToNumber preserva centavos', () => {
+  it('should preserve cents when formatBRL is followed by parseBRLToNumber', () => {
     assert(
       property(integer({ min: 0, max: 10_000_000 }), (cents) => {
         const formatted = formatBRL(String(cents));
@@ -28,7 +28,7 @@ describe('currency', () => {
     );
   });
 
-  it('numberToBRLInput seguido de parseBRLToNumber preserva centavos', () => {
+  it('should preserve cents when numberToBRLInput is followed by parseBRLToNumber', () => {
     assert(
       property(integer({ min: 0, max: 10_000_000 }), (cents) => {
         const value = new Decimal(cents).div(100).toNumber();

@@ -21,7 +21,7 @@ describe('speech-recognition-service', () => {
     jest.clearAllMocks();
   });
 
-  it('returns false when speech permission is denied', async () => {
+  it('should return false when speech permission is denied', async () => {
     jest.mocked(ExpoSpeechRecognitionModule.requestPermissionsAsync).mockResolvedValue({
       granted: false,
     } as never);
@@ -31,7 +31,7 @@ describe('speech-recognition-service', () => {
     expect(result).toBe(false);
   });
 
-  it('starts recognition with defaults in pt-BR', () => {
+  it('should start recognition with defaults in pt-BR', () => {
     startSpeechRecognition();
 
     expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith({
@@ -41,13 +41,13 @@ describe('speech-recognition-service', () => {
     });
   });
 
-  it('stops recognition', () => {
+  it('should stop recognition', () => {
     stopSpeechRecognition();
 
     expect(ExpoSpeechRecognitionModule.stop).toHaveBeenCalledTimes(1);
   });
 
-  it('extracts transcript from first result', () => {
+  it('should extract transcript from first result', () => {
     const transcript = getTranscriptFromResultEvent({
       results: [{ transcript: 'comprar arroz' }],
       isFinal: true,
@@ -56,7 +56,7 @@ describe('speech-recognition-service', () => {
     expect(transcript).toBe('comprar arroz');
   });
 
-  it('maps unmapped error payload to fallback message', () => {
+  it('should map unmapped error payload to fallback message', () => {
     const message = getErrorMessageFromEvent({ error: 'xpto', message: '' });
 
     expect(message).toBe('Erro desconhecido ao reconhecer voz.');

@@ -18,7 +18,7 @@ const toCents = (value: number): number => {
 };
 
 describe('buildTotalsByListId', () => {
-  it('agrega totais por lista em cenario real', () => {
+  it('should aggregate totals by list in a real-world scenario', () => {
     const items: RawListItem[] = [
       { list_id: 'l1', price: 12.5, amount: 2 },
       { list_id: 'l1', price: 0.99, amount: 3 },
@@ -36,7 +36,7 @@ describe('buildTotalsByListId', () => {
     expect(totals.undefined).toBeUndefined();
   });
 
-  it('bate com oraculo Decimal para lotes aleatorios', () => {
+  it('should match Decimal oracle for random batches', () => {
     assert(
       property(array(rawListItemArb, { minLength: 0, maxLength: 150 }), (items) => {
         const actual = buildTotalsByListId(items);

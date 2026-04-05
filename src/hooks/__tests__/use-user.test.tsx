@@ -63,7 +63,7 @@ describe('useUser', () => {
     resetSupabaseMocks();
   });
 
-  it('returns current user snapshot', () => {
+  it('should return current user snapshot', () => {
     const current: UserGuestType = {
       id: 'guest-1',
       is_guest: true,
@@ -77,7 +77,7 @@ describe('useUser', () => {
     expect(userHook.user).toEqual(current);
   });
 
-  it('updates user by patching current id and setting returned value', async () => {
+  it('should update user by patching current id and setting the returned value', async () => {
     const current: UserGuestType = {
       id: 'guest-1',
       is_guest: true,
@@ -100,7 +100,7 @@ describe('useUser', () => {
     expect(auth$.user.get()).toEqual(updated);
   });
 
-  it('creates guest and resets session', async () => {
+  it('should create guest and reset session', async () => {
     const guest: UserGuestType = {
       id: 'guest-2',
       is_guest: true,
@@ -122,7 +122,7 @@ describe('useUser', () => {
     expect(auth$.isLoading.get()).toBe(false);
   });
 
-  it('soft deletes guest user locally without calling supabase auth update', async () => {
+  it('should soft delete guest user locally without calling supabase auth update', async () => {
     const guest: UserGuestType = {
       id: 'guest-2',
       is_guest: true,
@@ -140,7 +140,7 @@ describe('useUser', () => {
     expect(supabase.auth.updateUser).not.toHaveBeenCalled();
   });
 
-  it('hard deletes non-guest user with edge function and clears local user', async () => {
+  it('should hard delete non-guest user with edge function and clear local user', async () => {
     const signedUser: UserGuestType = {
       id: 'user-1',
       is_guest: false,

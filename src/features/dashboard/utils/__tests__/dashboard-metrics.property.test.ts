@@ -86,7 +86,7 @@ const buildListsFromItems = (items: ListItem[]): List[] => {
 };
 
 describe('dashboard-metrics', () => {
-  it('getTotalCheckedPrice calcula corretamente em cenario real', () => {
+  it('should calculate total checked price correctly in a real-world scenario', () => {
     const items: ListItem[] = [
       {
         id: '1',
@@ -130,13 +130,13 @@ describe('dashboard-metrics', () => {
     expect(toCents(getTotalCheckedPrice(items))).toBe(toCents(expected.toNumber()));
   });
 
-  it('filterItemsByPeriod all retorna a mesma referencia', () => {
+  it('should return the same reference for filterItemsByPeriod("all")', () => {
     const items: ListItem[] = [];
 
     expect(filterItemsByPeriod(items, 'all')).toBe(items);
   });
 
-  it('calculateAverageDailyVariationPercent calcula media diaria corretamente', () => {
+  it('should calculate average daily variation correctly', () => {
     const series: DashboardDatePoint[] = [
       {
         dateKey: '2026-04-01',
@@ -164,7 +164,7 @@ describe('dashboard-metrics', () => {
     expect(calculateAverageDailyVariationPercent(series)).toBeCloseTo(75, 6);
   });
 
-  it('getTotalCheckedPrice bate com oraculo Decimal para lotes aleatorios', () => {
+  it('should match Decimal oracle for random batches when computing total checked price', () => {
     assert(
       property(array(itemArb, { minLength: 0, maxLength: 120 }), (items) => {
         const expected = items
@@ -178,7 +178,7 @@ describe('dashboard-metrics', () => {
     );
   });
 
-  it('buildDashboardSummary all preserva totalCheckedPrice esperado', () => {
+  it('should preserve expected totalCheckedPrice when calling buildDashboardSummary("all")', () => {
     assert(
       property(array(itemArb, { minLength: 0, maxLength: 120 }), (items) => {
         const lists = buildListsFromItems(items);
@@ -189,7 +189,7 @@ describe('dashboard-metrics', () => {
     );
   });
 
-  it('buildItemVariations sem serie diaria retorna dailySeries vazio', () => {
+  it('should return empty dailySeries when buildItemVariations is called without daily series', () => {
     assert(
       property(array(titledPricedItemArb, { minLength: 1, maxLength: 80 }), (items) => {
         const variations = buildItemVariations(items, { includeDailySeries: false });

@@ -40,7 +40,7 @@ const listItemArb = record<ListItem>({
 });
 
 describe('price-calcs.calculateTotal', () => {
-  it('calcula total de compra real com moeda BRL', () => {
+  it('should calculate real purchase total in BRL', () => {
     const items: ListItem[] = [
       {
         id: '1',
@@ -71,7 +71,7 @@ describe('price-calcs.calculateTotal', () => {
     expect(calculateTotal(items)).toBe('R$ 39,97');
   });
 
-  it('bate com oraculo Decimal para lotes aleatorios', () => {
+  it('should match Decimal oracle for random batches', () => {
     assert(
       property(array(listItemArb, { minLength: 0, maxLength: 80 }), (items) => {
         const expected = items
