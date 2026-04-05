@@ -1,15 +1,14 @@
-import { useMemo } from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { Text } from '@/components/ui/text';
 import { useTheme } from '@/context/themes';
 import { rawColors } from '@/context/themes/theme-config';
+import { DEFAULT_ACCENT_COLOR, isAccentColorToken } from '@/features/lists/utils/accent-colors';
+import { formatCurrency } from '@/utils/formatters';
 import { getThemeColorHex } from '@/utils/tailwind-color';
-import { isAccentColorToken, DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 import { Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFont } from '@shopify/react-native-skia';
+import { useMemo } from 'react';
+import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { Bar, CartesianChart } from 'victory-native';
-
-import { Text } from '@/components/ui/text';
-import { formatCurrency } from '@/features/list-items/utils/formatters';
 
 import type { DashboardPieSlice } from '../types';
 

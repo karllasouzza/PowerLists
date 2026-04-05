@@ -1,8 +1,7 @@
-import { Pressable, View } from 'react-native';
-
 import { Badge } from '@/components/ui/badge';
 import { Text } from '@/components/ui/text';
-import { formatCurrency } from '@/features/list-items/utils/formatters';
+import { formatCurrency } from '@/utils/formatters';
+import { Pressable, View } from 'react-native';
 
 import type { DashboardItemVariation } from '../types';
 
@@ -38,7 +37,8 @@ export function ItemVariationRow({ item, onPress }: ItemVariationRowProps) {
         <Text variant="muted" className="mt-0 flex-1 text-xs">
           Penúltimo: {previousValueLabel}
         </Text>
-        <Text className={`mt-0 text-xs font-semibold ${isIncrease ? 'text-destructive' : 'text-primary'}`}>
+        <Text
+          className={`mt-0 text-xs font-semibold ${isIncrease ? 'text-destructive' : 'text-primary'}`}>
           Último: {formatCurrency(item.lastUnitPrice)}
         </Text>
       </View>

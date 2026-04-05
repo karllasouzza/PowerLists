@@ -4,10 +4,10 @@ import { useRouter } from 'expo-router';
 
 import { TopBar } from '@/components/top-bar';
 import { Text } from '@/components/ui/text';
-import { formatCurrency } from '@/features/list-items/utils/formatters';
 
 import { DailyPriceBarChart, MetricCard } from './components';
 import { useItemPriceComparisonLogics } from './hooks/use-item-price-comparison-logics';
+import { formatCurrency } from '@/utils/formatters';
 
 export default function ItemPriceComparisonPage() {
   const router = useRouter();
