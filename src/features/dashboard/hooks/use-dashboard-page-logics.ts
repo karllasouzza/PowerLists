@@ -32,7 +32,7 @@ const normalizeItem = (item: Partial<ListItem>): ListItem => {
     price: item.price ?? 0,
     amount: item.amount ?? 0,
     isChecked: item.isChecked ?? false,
-    createdAt: item.createdAt,
+    createdAt: item.createdAt ?? new Date().toISOString(),
     updatedAt: item.updatedAt,
     deleted: item.deleted,
   };
@@ -53,14 +53,24 @@ export const useDashboardPageLogics = () => {
     const rawLists = Object.values(listsState ?? {});
     const formattedLists = convertFromSupabaseFormat(rawLists) as Partial<List>[];
 
-    return formattedLists.map(normalizeList);
+    return formattedLists.map(normalizeList).sort((a, b) => {
+      return (
+        new Date(b.updatedAt ?? b.createdAt).getTime() -
+        new Date(a.updatedAt ?? a.createdAt).getTime()
+      );
+    });
   }, [listsState]);
 
   const items = useMemo(() => {
     const rawItems = Object.values(listItemsState ?? {});
     const formattedItems = convertFromSupabaseFormat(rawItems) as Partial<ListItem>[];
 
-    return formattedItems.map(normalizeItem);
+    return formattedItems.map(normalizeItem).sort((a, b) => {
+      return (
+        new Date(b.updatedAt ?? b.createdAt).getTime() -
+        new Date(a.updatedAt ?? a.createdAt).getTime()
+      );
+    });
   }, [listItemsState]);
 
   useEffect(() => {

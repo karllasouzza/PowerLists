@@ -13,7 +13,7 @@ type ItemVariationSectionProps = {
   onPressItem: (item: DashboardItemVariation) => void;
 };
 
-const MAX_ROWS_PER_COLUMN = 4;
+const MAX_ROWS_PER_COLUMN = 3;
 
 export function ItemVariationSection({
   increases,
@@ -33,7 +33,7 @@ export function ItemVariationSection({
         </Button>
       </View>
 
-      <View className="flex-row gap-3">
+      <View className="flex-col gap-3">
         <View className="flex-1 gap-2">
           <Text className="text-sm font-semibold text-primary">Maiores quedas</Text>
           {topDecreases.length ? (

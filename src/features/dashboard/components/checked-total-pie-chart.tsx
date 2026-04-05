@@ -58,7 +58,7 @@ export function CheckedTotalPieChart({
     return new Map(chartData.map((item) => [item.position, item.createdAtLabel]));
   }, [chartData]);
 
-  const barWidth = 30;
+  const barWidth = 50;
 
   const chartWidth = useMemo(() => {
     const minVisibleWidth = Math.max(width - 80, 260);
@@ -67,7 +67,7 @@ export function CheckedTotalPieChart({
   }, [chartData.length, width]);
 
   return (
-    <View className="mx-4 rounded-3xl border border-border bg-card p-4">
+    <View className="rounded-b-2xl p-4">
       <Text className="text-base font-semibold text-foreground">Total de itens comprados</Text>
       <Text variant="muted" className="mt-1 text-xs">
         Distribuição por lista
@@ -100,10 +100,10 @@ export function CheckedTotalPieChart({
                 }}
                 yAxis={[
                   {
-                    tickCount: 4,
+                    tickCount: 5,
                     font: axisFont,
                     labelColor: '#6E6E6E',
-                    lineColor: '#D6D6D6',
+                    lineColor: '#d6d6d6a2',
                     formatYLabel: (value) => `R$ ${Number(value).toFixed(0)}`,
                   },
                 ]}>
@@ -120,7 +120,7 @@ export function CheckedTotalPieChart({
                           chartBounds={chartBounds}
                           color={bar.color}
                           barWidth={barWidth}
-                          roundedCorners={{ topLeft: 6, topRight: 6 }}
+                          roundedCorners={{ topLeft: 26, topRight: 26 }}
                         />
                       );
                     })}
