@@ -4,11 +4,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Decimal } from 'decimal.js';
-import { useValue } from '@legendapp/state/react';
 
 import { showToast } from '@/services';
-import { updateListItem, listItems$ } from '@/data/states/list-items';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { updateListItem } from '@/data/states/list-items';
 import {
   AppModal,
   AppModalContent,
@@ -41,7 +39,7 @@ const parseAmount = (val: string): number => {
 
 type ItemUpdateModalProps = {
   open: boolean;
-  itemId?: string;
+  currentItem: ListItem | null;
   onOpenChange: (open: boolean) => void;
   accentBgClassName: string;
   accentForegroundClassName: string;
@@ -49,7 +47,7 @@ type ItemUpdateModalProps = {
 
 export function ItemUpdateModal({
   open,
-  itemId,
+  currentItem,
   onOpenChange,
   accentBgClassName,
   accentForegroundClassName,
@@ -58,10 +56,6 @@ export function ItemUpdateModal({
   const titleRef = useRef<TextInput>(null);
   const priceRef = useRef<TextInput>(null);
   const amountRef = useRef<TextInput>(null);
-
-  const listItemsRaw = useValue(listItems$);
-  const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
-  const currentItem = allItems.find((item) => item.id === itemId);
 
   const {
     control,
@@ -91,12 +85,12 @@ export function ItemUpdateModal({
   }, [open, currentItem?.title, currentItem?.price, currentItem?.amount, reset]);
 
   const onSubmit = async (data: ItemFormData) => {
-    if (!itemId || !currentItem) return;
+    if (!currentItem) return;
 
     setIsSubmitting(true);
     try {
       const success = await updateListItem({
-        id: itemId,
+        id: currentItem.id,
         title: data.title,
         price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
@@ -197,7 +191,7 @@ export function ItemUpdateModal({
           confirmButtonClassName={accentBgClassName}
           confirmLabelClassName={accentForegroundClassName}
           isLoading={isSubmitting}
-          isConfirmDisabled={!itemId}
+          isConfirmDisabled={!currentItem?.title || !!errors.title}
         />
       </AppModalContent>
     </AppModal>

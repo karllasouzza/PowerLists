@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSelector, useValue } from '@legendapp/state/react';
 
 import { lists$ } from '@/data/states/lists';
@@ -8,12 +8,13 @@ import { List, ListItem as DataListItem } from '@/data/types';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { getAccentColorOption } from '@/features/lists/utils/accent-colors';
 
-import { calculateTotal, separateItemsByStatus } from '../utils';
+import { calculateTotal, sortItems } from '../utils';
 import type { SortMode } from '../utils';
 import type { ListItem } from '../types';
 
 export const useListItemsPageLogics = () => {
   const { id: listId } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
 
   const lists = useValue(lists$ || {});
   const listsFormated = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
@@ -27,7 +28,6 @@ export const useListItemsPageLogics = () => {
       title: item.title ?? '',
       price: item.price ?? 0,
       amount: item.amount ?? 0,
-      status: item.isChecked,
     })) as ListItem[];
   });
 
@@ -67,18 +67,27 @@ export const useListItemsPageLogics = () => {
     return items.filter((item) => item.title.toLowerCase().includes(query));
   }, [items, searchQuery]);
 
-  const { unchecked, checked } = useMemo(
-    () => separateItemsByStatus(filteredItems, sortMode),
-    [filteredItems, sortMode],
-  );
+  const sortedItems = useMemo(() => sortItems(filteredItems, sortMode), [filteredItems, sortMode]);
+  const checkedItems = useMemo(() => sortedItems.filter((item) => item.isChecked), [sortedItems]);
 
-  const total = useMemo(() => calculateTotal(filteredItems), [filteredItems]);
-  const payableTotal = useMemo(() => calculateTotal(checked), [checked]);
+  const total = useMemo(() => calculateTotal(sortedItems), [sortedItems]);
+  const payableTotal = useMemo(() => calculateTotal(checkedItems), [checkedItems]);
+  const activeItem = useMemo(
+    () => sortedItems.find((item) => item.id === activeItemId) ?? null,
+    [activeItemId, sortedItems],
+  );
 
   const accentColorOption = useMemo(
     () => getAccentColorOption(currentList?.accentColor),
     [currentList?.accentColor],
   );
+
+  const handleOpenAssistant = useCallback(() => {
+    router.push({
+      pathname: '/assistant',
+      params: { id: listId },
+    });
+  }, [listId, router]);
 
   return {
     listId,
@@ -89,8 +98,7 @@ export const useListItemsPageLogics = () => {
     sortMode,
     setSortMode,
 
-    unchecked,
-    checked,
+    items: sortedItems,
     total,
     payableTotal,
 
@@ -104,10 +112,13 @@ export const useListItemsPageLogics = () => {
     isDeleteOpen,
     setDeleteOpen,
     activeItemId,
+    activeItem,
 
     handleToggleCheck,
     handleOpenAdd,
     handleOpenUpdate,
     handleOpenDelete,
+
+    handleOpenAssistant,
   };
 };

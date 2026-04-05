@@ -1,25 +1,21 @@
 import { observer } from '@legendapp/state/react';
 import { IconRobotFace, IconPlus } from '@tabler/icons-react-native';
-import { useRouter } from 'expo-router';
-import React, { useCallback } from 'react';
+import { router } from 'expo-router';
+import React, { Suspense, useCallback } from 'react';
 import { View } from 'react-native';
 
 import { TopBar } from '@/components/top-bar';
 import { Fab } from '@/components/ui/fab';
 
-import {
-  ListItemsContent,
-  ListItemsFooter,
-  ListItemSkeletonList,
-  ListItemsSortBar,
-} from './components';
+import { ListItemsFooter, ListItemSkeletonList, ListItemsSortBar } from './components';
 import ListItemCard from './components/list-item-card';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 import type { ListItem } from './types';
 
+const AsyncListItemsContent = React.lazy(() => import('./components/list-items-content'));
+
 const ListItemsScreen = observer(() => {
-  const router = useRouter();
   const {
     listId,
     currentList,
@@ -27,8 +23,7 @@ const ListItemsScreen = observer(() => {
     setSearchQuery,
     sortMode,
     setSortMode,
-    unchecked,
-    checked,
+    items,
     payableTotal,
     accentBgClassName,
     accentForegroundClassName,
@@ -39,18 +34,13 @@ const ListItemsScreen = observer(() => {
     isDeleteOpen,
     setDeleteOpen,
     activeItemId,
+    activeItem,
     handleToggleCheck,
     handleOpenAdd,
     handleOpenUpdate,
     handleOpenDelete,
+    handleOpenAssistant,
   } = useListItemsPageLogics();
-
-  const handleOpenAssistant = useCallback(() => {
-    router.push({
-      pathname: '/list/assistant',
-      params: { id: listId },
-    });
-  }, [listId, router]);
 
   const renderItem = useCallback(
     (item: ListItem) => (
@@ -112,13 +102,14 @@ const ListItemsScreen = observer(() => {
         accentForegroundClassName={accentForegroundClassName}
       />
 
-      <ListItemsContent
-        unchecked={unchecked}
-        checked={checked}
-        accentBgClassName={accentBgClassName}
-        accentForegroundClassName={accentForegroundClassName}
-        renderItem={renderItem}
-      />
+      <Suspense fallback={<ListItemSkeletonList />}>
+        <AsyncListItemsContent
+          items={items}
+          accentBgClassName={accentBgClassName}
+          accentForegroundClassName={accentForegroundClassName}
+          renderItem={renderItem}
+        />
+      </Suspense>
 
       <ListItemsFooter
         total={payableTotal}
@@ -150,9 +141,10 @@ const ListItemsScreen = observer(() => {
         accentBgClassName={accentBgClassName}
         accentForegroundClassName={accentForegroundClassName}
       />
+
       <ItemUpdateModal
         open={isUpdateOpen}
-        itemId={activeItemId}
+        currentItem={activeItem}
         onOpenChange={setUpdateOpen}
         accentBgClassName={accentBgClassName}
         accentForegroundClassName={accentForegroundClassName}

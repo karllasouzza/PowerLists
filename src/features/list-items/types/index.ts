@@ -12,7 +12,6 @@ export interface ListItem {
   readonly title: string;
   readonly price: number;
   readonly amount: number;
-  readonly status: boolean;
   readonly isChecked: boolean;
   readonly createdAt?: string | Date;
   readonly updatedAt?: string | Date;
