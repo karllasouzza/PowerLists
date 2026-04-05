@@ -5,10 +5,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function ListItemSkeleton() {
   return (
     <View className="flex-row items-center gap-3 bg-card p-3 w-full min-h-[88px]">
-      <Skeleton className="rounded-xl" style={{ width: 64, height: 64 }} />
+      <Skeleton className="rounded-xl size-16 animate-pulse" />
       <View className="flex-1 justify-center gap-2">
-        <Skeleton className="rounded-md w-3/4 h-4" />
-        <Skeleton className="rounded-md w-1/2 h-3" />
+        <Skeleton className="rounded-md w-3/4 h-4 animate-pulse" />
+        <Skeleton className="rounded-md w-1/2 h-3 animate-pulse" />
       </View>
     </View>
   );
