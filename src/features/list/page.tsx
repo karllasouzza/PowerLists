@@ -11,7 +11,7 @@ import { ListItemsFooter, ListItemSkeletonList, ListItemsSortBar } from './compo
 import ListItemCard from './components/list-item-card';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
-import type { ListItem } from './types';
+import { ListItem } from '@/data/types';
 
 const AsyncListItemsContent = React.lazy(() => import('./components/list-items-content'));
 

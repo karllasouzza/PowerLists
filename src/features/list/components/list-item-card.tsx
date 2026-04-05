@@ -1,18 +1,16 @@
+import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
+import { Text } from '@/components/ui/text';
+import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { Decimal } from 'decimal.js';
 import React, { useCallback, useRef } from 'react';
 import { View } from 'react-native';
-import { Decimal } from 'decimal.js';
-
-import { Text } from '@/components/ui/text';
-import { SwipeableItem, type SwipeableItemRef } from '@/components/swipeable';
-import { cn } from '@/lib/utils';
-
 import { ListItemLeftActions } from './list-item-left-actions';
 import { ListItemRightActions } from './list-item-right-actions';
-import { formatCurrency } from '../utils';
 
 interface ListItemProps {
   id: string;
-  title: string;
+  title: string | null;
   price: number;
   amount: number;
   status: boolean;
@@ -99,7 +97,7 @@ function ListItemCard({
                 status ? 'text-muted-foreground line-through' : 'text-foreground',
               )}
               numberOfLines={1}>
-              {title}
+              {title ?? 'Sem título'}
             </Text>
             <Text variant="muted" className="text-sm">
               {amount} unidades

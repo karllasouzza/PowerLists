@@ -2,8 +2,8 @@
  * Utilitários de ordenação para items de lista
  */
 
+import { ListItem } from '@/data/types';
 import { Decimal } from 'decimal.js';
-import type { ListItem } from '../types';
 
 export type SortMode = 'default' | 'az' | 'price';
 

@@ -11,7 +11,7 @@ import {
   AppModalHeader,
   AppModalFooter,
 } from '@/components/molecules/app-modal';
-import { ListItem } from '../types';
+import { ListItem } from '@/data/types';
 
 type ItemDeleteModalProps = {
   open: boolean;

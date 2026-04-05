@@ -17,8 +17,7 @@ import {
   AppModalHeader,
   AppModalFooter,
 } from '@/components/molecules/app-modal';
-
-import { parseBRLToNumber, formatBRL } from '../utils';
+import { parseBRLToNumber, formatBRL } from '@/utils/currency';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),

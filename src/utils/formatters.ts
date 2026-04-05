@@ -1,5 +1,5 @@
+import { ListItem } from '@/data/types';
 import { Decimal } from 'decimal.js';
-import type { ListItem } from '../types';
 
 export const formatCurrency = (value: number | Decimal): string => {
   const num = value instanceof Decimal ? value.toNumber() : value;

@@ -1,13 +1,9 @@
-/**
- * Componente de cabeçalho para a tela de items
- */
-
-import React from 'react';
-import { View } from 'react-native';
+import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
-import { SortMode } from '../utils';
-import { Button } from '@/components/ui/button';
+import { SortMode } from '@/utils/sorting';
+import React from 'react';
+import { View } from 'react-native';
 
 interface ListItemsSortBarProps {
   sortMode: SortMode;
@@ -42,7 +38,11 @@ export const ListItemsSortBar = ({
               isActive ? accentBgClassName : 'border-border bg-background',
             )}
             onPress={() => setSortMode(opt.key)}>
-            <Text className={cn('font-semibold', isActive ? accentForegroundClassName : 'text-foreground')}>
+            <Text
+              className={cn(
+                'font-semibold',
+                isActive ? accentForegroundClassName : 'text-foreground',
+              )}>
               {opt.label}
             </Text>
           </Button>

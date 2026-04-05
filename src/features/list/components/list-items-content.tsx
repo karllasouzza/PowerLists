@@ -4,8 +4,8 @@ import { LegendList } from '@legendapp/list';
 
 import { closeOpenedSwipeable } from '@/components/swipeable';
 
-import type { ListItem } from '../types';
 import { ListItemsEmptyComponent } from './list-items-empty-component';
+import { ListItem } from '@/data/types';
 
 type ListItemsContentProps = {
   readonly items: ListItem[];

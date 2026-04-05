@@ -17,8 +17,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
-import { ListItem } from '../types';
-import { numberToBRLInput, parseBRLToNumber, formatBRL } from '../utils';
+import { ListItem } from '@/data/types';
+import { numberToBRLInput, parseBRLToNumber, formatBRL } from '@/utils/currency';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),

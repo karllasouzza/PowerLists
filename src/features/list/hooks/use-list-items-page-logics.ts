@@ -1,16 +1,14 @@
-import { useCallback, useMemo, useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSelector, useValue } from '@legendapp/state/react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 
-import { lists$ } from '@/data/states/lists';
 import { listItems$, toggleCheckListItem } from '@/data/states/list-items';
-import { List, ListItem as DataListItem } from '@/data/types';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { lists$ } from '@/data/states/lists';
+import { ListItem as DataListItem, List, ListItem } from '@/data/types';
 import { getAccentColorOption } from '@/features/lists/utils/accent-colors';
-
-import { calculateTotal, sortItems } from '../utils';
-import type { SortMode } from '../utils';
-import type { ListItem } from '../types';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { calculateTotal } from '@/utils/formatters';
+import { SortMode, sortItems } from '@/utils/sorting';
 
 export const useListItemsPageLogics = () => {
   const { id: listId } = useLocalSearchParams<{ id: string }>();
@@ -64,7 +62,7 @@ export const useListItemsPageLogics = () => {
     if (!searchQuery.trim()) return items;
 
     const query = searchQuery.toLowerCase();
-    return items.filter((item) => item.title.toLowerCase().includes(query));
+    return items.filter((item) => item.title?.toLowerCase().includes(query));
   }, [items, searchQuery]);
 
   const sortedItems = useMemo(() => sortItems(filteredItems, sortMode), [filteredItems, sortMode]);
