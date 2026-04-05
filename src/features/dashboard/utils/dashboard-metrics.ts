@@ -1,5 +1,6 @@
 import type { List, ListItem } from '@/data/types';
 import { DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
+import { Decimal } from 'decimal.js';
 
 import type {
   DashboardDatePoint,
@@ -22,12 +23,11 @@ const toDate = (value?: string | Date | null): Date | null => {
 };
 
 const resolveItemDate = (item: ListItem): Date => {
-  // Requirement decision: use createdAt as source with updatedAt fallback.
-  const createdAt = toDate(item.createdAt);
-  if (createdAt) return createdAt;
-
   const updatedAt = toDate(item.updatedAt);
   if (updatedAt) return updatedAt;
+
+  const createdAt = toDate(item.createdAt);
+  if (createdAt) return createdAt;
 
   return new Date();
 };
@@ -52,14 +52,14 @@ const normalizeTitleKey = (title?: string | null): string => {
   return (title ?? '').trim().toLocaleLowerCase('pt-BR');
 };
 
-const calculateItemTotalPrice = (item: Pick<ListItem, 'price' | 'amount'>): number => {
-  const price = item.price ?? 0;
-  const amount = item.amount ?? 0;
-  return price * amount;
+const calculateItemTotalPrice = (item: Pick<ListItem, 'price' | 'amount'>): Decimal => {
+  return new Decimal(item.price ?? 0).mul(item.amount ?? 0);
 };
 
 const calculateItemsTotalPrice = (items: Pick<ListItem, 'price' | 'amount'>[]): number => {
-  return items.reduce((total, item) => total + calculateItemTotalPrice(item), 0);
+  return items
+    .reduce((total, item) => total.plus(calculateItemTotalPrice(item)), new Decimal(0))
+    .toNumber();
 };
 
 export const filterItemsByPeriod = (
@@ -154,7 +154,7 @@ export const buildPieSlices = (lists: List[], periodItems: ListItem[]): Dashboar
 type DailyBucket = {
   dateKey: string;
   totalAmount: number;
-  totalPrice: number;
+  totalPrice: Decimal;
   sampleCount: number;
 };
 
@@ -169,12 +169,12 @@ const buildDailySeries = (items: ListItem[]): DashboardDatePoint[] => {
     const current = map.get(dateKey) ?? {
       dateKey,
       totalAmount: 0,
-      totalPrice: 0,
+      totalPrice: new Decimal(0),
       sampleCount: 0,
     };
 
     current.totalAmount += item.amount ?? 0;
-    current.totalPrice += unitPrice;
+    current.totalPrice = current.totalPrice.plus(unitPrice);
     current.sampleCount += 1;
 
     map.set(dateKey, current);
@@ -187,7 +187,8 @@ const buildDailySeries = (items: ListItem[]): DashboardDatePoint[] => {
     .map((bucket) => ({
       dateKey: bucket.dateKey,
       label: getDateLabel(bucket.dateKey),
-      averageUnitPrice: bucket.sampleCount > 0 ? bucket.totalPrice / bucket.sampleCount : 0,
+      averageUnitPrice:
+        bucket.sampleCount > 0 ? bucket.totalPrice.div(bucket.sampleCount).toNumber() : 0,
       totalAmount: bucket.totalAmount,
       sampleCount: bucket.sampleCount,
     }));
@@ -223,8 +224,13 @@ const buildItemVariation = (key: string, items: ListItem[]): DashboardItemVariat
       : changePercent;
   const direction = recentDelta > 0.01 ? 'increase' : recentDelta < -0.01 ? 'decrease' : 'stable';
 
-  const totalAmount = sortedByDate.reduce((acc, item) => acc + (item.amount ?? 0), 0);
-  const averageUnitPrice = prices.reduce((acc, price) => acc + price, 0) / prices.length;
+  const totalAmount = sortedByDate
+    .reduce((acc, item) => acc.plus(item.amount ?? 0), new Decimal(0))
+    .toNumber();
+  const averageUnitPrice = prices
+    .reduce((acc, price) => acc.plus(price), new Decimal(0))
+    .div(prices.length)
+    .toNumber();
 
   return {
     key,
@@ -290,9 +296,14 @@ const buildItemVariationWithoutDailySeries = (
       : changePercent;
   const direction = recentDelta > 0.01 ? 'increase' : recentDelta < -0.01 ? 'decrease' : 'stable';
 
-  const totalAmount = sortedByDate.reduce((acc, item) => acc + (item.amount ?? 0), 0);
+  const totalAmount = sortedByDate
+    .reduce((acc, item) => acc.plus(item.amount ?? 0), new Decimal(0))
+    .toNumber();
   const allPrices = sortedByDate.map((item) => item.price ?? 0);
-  const averageUnitPrice = allPrices.reduce((acc, price) => acc + price, 0) / allPrices.length;
+  const averageUnitPrice = allPrices
+    .reduce((acc, price) => acc.plus(price), new Decimal(0))
+    .div(allPrices.length)
+    .toNumber();
 
   return {
     key,
