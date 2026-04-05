@@ -8,30 +8,7 @@ import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { formatCurrency } from '@/utils/formatters';
 
 import { filterListsByQuery } from '../utils/list-filters';
-
-type RawListItem = {
-  list_id?: string;
-  price?: number | null;
-  amount?: number | null;
-};
-
-const buildTotalsByListId = (items: RawListItem[]): Record<string, number> => {
-  const totals: Record<string, number> = {};
-
-  for (const item of items) {
-    const listId = item.list_id;
-    if (!listId) continue;
-
-    const price = Number(item.price ?? 0);
-    const amount = Number(item.amount ?? 0);
-
-    if (!Number.isFinite(price) || !Number.isFinite(amount)) continue;
-
-    totals[listId] = (totals[listId] ?? 0) + price * amount;
-  }
-
-  return totals;
-};
+import { buildTotalsByListId, type RawListItem } from '../utils/list-totals';
 
 export const useListPageLogics = () => {
   const [searchQuery, setSearchQuery] = useState('');
