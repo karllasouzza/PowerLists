@@ -56,7 +56,7 @@ describe('speech-recognition-service', () => {
     expect(transcript).toBe('comprar arroz');
   });
 
-  it('maps unknown error payload to fallback message', () => {
+  it('maps unmapped error payload to fallback message', () => {
     const message = getErrorMessageFromEvent({ error: 'xpto', message: '' });
 
     expect(message).toBe('Erro desconhecido ao reconhecer voz.');
