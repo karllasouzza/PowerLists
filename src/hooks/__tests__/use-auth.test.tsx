@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import type { Session } from '@supabase/supabase-js';
+import type { UserType } from '@/data/types/user';
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 jest.mock('expo-linking', () => ({
@@ -12,29 +14,69 @@ jest.mock('@/services', () => require('../../../__mocks__/services.cjs'));
 jest.mock('@/data/storage', () => require('../../../__mocks__/storage.cjs'));
 jest.mock('@/data/states/auth', () => require('../../../__mocks__/auth-state.cjs'));
 
-const { useAuth } = require('@/hooks/use-auth') as { useAuth: () => any };
-const { auth$, resetAuthState } = require('../../../__mocks__/auth-state.cjs') as {
-  auth$: any;
-  resetAuthState: () => void;
+type Cell<T> = {
+  get: () => T;
+  set: (next: T) => void;
 };
-const { supabase, resetSupabaseMocks } = require('../../../__mocks__/supabase.cjs') as {
-  supabase: any;
-  resetSupabaseMocks: () => void;
+
+type AuthStoreMock = {
+  user: Cell<UserType>;
+  session: Cell<Session | null>;
+  isInitialized: Cell<boolean>;
+  isLoading: Cell<boolean>;
 };
-const authActions = require('../../../__mocks__/auth-actions.cjs') as Record<string, jest.Mock> & {
+
+type UseAuthContract = {
+  session: Session | null;
+  isInitialized: boolean;
+  isLoading: boolean;
+  fetchUserDataAsync: () => Promise<boolean>;
+  signInWithPassword: (params: { email: string; password: string }) => Promise<boolean>;
+  signOut: () => Promise<boolean>;
+  resetPassword: (params: { password: string }) => Promise<boolean>;
+};
+
+type AuthActionsMock = {
+  signInWithPassword: jest.Mock;
+  performSignOut: jest.Mock;
   resetAuthActionMocks: () => void;
 };
-const { clearAllStorage, resetStorageMocks } = require('../../../__mocks__/storage.cjs') as {
+
+type SupabaseMock = {
+  auth: {
+    updateUser: jest.Mock;
+  };
+  resetSupabaseMocks: () => void;
+};
+
+type ServicesMock = {
+  showToast: jest.Mock;
+  SyncService: jest.Mock;
+  promptDataMigration: jest.Mock;
+  resetServiceMocks: () => void;
+};
+
+type StorageMock = {
   clearAllStorage: jest.Mock;
   resetStorageMocks: () => void;
 };
+
+const { useAuth } = require('@/hooks/use-auth') as { useAuth: () => UseAuthContract };
+const { auth$, resetAuthState } = require('../../../__mocks__/auth-state.cjs') as {
+  auth$: AuthStoreMock;
+  resetAuthState: () => void;
+};
+const { supabase, resetSupabaseMocks } = require('../../../__mocks__/supabase.cjs') as {
+  supabase: SupabaseMock;
+  resetSupabaseMocks: () => void;
+};
+const authActions = require('../../../__mocks__/auth-actions.cjs') as AuthActionsMock;
+const { clearAllStorage, resetStorageMocks } = require('../../../__mocks__/storage.cjs') as {
+  clearAllStorage: StorageMock['clearAllStorage'];
+  resetStorageMocks: StorageMock['resetStorageMocks'];
+};
 const { showToast, SyncService, promptDataMigration, resetServiceMocks } =
-  require('../../../__mocks__/services.cjs') as {
-    showToast: jest.Mock;
-    SyncService: jest.Mock;
-    promptDataMigration: jest.Mock;
-    resetServiceMocks: () => void;
-  };
+  require('../../../__mocks__/services.cjs') as ServicesMock;
 
 describe('useAuth', () => {
   let consoleErrorSpy: jest.SpiedFunction<typeof console.error>;
@@ -72,7 +114,7 @@ describe('useAuth', () => {
     };
     const signedUser = { id: 'user-1', is_guest: false };
 
-    auth$.user.set(previousGuest as any);
+    auth$.user.set(previousGuest);
     (authActions.signInWithPassword as jest.Mock).mockImplementation(async () => ({
       user: signedUser,
       error: null,
@@ -122,8 +164,8 @@ describe('useAuth', () => {
       id: 'user-1',
       is_guest: false,
       created_at: '2026-04-05T00:00:00.000Z',
-    } as any);
-    auth$.session.set({ access_token: 'token' } as any);
+    });
+    auth$.session.set({ access_token: 'token' } as Session);
 
     const auth = useAuth();
     const result = await auth.signOut();

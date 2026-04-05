@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import type { Session } from '@supabase/supabase-js';
+import type { UserGuestType, UserOperationResult, UserType } from '@/data/types/user';
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 jest.mock('@legendapp/state/react', () => require('../../../__mocks__/legend-state-react.cjs'));
@@ -6,16 +8,49 @@ jest.mock('@/data/states/auth', () => require('../../../__mocks__/auth-state.cjs
 jest.mock('@/data/actions/auth', () => require('../../../__mocks__/auth-actions.cjs'));
 jest.mock('@/lib/supabase', () => require('../../../__mocks__/supabase.cjs'));
 
-const { useUser } = require('@/hooks/use-user') as { useUser: () => any };
-const { auth$, resetAuthState } = require('../../../__mocks__/auth-state.cjs') as {
-  auth$: any;
-  resetAuthState: () => void;
+type Cell<T> = {
+  get: () => T;
+  set: (next: T) => void;
 };
-const authActions = require('../../../__mocks__/auth-actions.cjs') as Record<string, jest.Mock> & {
+
+type AuthStoreMock = {
+  user: Cell<UserType>;
+  session: Cell<Session | null>;
+  isInitialized: Cell<boolean>;
+  isLoading: Cell<boolean>;
+};
+
+type UseUserContract = {
+  user: UserType;
+  updateUser: (params: { updates: { name?: string } }) => Promise<void>;
+  createGuest: (params: { name?: string }) => Promise<UserType>;
+  softDeleteUser: (id: string) => Promise<UserOperationResult>;
+  hardDeleteUser: (id: string) => Promise<{ success: boolean; error?: string }>;
+};
+
+type AuthActionsMock = {
+  patchUser: jest.Mock;
+  createGuest: jest.Mock;
   resetAuthActionMocks: () => void;
 };
+
+type SupabaseMock = {
+  auth: {
+    updateUser: jest.Mock;
+  };
+  functions: {
+    invoke: jest.Mock;
+  };
+};
+
+const { useUser } = require('@/hooks/use-user') as { useUser: () => UseUserContract };
+const { auth$, resetAuthState } = require('../../../__mocks__/auth-state.cjs') as {
+  auth$: AuthStoreMock;
+  resetAuthState: () => void;
+};
+const authActions = require('../../../__mocks__/auth-actions.cjs') as AuthActionsMock;
 const { supabase, resetSupabaseMocks } = require('../../../__mocks__/supabase.cjs') as {
-  supabase: any;
+  supabase: SupabaseMock;
   resetSupabaseMocks: () => void;
 };
 
@@ -29,13 +64,13 @@ describe('useUser', () => {
   });
 
   it('returns current user snapshot', () => {
-    const current = {
+    const current: UserGuestType = {
       id: 'guest-1',
       is_guest: true,
       created_at: '2026-04-05T00:00:00.000Z',
     };
 
-    auth$.user.set(current as any);
+    auth$.user.set(current);
 
     const userHook = useUser();
 
@@ -43,20 +78,20 @@ describe('useUser', () => {
   });
 
   it('updates user by patching current id and setting returned value', async () => {
-    const current = {
+    const current: UserGuestType = {
       id: 'guest-1',
       is_guest: true,
       created_at: '2026-04-05T00:00:00.000Z',
     };
-    const updated = {
+    const updated: UserGuestType = {
       ...current,
       name: 'Maria',
     };
 
-    auth$.user.set(current as any);
+    auth$.user.set(current);
     (authActions.patchUser as jest.Mock).mockImplementation(async () => ({ user: updated }));
 
-    await useUser().updateUser({ updates: { name: 'Maria' } as any });
+    await useUser().updateUser({ updates: { name: 'Maria' } });
 
     expect(authActions.patchUser).toHaveBeenCalledWith({
       id: current.id,
@@ -66,14 +101,14 @@ describe('useUser', () => {
   });
 
   it('creates guest and resets session', async () => {
-    const guest = {
+    const guest: UserGuestType = {
       id: 'guest-2',
       is_guest: true,
       created_at: '2026-04-05T00:00:00.000Z',
       name: 'Convidado',
     };
 
-    auth$.session.set({ access_token: 'old-token' } as any);
+    auth$.session.set({ access_token: 'old-token' } as Session);
     (authActions.createGuest as jest.Mock).mockImplementation(async () => ({
       user: guest,
       error: null,
@@ -88,33 +123,31 @@ describe('useUser', () => {
   });
 
   it('soft deletes guest user locally without calling supabase auth update', async () => {
-    const guest = {
+    const guest: UserGuestType = {
       id: 'guest-2',
       is_guest: true,
       created_at: '2026-04-05T00:00:00.000Z',
     };
 
-    auth$.user.set(guest as any);
+    auth$.user.set(guest);
 
     const result = await useUser().softDeleteUser(guest.id);
 
-    expect(result.user).toEqual(
-      expect.objectContaining({
-        id: guest.id,
-        deleted_at: expect.any(String),
-      }),
-    );
+    const deletedUser = result.user as UserGuestType | null;
+    expect(deletedUser?.id).toBe(guest.id);
+    expect(typeof deletedUser?.deleted_at).toBe('string');
+    expect(Boolean(deletedUser?.deleted_at)).toBe(true);
     expect(supabase.auth.updateUser).not.toHaveBeenCalled();
   });
 
   it('hard deletes non-guest user with edge function and clears local user', async () => {
-    const signedUser = {
+    const signedUser: UserGuestType = {
       id: 'user-1',
       is_guest: false,
       created_at: '2026-04-05T00:00:00.000Z',
     };
 
-    auth$.user.set(signedUser as any);
+    auth$.user.set(signedUser);
 
     const result = await useUser().hardDeleteUser(signedUser.id);
 
