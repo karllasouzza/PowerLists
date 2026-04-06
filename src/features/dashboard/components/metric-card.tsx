@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
@@ -10,7 +11,7 @@ type MetricCardProps = {
   valueClassName?: string;
 };
 
-export function MetricCard({ title, value, subtitle, valueClassName }: MetricCardProps) {
+function MetricCardComponent({ title, value, subtitle, valueClassName }: MetricCardProps) {
   return (
     <View className="min-h-[102px] flex-1 rounded-2xl border border-border bg-card p-4">
       <Text variant="muted" className="mt-0 text-xs">
@@ -25,3 +26,5 @@ export function MetricCard({ title, value, subtitle, valueClassName }: MetricCar
     </View>
   );
 }
+
+export const MetricCard = memo(MetricCardComponent);

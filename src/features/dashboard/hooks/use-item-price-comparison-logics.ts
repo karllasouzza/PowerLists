@@ -6,12 +6,12 @@ import { listItems$ } from '@/data/states/list-items';
 import type { ListItem } from '@/data/types';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 
-import type { DashboardPeriod } from '../types';
 import {
   buildItemVariations,
   calculateAverageDailyVariationPercent,
   filterItemsByPeriod,
   getPeriodLabel,
+  parseDashboardPeriod,
 } from '../utils';
 
 const normalizeItem = (item: Partial<ListItem>): ListItem => {
@@ -29,11 +29,6 @@ const normalizeItem = (item: Partial<ListItem>): ListItem => {
   };
 };
 
-const parsePeriodParam = (value?: string): DashboardPeriod => {
-  if (value === 'all' || value === 'week' || value === 'month' || value === 'year') return value;
-  return 'all';
-};
-
 export const useItemPriceComparisonLogics = () => {
   const {
     itemKey,
@@ -45,7 +40,7 @@ export const useItemPriceComparisonLogics = () => {
     period?: string;
   }>();
 
-  const period = parsePeriodParam(periodParam);
+  const period = parseDashboardPeriod(periodParam);
   const listItemsState = useValue(listItems$.get());
 
   const allItems = useMemo(() => {

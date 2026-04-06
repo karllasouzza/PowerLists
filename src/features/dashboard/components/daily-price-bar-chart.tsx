@@ -1,3 +1,4 @@
+import React, { memo, useMemo } from 'react';
 import { View } from 'react-native';
 import { Bar, CartesianChart } from 'victory-native';
 import { useTheme } from '@/context/themes';
@@ -12,11 +13,13 @@ type DailyPriceBarChartProps = {
   series: DashboardDatePoint[];
 };
 
-export function DailyPriceBarChart({ series }: DailyPriceBarChartProps) {
-  const chartData = series.map((point) => ({
-    day: point.label,
-    price: Number(point.averageUnitPrice.toFixed(2)),
-  }));
+function DailyPriceBarChartComponent({ series }: DailyPriceBarChartProps) {
+  const chartData = useMemo(() => {
+    return series.map((point) => ({
+      day: point.label,
+      price: Number(point.averageUnitPrice.toFixed(2)),
+    }));
+  }, [series]);
 
   const { theme: themeName, colorScheme } = useTheme();
   const themeVars = rawColors[themeName][colorScheme];
@@ -77,3 +80,5 @@ export function DailyPriceBarChart({ series }: DailyPriceBarChartProps) {
     </View>
   );
 }
+
+export const DailyPriceBarChart = memo(DailyPriceBarChartComponent);

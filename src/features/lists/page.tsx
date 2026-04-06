@@ -1,10 +1,9 @@
-import React, { useCallback } from 'react';
+import React, { Suspense, useCallback } from 'react';
 import { View } from 'react-native';
 import { LegendList } from '@legendapp/list';
 import { observer } from '@legendapp/state/react';
 
 import type { List } from '@/data/types';
-import { CardList } from '@/features/lists/components/card-list';
 import { CardListSkeletonList } from '@/features/lists/components/card-list-skeleton';
 import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
@@ -17,11 +16,17 @@ import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
 const LIST_CARD_ESTIMATED_ITEM_SIZE = 96;
 const LIST_CARD_DRAW_DISTANCE = 700;
 
+const AsyncCardList = React.lazy(async () => {
+  const module = await import('@/features/lists/components/card-list');
+  return { default: module.CardList };
+});
+
 const HomeScreen = observer(() => {
   const {
     searchQuery,
     setSearchQuery,
     lists,
+    listTotalsById,
     isLoading,
     isCreateOpen,
     setCreateOpen,
@@ -37,9 +42,14 @@ const HomeScreen = observer(() => {
 
   const renderList = useCallback(
     (list: List) => (
-      <CardList list={list} onEdit={handleOpenUpdateModal} onDelete={handleOpenDeleteModal} />
+      <AsyncCardList
+        list={list}
+        totalPrice={listTotalsById[list.id] ?? 'R$ 0,00'}
+        onEdit={handleOpenUpdateModal}
+        onDelete={handleOpenDeleteModal}
+      />
     ),
-    [handleOpenUpdateModal, handleOpenDeleteModal],
+    [handleOpenDeleteModal, handleOpenUpdateModal, listTotalsById],
   );
 
   const handleListScrollStart = useCallback(() => {
@@ -59,18 +69,20 @@ const HomeScreen = observer(() => {
       {isLoading ? (
         <CardListSkeletonList />
       ) : (
-        <LegendList
-          data={lists}
-          renderItem={({ item }) => renderList(item)}
-          estimatedItemSize={LIST_CARD_ESTIMATED_ITEM_SIZE}
-          drawDistance={LIST_CARD_DRAW_DISTANCE}
-          className="flex flex-1 w-full h-full"
-          keyExtractor={(item) => item.id}
-          extraData={searchQuery}
-          recycleItems
-          onScrollBeginDrag={handleListScrollStart}
-          ListFooterComponent={<View className="h-20" />}
-        />
+        <Suspense fallback={<CardListSkeletonList />}>
+          <LegendList
+            data={lists}
+            renderItem={({ item }) => renderList(item)}
+            estimatedItemSize={LIST_CARD_ESTIMATED_ITEM_SIZE}
+            drawDistance={LIST_CARD_DRAW_DISTANCE}
+            className="flex flex-1 w-full h-full"
+            keyExtractor={(item) => item.id}
+            extraData={listTotalsById}
+            recycleItems
+            onScrollBeginDrag={handleListScrollStart}
+            ListFooterComponent={<View className="h-20" />}
+          />
+        </Suspense>
       )}
 
       <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />

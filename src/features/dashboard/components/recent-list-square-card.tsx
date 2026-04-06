@@ -1,12 +1,12 @@
-import { Pressable, View } from 'react-native';
-import { IconShoppingCart } from '@tabler/icons-react-native';
-
+import { memo } from 'react';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { formatCurrency } from '@/features/list-items/utils/formatters';
-import { iconMap } from '@/features/lists/utils/icon-map';
 import { getAccentColorCardClasses } from '@/features/lists/utils/accent-colors';
+import { iconMap } from '@/features/lists/utils/icon-map';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatters';
+import { IconShoppingCart } from '@tabler/icons-react-native';
+import { Pressable, View } from 'react-native';
 
 import type { DashboardRecentListCard } from '../types';
 
@@ -15,7 +15,7 @@ type RecentListSquareCardProps = {
   onPress: (listId: string) => void;
 };
 
-export function RecentListSquareCard({ card, onPress }: RecentListSquareCardProps) {
+function RecentListSquareCardComponent({ card, onPress }: RecentListSquareCardProps) {
   const ListIcon = iconMap[card.icon] ?? IconShoppingCart;
   const { backgroundClassName, foregroundClassName } = getAccentColorCardClasses(card.accentColor);
 
@@ -43,3 +43,5 @@ export function RecentListSquareCard({ card, onPress }: RecentListSquareCardProp
     </Pressable>
   );
 }
+
+export const RecentListSquareCard = memo(RecentListSquareCardComponent);

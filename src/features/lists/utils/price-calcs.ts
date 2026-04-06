@@ -1,13 +1,12 @@
 import { ListItem } from '@/data/types';
+import { Decimal } from 'decimal.js';
 
 export const calculateTotal = (items: ListItem[]) => {
-  const prices = items.map((item: any) => item.price * item.amount);
-  let total = 0;
-  if (prices.length >= 1) {
-    total = prices.reduce((accum: number, curr: number) => accum + curr, 0);
-  } else {
-    total = 0;
-  }
+  const total = items
+    .reduce((accum, item) => {
+      return accum.plus(new Decimal(item.price ?? 0).mul(item.amount ?? 0));
+    }, new Decimal(0))
+    .toNumber();
 
   const priceFormatter = new Intl.NumberFormat('pt-BR', {
     style: 'currency',

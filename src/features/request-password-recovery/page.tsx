@@ -1,88 +1,26 @@
-import React, { useMemo } from 'react';
-import { View } from 'react-native';
-import { IconLoader2, IconMail } from '@tabler/icons-react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { Image } from 'expo-image';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useCountdown } from '@/hooks/use-countdown';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/ui/icon';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
+import { IconLoader2, IconMail } from '@tabler/icons-react-native';
+import { Image } from 'expo-image';
+import { Controller } from 'react-hook-form';
+import { View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useRequestPasswordRecoveryLogic } from './hooks/use-request-password-recovery-page-logic';
 
-import { RequestPasswordRecoverySchema } from '.';
-import { RequestPasswordRecoverySchemaType } from './types';
-import { errorsCase } from './utils';
-import { useAuth } from '@/hooks/use-auth';
-
-type LatestShipments = {
-  date: Date;
-  email: string;
-  success: boolean;
-};
-
-export default function PasswordRecoveryScreen() {
-  const { sendResetPasswordByEmail, isLoading } = useAuth();
-
-  const [latestShipments, setLatestShipments] = React.useState<LatestShipments[]>([]);
-
-  const SEND_EMAIL_DELAY = 60 * 1000;
-
-  const lastShipment = latestShipments.at(-1);
-  const targetDate = useMemo(
-    () => (lastShipment ? new Date(lastShipment.date.getTime() + SEND_EMAIL_DELAY) : null),
-    [lastShipment, SEND_EMAIL_DELAY],
-  );
-
-  const { formattedTime, timeLeft } = useCountdown(targetDate);
-  const isBlocked = timeLeft > 0;
-
+export default function RequestPasswordRecoveryScreen() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm<RequestPasswordRecoverySchemaType>({
-    resolver: zodResolver(RequestPasswordRecoverySchema),
-    defaultValues: {
-      email: '',
-    },
-  });
-
-  const onSubmit = async (data: RequestPasswordRecoverySchemaType) => {
-    try {
-      if (!data.email) throw new Error('email-required');
-      if (!data.email.includes('@')) throw new Error('email-invalid');
-      if (
-        latestShipments.filter((shipment) => shipment.email === data.email && shipment.success)
-          .length > 5
-      )
-        throw new Error('five-emails-per-hour');
-      if (
-        latestShipments.length &&
-        latestShipments[latestShipments.length - 1].email === data.email &&
-        latestShipments[latestShipments.length - 1].success &&
-        latestShipments[latestShipments.length - 1].date.getTime() + SEND_EMAIL_DELAY >
-          new Date().getTime()
-      )
-        throw new Error('one-email-per-minute');
-
-      const sucess = await sendResetPasswordByEmail({ email: data.email });
-      if (!sucess) throw new Error('email-not-found');
-
-      setLatestShipments((prev) => [
-        ...prev,
-        { date: new Date(), email: data.email, success: sucess },
-      ]);
-    } catch (error) {
-      console.error('Error on password recovery:', error);
-
-      if (error instanceof Error) {
-        errorsCase(error.message);
-      }
-    }
-  };
+    errors,
+    isLoading,
+    isBlocked,
+    formattedTime,
+    onSubmit,
+    lastShipment,
+  } = useRequestPasswordRecoveryLogic();
 
   return (
     <KeyboardAwareScrollView

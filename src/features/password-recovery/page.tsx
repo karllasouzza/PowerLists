@@ -1,55 +1,28 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { IconEye, IconEyeClosed, IconLoader2, IconMail } from '@tabler/icons-react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-
-import { PasswordRecoverySchema } from '.';
-import { PasswordRecoverySchemaType } from './types';
 import { Icon } from '@/components/ui/icon';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
+import { IconEye, IconEyeClosed, IconLoader2, IconMail } from '@tabler/icons-react-native';
 import { Image } from 'expo-image';
+import React from 'react';
+import { Controller } from 'react-hook-form';
+import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/hooks/use-auth';
+import { usePasswordRecoveryLogic } from './hooks/use-password-recovery-page-logic';
 
 export default function PasswordRecoveryScreen() {
-  const router = useRouter();
-  const { resetPassword, isLoading } = useAuth();
-
-  const [isSecureNewPassword, setIsSecureNewPassword] = useState(true);
-  const [isSecureNewPasswordConfirmation, setIsSecureNewPasswordConfirmation] = useState(true);
-
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm<PasswordRecoverySchemaType>({
-    resolver: zodResolver(PasswordRecoverySchema),
-    defaultValues: {
-      newPassword: '',
-      newPasswordConfirmation: '',
-    },
-  });
-
-  const onSubmit = async (data: PasswordRecoverySchemaType) => {
-    try {
-      if (!data.newPassword) throw new Error('password is required');
-      if (!data.newPasswordConfirmation) throw new Error('password confirmation is required');
-
-      if (data.newPassword !== data.newPasswordConfirmation)
-        throw new Error('passwords do not match');
-
-      await resetPassword({ password: data.newPassword });
-      router.back();
-    } catch (error) {
-      console.error('Error on password recovery:', error);
-    }
-  };
+    errors,
+    isSecureNewPassword,
+    setIsSecureNewPassword,
+    isSecureNewPasswordConfirmation,
+    setIsSecureNewPasswordConfirmation,
+    isLoading,
+    onSubmit,
+  } = usePasswordRecoveryLogic();
 
   return (
     <KeyboardAwareScrollView
@@ -60,8 +33,8 @@ export default function PasswordRecoveryScreen() {
         <View className="w-full max-w-md items-center justify-center gap-2">
           <Image
             source={require('/assets/adaptive-icon.png')}
-            style={{ width: 150, height: 150 }}
             contentFit="contain"
+            className="size-40"
           />
         </View>
         <View className="w-full max-w-md items-center justify-center gap-2">
