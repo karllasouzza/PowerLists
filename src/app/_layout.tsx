@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { Stack } from 'expo-router';
 import { PortalHost } from '@rn-primitives/portal';
-import { Toaster } from 'sonner-native';
+import { Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import BootSplash from 'react-native-bootsplash';
-import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
+import { Toaster } from 'sonner-native';
 
-import ThemeProvider from '@/context/themes/use-themes';
-import { useAuth } from '@/hooks/use-auth';
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { useAppFonts } from '@/utils/fonts';
+import ThemeProvider from '@/context/themes/use-themes';
 import '@/css/global.css';
+import { useAuth } from '@/hooks/use-auth';
+import { useUser } from '@/hooks/use-user';
+import { useAppFonts } from '@/utils/fonts';
+import ErrorBoundary from '@/components/error-boundary';
 
 export default function RootLayout() {
   const [visible, setVisible] = useState(true);
 
-  const { isLoading, user, fetchUserDataAsync } = useAuth();
+  const { isLoading, fetchUserDataAsync } = useAuth();
+  const { user } = useUser();
   const fontsLoaded = useAppFonts();
 
   useEffect(() => {
     fetchUserDataAsync();
-    // Intentionally run only once on mount to avoid repeated state updates
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

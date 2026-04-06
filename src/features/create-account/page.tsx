@@ -1,53 +1,27 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { IconEye, IconEyeClosed, IconLoader2, IconUserPlus } from '@tabler/icons-react-native';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'expo-router';
-
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-
-import { CreateAccountSchema } from '.';
-import { CreateAccountSchemaType } from './types';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
-import { Image } from 'expo-image';
 import { Icon } from '@/components/ui/icon';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/hooks/use-auth';
+import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
+import { IconEye, IconEyeClosed, IconLoader2, IconUserPlus } from '@tabler/icons-react-native';
+import { Image } from 'expo-image';
+import { Controller } from 'react-hook-form';
+import { View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useCreateAccountLogic } from './hooks/use-create-account-logic';
 
 export default function CreateAccountScreen() {
-  const router = useRouter();
-  const [isSecureTextEntry, setIsSecureTextEntry] = useState(true);
-
-  const { signUpWithPassword, isLoading } = useAuth();
-
   const {
     control,
     handleSubmit,
-    formState: { errors },
-  } = useForm<CreateAccountSchemaType>({
-    resolver: zodResolver(CreateAccountSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
-
-  const onSubmit = async (data: CreateAccountSchemaType) => {
-    try {
-      await signUpWithPassword({ email: data.email, password: data.password });
-      router.replace('/');
-    } catch (error) {
-      console.error('Error on signUpWithPassword:', error);
-    }
-  };
-
-  const handleLogin = () => {
-    router.navigate('/login');
-  };
+    errors,
+    isSecureTextEntry,
+    setIsSecureTextEntry,
+    onSubmit,
+    handleLogin,
+    isLoading,
+  } = useCreateAccountLogic();
 
   return (
     <KeyboardAwareScrollView

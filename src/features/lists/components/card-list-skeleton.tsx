@@ -5,10 +5,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function CardListSkeleton() {
   return (
     <View className="flex-row items-center gap-3 bg-card px-4 py-4">
-      <Skeleton className="rounded-full size-[50px]" />
+      <Skeleton className="rounded-full size-[50px] animate-pulse" />
       <View className="flex-col flex-1 gap-2">
-        <Skeleton className="rounded-md w-2/3 h-4" />
-        <Skeleton className="rounded-md w-1/3 h-4" />
+        <Skeleton className="rounded-md w-2/3 h-4 animate-pulse" />
+        <Skeleton className="rounded-md w-1/3 h-4 animate-pulse" />
       </View>
     </View>
   );

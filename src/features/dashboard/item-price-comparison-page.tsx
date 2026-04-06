@@ -1,13 +1,36 @@
-import { useMemo } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { TopBar } from '@/components/top-bar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
-import { formatCurrency } from '@/features/list-items/utils/formatters';
 
-import { DailyPriceBarChart, MetricCard } from './components';
 import { useItemPriceComparisonLogics } from './hooks/use-item-price-comparison-logics';
+import { formatCurrency } from '@/utils/formatters';
+
+const AsyncDailyPriceBarChart = React.lazy(async () => {
+  const module = await import('./components/daily-price-bar-chart');
+  return { default: module.DailyPriceBarChart };
+});
+
+const AsyncMetricCard = React.lazy(async () => {
+  const module = await import('./components/metric-card');
+  return { default: module.MetricCard };
+});
+
+function ItemPriceComparisonLoading() {
+  return (
+    <View className="gap-4 p-4">
+      <Skeleton className="h-80 w-full rounded-3xl" />
+      <View className="flex-row gap-3">
+        <Skeleton className="h-[102px] flex-1 rounded-2xl" />
+        <Skeleton className="h-[102px] flex-1 rounded-2xl" />
+      </View>
+      <Skeleton className="h-[122px] w-full rounded-2xl" />
+    </View>
+  );
+}
 
 export default function ItemPriceComparisonPage() {
   const router = useRouter();
@@ -48,30 +71,32 @@ export default function ItemPriceComparisonPage() {
           </Text>
         </View>
       ) : (
-        <ScrollView className="flex-1" contentContainerClassName="gap-4 p-4 pb-8">
-          <DailyPriceBarChart series={variation.dailySeries} />
+        <Suspense fallback={<ItemPriceComparisonLoading />}>
+          <ScrollView className="flex-1" contentContainerClassName="gap-4 p-4 pb-8">
+            <AsyncDailyPriceBarChart series={variation.dailySeries} />
 
-          <View className="flex-row gap-3">
-            <MetricCard
-              title="Quantidade total"
-              value={`${variation.totalAmount}`}
-              subtitle="Soma das ocorrências no período"
-            />
-            <MetricCard
-              title="Variação média diária"
-              value={averageDailyDeltaValue}
-              subtitle="Média do delta entre dias"
-              valueClassName={averageDailyVariation >= 0 ? 'text-destructive' : 'text-primary'}
-            />
-          </View>
+            <View className="flex-row gap-3">
+              <AsyncMetricCard
+                title="Quantidade total"
+                value={`${variation.totalAmount}`}
+                subtitle="Soma das ocorrências no período"
+              />
+              <AsyncMetricCard
+                title="Variação média diária"
+                value={averageDailyDeltaValue}
+                subtitle="Média do delta entre dias"
+                valueClassName={averageDailyVariation >= 0 ? 'text-destructive' : 'text-primary'}
+              />
+            </View>
 
-          <MetricCard
-            title={totalDeltaTitle}
-            value={totalDeltaValue}
-            subtitle={`${periodLabel} | Min ${formatCurrency(variation.minUnitPrice)} | Max ${formatCurrency(variation.maxUnitPrice)}`}
-            valueClassName={variation.changePercent >= 0 ? 'text-destructive' : 'text-primary'}
-          />
-        </ScrollView>
+            <AsyncMetricCard
+              title={totalDeltaTitle}
+              value={totalDeltaValue}
+              subtitle={`${periodLabel} | Min ${formatCurrency(variation.minUnitPrice)} | Max ${formatCurrency(variation.maxUnitPrice)}`}
+              valueClassName={variation.changePercent >= 0 ? 'text-destructive' : 'text-primary'}
+            />
+          </ScrollView>
+        </Suspense>
       )}
     </View>
   );

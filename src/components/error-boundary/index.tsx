@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Text } from '@/components/ui/text';
 
@@ -12,51 +12,44 @@ type ErrorBoundaryState = {
   error: Error | null;
 };
 
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+export default function ErrorBoundary(props: ErrorBoundaryProps) {
+  const [state, setState] = useState<ErrorBoundaryState>({ hasError: false, error: null });
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('[ErrorBoundary] Erro capturado:', error, info.componentStack);
-  }
-
-  private handleReset = () => {
-    this.setState({ hasError: false, error: null });
+  const handleReset = () => {
+    setState({ hasError: false, error: null });
   };
 
-  render() {
-    if (this.state.hasError) {
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
+  useEffect(() => {
+    if (state.hasError) {
+      console.error('[ErrorBoundary] Erro capturado:', state.error);
+    }
+  }, [state.hasError, state.error]);
 
-      return (
-        <View className="flex-1 items-center justify-center gap-6 bg-background px-8">
-          <View className="items-center gap-3">
-            <Text className="text-center text-2xl font-semibold text-foreground">
-              Algo deu errado
-            </Text>
-            <Text className="text-center text-base text-muted-foreground">
-              Ocorreu um erro inesperado. Tente novamente ou reinicie o aplicativo.
-            </Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={this.handleReset}
-            className="rounded-xl bg-primary px-6 py-3"
-            activeOpacity={0.8}>
-            <Text className="font-medium text-primary-foreground">Tentar novamente</Text>
-          </TouchableOpacity>
-        </View>
-      );
+  if (state.hasError) {
+    if (props.fallback) {
+      return props.fallback;
     }
 
-    return this.props.children;
+    return (
+      <View className="flex-1 items-center justify-center gap-6 bg-background px-8">
+        <View className="items-center gap-3">
+          <Text className="text-center text-2xl font-semibold text-foreground">
+            Algo deu errado
+          </Text>
+          <Text className="text-center text-base text-muted-foreground">
+            Ocorreu um erro inesperado. Tente novamente ou reinicie o aplicativo.
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          onPress={handleReset}
+          className="rounded-xl bg-primary px-6 py-3"
+          activeOpacity={0.8}>
+          <Text className="font-medium text-primary-foreground">Tentar novamente</Text>
+        </TouchableOpacity>
+      </View>
+    );
   }
+
+  return props.children;
 }

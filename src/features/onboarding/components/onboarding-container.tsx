@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
 import { View, useWindowDimensions, FlatList, TouchableOpacity } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { OnboardingContainerItem } from './onboarding-container-item';
@@ -33,19 +33,22 @@ const SLIDE_PAGES: ISlide[] = [
   },
 ];
 
-export const OnboardingContainer = ({ completeOnboarding }: SlidesProps) => {
+const OnboardingContainer = ({ completeOnboarding }: SlidesProps) => {
   const { width } = useWindowDimensions();
   const flatListRef = useRef<FlatList<ISlide>>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const isLastSlide = currentSlide === SLIDE_PAGES.length - 1;
+  const isLastSlide = useMemo(() => currentSlide === SLIDE_PAGES.length - 1, [currentSlide]);
 
-  const handleScrollEnd = (event: any) => {
-    const index = Math.round(event.nativeEvent.contentOffset.x / width);
-    setCurrentSlide(index);
-  };
+  const handleScrollEnd = useCallback(
+    (event: any) => {
+      const index = Math.round(event.nativeEvent.contentOffset.x / width);
+      setCurrentSlide(index);
+    },
+    [width],
+  );
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (isLastSlide) {
       completeOnboarding();
     } else {
@@ -53,7 +56,7 @@ export const OnboardingContainer = ({ completeOnboarding }: SlidesProps) => {
       flatListRef.current?.scrollToIndex({ index: next, animated: true });
       setCurrentSlide(next);
     }
-  };
+  }, [isLastSlide, completeOnboarding, currentSlide]);
 
   return (
     <View className="flex-1 bg-background">
@@ -95,3 +98,5 @@ export const OnboardingContainer = ({ completeOnboarding }: SlidesProps) => {
     </View>
   );
 };
+
+export default memo(OnboardingContainer);

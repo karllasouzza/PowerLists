@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import React, { Suspense, useCallback } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { observer } from '@legendapp/state/react';
@@ -6,14 +6,28 @@ import { observer } from '@legendapp/state/react';
 import { TopBar } from '@/components/top-bar';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import {
-  CheckedTotalPieChart,
-  ItemVariationSection,
-  PeriodFilter,
-  RecentListsSection,
-} from './components';
 import { useDashboardPageLogics } from './hooks/use-dashboard-page-logics';
 import type { DashboardItemVariation } from './types';
+
+const AsyncPeriodFilter = React.lazy(async () => {
+  const module = await import('./components/period-filter');
+  return { default: module.PeriodFilter };
+});
+
+const AsyncCheckedTotalPieChart = React.lazy(async () => {
+  const module = await import('./components/checked-total-pie-chart');
+  return { default: module.CheckedTotalPieChart };
+});
+
+const AsyncRecentListsSection = React.lazy(async () => {
+  const module = await import('./components/recent-lists-section');
+  return { default: module.RecentListsSection };
+});
+
+const AsyncItemVariationSection = React.lazy(async () => {
+  const module = await import('./components/item-variation-section');
+  return { default: module.ItemVariationSection };
+});
 
 const DashboardLoading = () => {
   return (
@@ -88,28 +102,30 @@ function DashboardPage() {
       {isLoading ? (
         <DashboardLoading />
       ) : (
-        <ScrollView className="flex-1" contentContainerClassName="gap-5 py-4 pb-8">
-          <PeriodFilter period={period} onChange={setPeriod} />
+        <Suspense fallback={<DashboardLoading />}>
+          <ScrollView className="flex-1" contentContainerClassName="gap-5 py-4 pb-8">
+            <AsyncPeriodFilter period={period} onChange={setPeriod} />
 
-          <CheckedTotalPieChart
-            slices={pieSlices}
-            totalCheckedPrice={totalCheckedPrice}
-            periodLabel={periodLabel}
-          />
+            <AsyncCheckedTotalPieChart
+              slices={pieSlices}
+              totalCheckedPrice={totalCheckedPrice}
+              periodLabel={periodLabel}
+            />
 
-          <RecentListsSection
-            cards={recentLists}
-            onViewAll={handleViewAllLists}
-            onPressCard={handleOpenList}
-          />
+            <AsyncRecentListsSection
+              cards={recentLists}
+              onViewAll={handleViewAllLists}
+              onPressCard={handleOpenList}
+            />
 
-          <ItemVariationSection
-            increases={increases}
-            decreases={decreases}
-            onViewAll={handleViewAllItemVariations}
-            onPressItem={handleOpenItemComparison}
-          />
-        </ScrollView>
+            <AsyncItemVariationSection
+              increases={increases}
+              decreases={decreases}
+              onViewAll={handleViewAllItemVariations}
+              onPressItem={handleOpenItemComparison}
+            />
+          </ScrollView>
+        </Suspense>
       )}
     </View>
   );

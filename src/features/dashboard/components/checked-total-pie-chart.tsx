@@ -1,15 +1,14 @@
-import { useMemo } from 'react';
-import { ScrollView, View, useWindowDimensions } from 'react-native';
+import { Text } from '@/components/ui/text';
 import { useTheme } from '@/context/themes';
 import { rawColors } from '@/context/themes/theme-config';
+import { DEFAULT_ACCENT_COLOR, isAccentColorToken } from '@/features/lists/utils/accent-colors';
+import { formatCurrency } from '@/utils/formatters';
 import { getThemeColorHex } from '@/utils/tailwind-color';
-import { isAccentColorToken, DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 import { Poppins_500Medium } from '@expo-google-fonts/poppins';
 import { useFont } from '@shopify/react-native-skia';
+import React, { memo, useMemo } from 'react';
+import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { Bar, CartesianChart } from 'victory-native';
-
-import { Text } from '@/components/ui/text';
-import { formatCurrency } from '@/features/list-items/utils/formatters';
 
 import type { DashboardPieSlice } from '../types';
 
@@ -27,7 +26,12 @@ type ChartBar = {
   color: string;
 };
 
-export function CheckedTotalPieChart({
+const createdAtFormatter = new Intl.DateTimeFormat('pt-BR', {
+  day: '2-digit',
+  month: '2-digit',
+});
+
+function CheckedTotalPieChartComponent({
   slices,
   totalCheckedPrice,
   periodLabel,
@@ -38,13 +42,6 @@ export function CheckedTotalPieChart({
   const { theme: themeName, colorScheme } = useTheme();
   const themeVars = rawColors[themeName][colorScheme];
 
-  const formatCreatedAt = (date: Date) => {
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-    }).format(date);
-  };
-
   const chartData = useMemo<ChartBar[]>(() => {
     return slices
       .filter((slice) => slice.y > 0)
@@ -52,7 +49,6 @@ export function CheckedTotalPieChart({
         const rawColor = slice.color ?? DEFAULT_ACCENT_COLOR;
         let resolvedColor = String(rawColor);
 
-        // If the slice.color is an accent token, resolve it to a hex value using theme vars
         if (isAccentColorToken(resolvedColor)) {
           resolvedColor = getThemeColorHex({
             themeVars,
@@ -64,7 +60,7 @@ export function CheckedTotalPieChart({
         return {
           key: slice.listId,
           position: index + 1,
-          createdAtLabel: formatCreatedAt(slice.createdAt),
+          createdAtLabel: createdAtFormatter.format(slice.createdAt),
           total: Number(slice.y.toFixed(2)),
           color: resolvedColor,
         };
@@ -183,3 +179,5 @@ export function CheckedTotalPieChart({
     </View>
   );
 }
+
+export const CheckedTotalPieChart = memo(CheckedTotalPieChartComponent);

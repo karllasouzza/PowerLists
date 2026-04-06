@@ -1,33 +1,12 @@
-import React, { useEffect } from 'react';
-import { View, Text } from 'react-native';
-import { useRouter } from 'expo-router';
-import { Image } from 'expo-image';
-import { IconFolder } from '@tabler/icons-react-native';
-
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { useTheme } from '@/context/themes';
+import { IconFolder } from '@tabler/icons-react-native';
+import { Image } from 'expo-image';
+import { Text, View } from 'react-native';
+import { useAuthPageLogic } from './hooks/use-auth-page-logic';
 
 export default function AuthScreen() {
-  const router = useRouter();
-  const { setBackgroundColor } = useTheme();
-
-  useEffect(() => {
-    setBackgroundColor('default');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleCreateAccount = () => {
-    router.navigate('/create-account');
-  };
-
-  const handleLogin = () => {
-    router.navigate('/login');
-  };
-
-  const handleGuest = () => {
-    router.navigate('/guest');
-  };
+  const { handleCreateAccount, handleLogin, handleGuest } = useAuthPageLogic();
 
   return (
     <View className="h-full w-full flex-1 flex-col items-center justify-between gap-2 overflow-hidden bg-background">

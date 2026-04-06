@@ -1,15 +1,13 @@
 import { List } from '@/data/types';
 
 export const filterListsByQuery = (lists: List[], query: string): List[] => {
-  let filteredLists: List[] = [];
+  const normalizedQuery = query.trim().toLowerCase();
 
-  if (query.length > 0) {
-    filteredLists = lists.filter((list) => list.title.toLowerCase().includes(query.toLowerCase()));
-  } else {
-    filteredLists = lists;
-  }
+  const filteredLists = normalizedQuery
+    ? lists.filter((list) => list.title.toLowerCase().includes(normalizedQuery))
+    : lists;
 
-  return filteredLists.sort(
+  return [...filteredLists].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 };
