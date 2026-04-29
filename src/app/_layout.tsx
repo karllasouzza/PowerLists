@@ -7,7 +7,7 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { Toaster } from 'sonner-native';
 
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
-import ThemeProvider from '@/context/themes/use-themes';
+import ThemeProvider from '@/context/themes/provider';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
 import { useUser } from '@/hooks/use-user';
@@ -23,7 +23,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     fetchUserDataAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
