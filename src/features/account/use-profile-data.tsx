@@ -1,4 +1,4 @@
-import { useTheme } from '@/context/themes';
+import { useUserPreferences } from '@/context/themes/context';
 import { profiles$ } from '@/data/states/profile';
 import { useAuth } from '@/hooks/use-auth';
 import { useUser } from '@/hooks/use-user';
@@ -9,7 +9,7 @@ const useProfileData = () => {
   const { user } = useUser();
   const profiles = useValue(profiles$);
   const profile = (user?.id ? profiles[user.id] : null) ?? null;
-  const { theme, colorScheme, setTheme, setColorScheme } = useTheme();
+  const { theme, colorScheme, setTheme, setColorScheme } = useUserPreferences();
 
   return { user, signOut, profile, theme, colorScheme, setTheme, setColorScheme };
 };
