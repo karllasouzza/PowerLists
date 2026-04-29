@@ -1,9 +1,10 @@
 import { observable } from '@legendapp/state';
 import { synced } from '@legendapp/state/sync';
-import { MMKVPersistPluginWrapper } from '@/data/storage';
+import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 
 import type { UserType } from '@/data/types/user';
 import { Session } from '@supabase/supabase-js';
+
 interface AuthState {
   user: UserType;
   session: Session | null;
@@ -23,8 +24,7 @@ export const auth$ = observable({
     initial: null as UserType,
     persist: {
       name: 'local_user',
-      plugin: MMKVPersistPluginWrapper,
-      retrySync: true,
+      plugin: ObservablePersistMMKV,
     },
   }),
   session: initialState.session,

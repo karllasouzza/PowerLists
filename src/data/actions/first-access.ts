@@ -1,13 +1,15 @@
-import { firstAccess$, FIRST_ACCESS_STORAGE_KEY } from '@/data/states/first-access';
-import { storage } from '@/data/storage';
+import { firstAccess$ } from '@/data/states/first-access';
 
 export const completeFirstAccess = (): boolean => {
   try {
-    storage.set(FIRST_ACCESS_STORAGE_KEY, true);
-    firstAccess$.hasCompletedOnboarding.set(true);
+    firstAccess$.set(true);
     return true;
   } catch (error) {
     console.error('Error completing first access:', error);
     return false;
   }
+};
+
+export const resetFirstAccessState = (): void => {
+  firstAccess$.set(false);
 };

@@ -1,7 +1,7 @@
-import { computed } from '@legendapp/state';
 import { auth$ } from '@/data/states/auth';
-import { resetListStore } from './states/lists';
-import { resetListItemsStore } from './states/list-items';
+import { computed } from '@legendapp/state';
+import { resetListItemsStore } from './actions/list-items';
+import { resetListStore } from './actions/lists';
 import { resetProfilesStore } from './states/profile';
 
 let previousUserId: string | null = null;

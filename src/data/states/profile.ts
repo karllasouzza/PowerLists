@@ -2,13 +2,13 @@ import { observable } from '@legendapp/state';
 import { supabase } from '@/lib/supabase';
 import { convertFromSupabaseFormat, convertToSupabaseFormat } from '@/lib/supabase/utils';
 
-import { getCurrentUserId, customSynced } from '../database';
+import { getCurrentUserId, supabaseSynced } from '../database';
 import { storage } from '../storage';
 import type { ProfileType, CreateProfileType, UpdateProfileType } from '../types/profile';
 import { generateId } from '../utils';
 
 export const profiles$ = observable(
-  customSynced({
+  supabaseSynced({
     initial: {} as Record<string, any>,
     supabase,
     collection: 'profiles',
@@ -16,9 +16,6 @@ export const profiles$ = observable(
     filter: (select: any) => select.eq('id', getCurrentUserId()),
     actions: ['read', 'create', 'update', 'delete'],
     persist: { name: 'profiles', retrySync: true },
-    retry: {
-      infinite: true,
-    },
   }),
 );
 

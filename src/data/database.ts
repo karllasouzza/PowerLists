@@ -4,16 +4,17 @@ import { generateId } from './utils';
 import { supabase } from '@/lib/supabase';
 import { auth$ } from '@/data/states/auth';
 import { enableReactTracking } from '@legendapp/state/config/enableReactTracking';
-import { MMKVPersistPluginWrapper } from './storage';
+import { ObservablePersistMMKV } from '@legendapp/state/persist-plugins/mmkv';
 
 enableReactTracking({
   warnMissingUse: true,
 });
 
-export const customSynced = configureSynced(syncedSupabase, {
+export const supabaseSynced = configureSynced(syncedSupabase, {
   supabase,
   persist: {
-    plugin: MMKVPersistPluginWrapper,
+    plugin: ObservablePersistMMKV,
+    retrySync: true,
   },
   generateId,
   mode: 'merge',
@@ -22,6 +23,9 @@ export const customSynced = configureSynced(syncedSupabase, {
   fieldCreatedAt: 'created_at',
   fieldUpdatedAt: 'updated_at',
   fieldDeleted: 'deleted',
+  retry: {
+    infinite: true,
+  },
 });
 
 export const getCurrentUserId = (): string | null => {

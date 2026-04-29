@@ -1,17 +1,17 @@
 import { AuthError, AuthUser } from '@supabase/supabase-js';
 
-import { supabase } from '@/lib/supabase';
+import { auth$ } from '@/data/states/auth';
+import { resetProfilesStore } from '@/data/states/profile';
 import type {
-  UserGuestType,
   CreateUserParams,
   UpdateUserParams,
+  UserGuestType,
   UserOperationResult,
 } from '@/data/types/user';
 import { generateId } from '@/data/utils';
-import { resetProfilesStore } from '@/data/states/profile';
-import { resetListStore } from '@/data/states/lists';
-import { resetListItemsStore } from '@/data/states/list-items';
-import { auth$ } from '@/data/states/auth';
+import { supabase } from '@/lib/supabase';
+import { resetListItemsStore } from './list-items';
+import { resetListStore } from './lists';
 
 export async function fetchOrRestoreUser(): Promise<UserOperationResult> {
   const useCached = auth$.user.get();
