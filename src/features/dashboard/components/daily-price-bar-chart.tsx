@@ -1,13 +1,13 @@
 import React, { memo, useMemo } from 'react';
 import { View } from 'react-native';
 import { Bar, CartesianChart } from 'victory-native';
-import { useTheme } from '@/context/themes';
-import { rawColors } from '@/context/themes/theme-config';
+import { useUserPreferences } from '@/context/themes/context';
 import { getThemeColorHex } from '@/utils/tailwind-color';
 
 import { Text } from '@/components/ui/text';
 
 import type { DashboardDatePoint } from '../types';
+import { rawColors } from '@/lib/themes';
 
 type DailyPriceBarChartProps = {
   series: DashboardDatePoint[];
@@ -21,7 +21,7 @@ function DailyPriceBarChartComponent({ series }: DailyPriceBarChartProps) {
     }));
   }, [series]);
 
-  const { theme: themeName, colorScheme } = useTheme();
+  const { theme: themeName, colorScheme } = useUserPreferences();
   const themeVars = rawColors[themeName][colorScheme];
 
   const labelColor = getThemeColorHex({

@@ -1,17 +1,18 @@
+import { useValue } from '@legendapp/state/react';
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
-import { useValue } from '@legendapp/state/react';
 
-import { deleteListItem, listItems$ } from '@/data/states/list-items';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import {
   AppModal,
   AppModalContent,
+  AppModalFooter,
   AppModalHandle,
   AppModalHeader,
-  AppModalFooter,
 } from '@/components/molecules/app-modal';
+import { deleteListItem } from '@/data/actions/list-items';
+import { listItems$ } from '@/data/states/list-items';
 import { ListItem } from '@/data/types';
+import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 
 type ItemDeleteModalProps = {
   open: boolean;

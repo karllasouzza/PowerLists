@@ -2,13 +2,14 @@ import { useSelector, useValue } from '@legendapp/state/react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
-import { listItems$, toggleCheckListItem } from '@/data/states/list-items';
+import { listItems$ } from '@/data/states/list-items';
 import { lists$ } from '@/data/states/lists';
 import { ListItem as DataListItem, List, ListItem } from '@/data/types';
 import { getAccentColorOption } from '@/features/lists/utils/accent-colors';
 import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { calculateTotal } from '@/utils/formatters';
 import { SortMode, sortItems } from '@/utils/sorting';
+import { toggleCheckListItem } from '@/data/actions/list-items';
 
 export const useListItemsPageLogics = () => {
   const { id: listId } = useLocalSearchParams<{ id: string }>();

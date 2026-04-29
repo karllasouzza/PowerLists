@@ -1,4 +1,4 @@
-import { createNewListItem } from '@/data/states/list-items';
+import { createNewListItem } from '@/data/actions/list-items';
 import { generateUUID } from '@/utils/generate-uuid';
 import type { AudioPlayer } from 'expo-audio';
 import { useCallback } from 'react';

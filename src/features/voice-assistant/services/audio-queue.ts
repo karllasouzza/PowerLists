@@ -4,9 +4,6 @@ import type { AudioPlayer } from 'expo-audio';
  * Plays an audio player from the beginning and returns a Promise that resolves
  * when the audio finishes. Seeking to position 0 ensures the audio can replay
  * after having already been played once.
- *
- * A fallback timeout resolves the promise if `didJustFinish` is never fired
- * (e.g. very short sounds, native glitches).
  */
 const playAndWait = (player: AudioPlayer): Promise<void> =>
   new Promise<void>((resolve) => {

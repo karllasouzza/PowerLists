@@ -1,23 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Decimal } from 'decimal.js';
+import React, { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { TextInput, View } from 'react-native';
+import { z } from 'zod';
 
-import { showToast } from '@/services';
-import { createNewListItem } from '@/data/states/list-items';
-import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
-import { Label } from '@/components/ui/label';
 import {
   AppModal,
   AppModalContent,
+  AppModalFooter,
   AppModalHandle,
   AppModalHeader,
-  AppModalFooter,
 } from '@/components/molecules/app-modal';
-import { parseBRLToNumber, formatBRL } from '@/utils/currency';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
+import { createNewListItem } from '@/data/actions/list-items';
+import { showToast } from '@/services';
+import { formatBRL, parseBRLToNumber } from '@/utils/currency';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),

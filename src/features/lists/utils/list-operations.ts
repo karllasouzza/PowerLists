@@ -2,7 +2,7 @@ import {
   createNewList,
   updateList as editListAction,
   deleteList as deleteListAction,
-} from '@/data/states/lists';
+} from '@/data/actions/lists';
 import { showToast } from '@/services';
 import { FormData } from '../types';
 

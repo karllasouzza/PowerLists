@@ -3,14 +3,14 @@ import { completeFirstAccess } from '@/data/actions/first-access';
 import { firstAccess$ } from '@/data/states/first-access';
 
 export const useOnboardingFirstAccess = () => {
-  const hasCompletedOnboarding = useValue(firstAccess$.hasCompletedOnboarding);
+  const isFirstAccess = useValue(firstAccess$);
 
   const completeOnboarding = () => {
     completeFirstAccess();
   };
 
   return {
-    isFirstAccess: !hasCompletedOnboarding,
+    isFirstAccess,
     completeOnboarding,
   };
 };
