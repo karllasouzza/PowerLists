@@ -146,11 +146,11 @@ export interface UpdateEntityProps {
 
 ```ts
 import { observable } from '@legendapp/state';
-import { customSynced, getCurrentUserId } from '../database';
+import { supabaseSynced, getCurrentUserId } from '../database';
 import { supabase } from '@/lib/supabase';
 
 export const entity$ = observable(
-  customSynced({
+  supabaseSynced({
     initial: {} as Record<string, any>,
     supabase,
     collection: '[table_name]',               // Supabase table (snake_case)
