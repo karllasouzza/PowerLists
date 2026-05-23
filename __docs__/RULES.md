@@ -41,12 +41,15 @@ This document outlines the core development rules and conventions for the PowerL
 
 ## State Management Rules
 
-### Legend App (`@legendapp/state`)
-- All global state is observable
-- Define state in `src/data/states/` using `observable()`
-- Read in components by wrapping with `observer()` or using `useValue()`
-- Write to observables using `.set()` or `.update()` methods
+### WatermelonDB
+- All persistent data lives in WatermelonDB (`src/database/`)
+- Schema is defined in `src/database/schema.ts`
+- Models are in `src/database/models/` using `@nozbe/watermelondb` decorators
+- Database operations are in `src/database/operations/`
+- Read reactive data in components using `useObservableQuery()` (custom hook in `src/hooks/use-observable-query.ts`)
+- Use `withObservables` HOC from WatermelonDB when appropriate
 - Use `useState` only for local UI state (modal open/close, search query, etc.)
+- Auth state uses `expo-secure-store` for persistence + `useSyncExternalStore` for reactivity
 
 ## Styling Rules
 
@@ -73,8 +76,9 @@ This document outlines the core development rules and conventions for the PowerL
 - Use helpers in `src/data/` or `src/features/*/utils/`:
   - `convertFromSupabaseFormat()` — snake_case → camelCase
   - `convertToSupabaseFormat()` — camelCase → snake_case
-- Legend App handles automatic bidirectional sync (Supabase ↔ MMKV local storage) for offline-first support
-- Prefer updating the observable store over calling Supabase directly from components
+- WatermelonDB syncs with Supabase via `synchronize()` in `src/database/sync.ts`
+- Supabase Postgres triggers and RPC functions (`pull`, `push`) handle server-side sync
+- Prefer using WatermelonDB operations over calling Supabase directly from components
 
 ## Naming Conventions
 
@@ -83,7 +87,7 @@ This document outlines the core development rules and conventions for the PowerL
 | Files | `kebab-case` | `list-create-modal.tsx`, `use-list-page-logics.ts` |
 | Components | `PascalCase` | `CardList`, `ListCreateModal` |
 | Hooks | `use` prefix | `useListPageLogics`, `useAuth` |
-| Observables | `$` suffix | `lists$`, `profile$` |
+| Database models | PascalCase | `List`, `ListItem`, `Profile` |
 | Prop types | `Props` suffix | `type CardListProps = { ... }` |
 
 ## TypeScript Rules

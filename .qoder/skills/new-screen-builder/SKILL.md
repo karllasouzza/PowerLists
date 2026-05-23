@@ -1,6 +1,6 @@
 ---
 name: new-screen-builder
-description: Build new screens following PowerLists feature module pattern: Expo Router + NativeWind + Legend App state + @rn-primitives. Use when creating new screens, adding features, or implementing UI designs.
+description: Build new screens following PowerLists feature module pattern: Expo Router + NativeWind + WatermelonDB + @rn-primitives. Use when creating new screens, adding features, or implementing UI designs.
 ---
 
 # New Screen Builder
@@ -31,7 +31,7 @@ Use existing components from `src/components/ui/` or `@rn-primitives`:
 - Dropdown → `DropdownMenu` (`@/components/ui/dropdown-menu`)
 - Separator → `Separator` (`@/components/ui/separator`)
 - Icon → `Icon` wrapper (`@/components/ui/icon`)
-- Optimized list → `LegendList` (`@legendapp/list`)
+- Optimized list → `LegendList` (`@legendapp/list`) or `FlatList`
 - Progress bar → `Progress` (`@/components/ui/progress`)
 
 ### 3. Create Feature Module Structure
@@ -66,15 +66,15 @@ export default FeatureNameScreen;
 
 ### 5. Define Data Structure
 
-Create `src/features/[feature]/types.ts` with interfaces and `src/data/states/[entity].ts` with observable state following the pattern in `src/data/states/lists.ts`.
+Create `src/features/[feature]/types.ts` with interfaces. If the feature needs persistent data, add a WatermelonDB model in `src/database/models/` and operations in `src/database/operations/` following the pattern in `src/database/operations/lists.ts`.
 
 ### 6. Build Business Logic Hook
 
-Create `src/features/[feature]/hooks/use-[feature]-page-logics.ts` following the pattern in `src/features/lists/hooks/use-list-page-logics.ts`.
+Create `src/features/[feature]/hooks/use-[feature]-page-logics.ts` following the pattern in `src/features/lists/hooks/use-list-page-logics.ts`, using `useObservableQuery()` for reactive WatermelonDB data.
 
 ### 7. Build Screen Component
 
-Create `src/features/[feature]/page.tsx` following the pattern in `src/features/lists/page.tsx`, using `observer()` HOC and proper imports.
+Create `src/features/[feature]/page.tsx` following the pattern in `src/features/lists/page.tsx`. Use standard React hooks; `observer()` is no longer needed.
 
 ### 8. Build CRUD Modals
 
@@ -96,10 +96,10 @@ Use semantic tokens from `src/css/global.css` via Tailwind classes:
 
 ### 11. Integrate with Supabase
 
-- Mutations go through `src/data/actions/[entity].ts`
-- DB columns are `snake_case` → use `convertToSupabaseFormat()` before writing
-- Reading → use `convertFromSupabaseFormat()` for `camelCase` objects
-- Never call Supabase directly from components — always go through observable store
+- Mutations go through `src/database/operations/[entity].ts` using WatermelonDB writers
+- DB columns are `snake_case` in Supabase; WatermelonDB models expose `camelCase` fields via decorators
+- Never call Supabase directly from components — always go through WatermelonDB operations
+- Sync is handled automatically by `src/database/sync.ts`
 
 ## Verification Checklist
 
@@ -107,14 +107,14 @@ Before submitting:
 - [ ] All user-visible strings are in Portuguese (Brazil)
 - [ ] Feature module follows exact directory structure
 - [ ] Expo Router entry is a thin wrapper importing from feature module
-- [ ] Observable state follows pattern in `src/data/states/lists.ts`
-- [ ] Business logic hook uses `useValue()` and proper observable patterns
-- [ ] Screen component uses `observer()` HOC
+- [ ] WatermelonDB model and operations follow pattern in `src/database/operations/lists.ts`
+- [ ] Business logic hook uses `useObservableQuery()` for reactive data
+- [ ] Screen component uses standard React hooks (no `observer()` needed)
 - [ ] All styling uses NativeWind `className`, no `StyleSheet.create()`
 - [ ] All icons use `@tabler/icons-react-native`
 - [ ] Toast notifications use `showToast()` from `src/services/`
 - [ ] Dark mode works automatically via CSS variable tokens
-- [ ] Offline-first functionality works (Legend App + MMKV)
+- [ ] Offline-first functionality works (WatermelonDB + Supabase sync)
 - [ ] Proper error handling and validation implemented
 - [ ] All `@/` aliases used instead of deep relative paths
 
@@ -123,4 +123,4 @@ Before submitting:
 - For complete implementation examples, see `src/features/lists/`
 - For styling tokens, see `src/css/global.css`
 - For Tailwind configuration, see `tailwind.config.js`
-- For Supabase integration patterns, see `src/data/states/lists.ts` and `src/data/actions/lists.ts`
+- For WatermelonDB integration patterns, see `src/database/operations/lists.ts` and `src/database/models/List.ts`
