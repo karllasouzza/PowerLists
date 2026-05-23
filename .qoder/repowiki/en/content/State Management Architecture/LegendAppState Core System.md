@@ -2,18 +2,33 @@
 
 <cite>
 **Referenced Files in This Document**
-- [auth.ts](file://src/data/states/auth.ts)
-- [lists.ts](file://src/data/states/lists.ts)
-- [list-items.ts](file://src/data/states/list-items.ts)
-- [profile.ts](file://src/data/states/profile.ts)
-- [user-preferences.ts](file://src/data/states/user-preferences.ts)
-- [first-access.ts](file://src/data/states/first-access.ts)
-- [database.ts](file://src/data/database.ts)
+- [index.ts](file://src/database/index.ts)
+- [schema.ts](file://src/database/schema.ts)
+- [migrations.ts](file://src/database/migrations.ts)
+- [sync.ts](file://src/database/sync.ts)
+- [Profile.ts](file://src/database/models/Profile.ts)
+- [List.ts](file://src/database/models/List.ts)
+- [ListItem.ts](file://src/database/models/ListItem.ts)
+- [profiles.ts](file://src/database/operations/profiles.ts)
+- [lists.ts](file://src/database/operations/lists.ts)
+- [listItems.ts](file://src/database/operations/listItems.ts)
+- [use-observable-query.ts](file://src/hooks/use-observable-query.ts)
 - [use-auth.ts](file://src/hooks/use-auth.ts)
 - [use-user.ts](file://src/hooks/use-user.ts)
+- [authState.ts](file://src/features/auth/authState.ts)
+- [auth.ts](file://src/data/actions/auth.ts)
+- [session-store.ts](file://src/data/session-store.ts)
+- [use-list-page-logics.ts](file://src/features/lists/hooks/use-list-page-logics.ts)
 - [RULES.md](file://__docs__/RULES.md)
-- [new-screen.md](file://.github/agents/new-screen.md)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Complete replacement of LegendAppState with WatermelonDB integration
+- Replaced reactive observables with WatermelonDB model-based architecture
+- Updated synchronization approach from Supabase synced transport to WatermelonDB sync
+- Replaced state management patterns with database-driven operations
+- Updated hooks to use WatermelonDB queries and model observables
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -28,351 +43,418 @@
 10. [Appendices](#appendices)
 
 ## Introduction
-This document explains the LegendAppState core system powering reactive state in PowerLists. It covers the reactive state architecture, observer pattern implementation, automatic UI updates, state configuration, tracking setup, and integration with React components. It also documents initialization, observable patterns, performance optimizations, practical examples, validation, and debugging strategies for reactive state management.
+This document explains the LegendAppState core system powered by WatermelonDB integration in PowerLists. The system has been completely replaced from the previous reactive state architecture to a database-first approach using WatermelonDB's model-driven patterns. It covers the WatermelonDB architecture, model relationships, database operations, synchronization approach, and integration with React components through custom hooks.
 
 ## Project Structure
-The state system is organized around observable stores defined under the data layer. Each domain (authentication, lists, list items, profiles, user preferences, first access) exposes a single observable root for global state. The database module configures Legend’s synced transport for Supabase and persistence, and enables React tracking to connect state changes to component re-renders.
+The state system is now built around WatermelonDB models and database operations. Each domain (authentication, lists, list items, profiles) is represented by database models with associated operations and React hooks for UI integration. The database module configures WatermelonDB adapters for different platforms and enables real-time synchronization with Supabase.
 
 ```mermaid
 graph TB
-subgraph "Data Layer"
-AUTH["auth$ (src/data/states/auth.ts)"]
-LISTS["lists$ (src/data/states/lists.ts)"]
-LIST_ITEMS["listItems$ (src/data/states/list-items.ts)"]
-PROFILE["profiles$ (src/data/states/profile.ts)"]
-PREFS["userPreferences$ (src/data/states/user-preferences.ts)"]
-FIRST["firstAccess$ (src/data/states/first-access.ts)"]
+subgraph "Database Layer"
+DB["database (src/database/index.ts)"]
+SCHEMA["schema (src/database/schema.ts)"]
+MIGRATIONS["migrations (src/database/migrations.ts)"]
+SYNC["sync (src/database/sync.ts)"]
 end
-subgraph "Database Config"
-DB["supabaseSynced (src/data/database.ts)"]
-REACT["enableReactTracking (src/data/database.ts)"]
+subgraph "Models"
+PROFILE_MODEL["Profile (src/database/models/Profile.ts)"]
+LIST_MODEL["List (src/database/models/List.ts)"]
+ITEM_MODEL["ListItem (src/database/models/ListItem.ts)"]
 end
-subgraph "Hooks"
-USEAUTH["useAuth (src/hooks/use-auth.ts)"]
-USEUSER["useUser (src/hooks/use-user.ts)"]
+subgraph "Operations"
+PROFILES_OP["profiles.ts (src/database/operations/profiles.ts)"]
+LISTS_OP["lists.ts (src/database/operations/lists.ts)"]
+ITEMS_OP["listItems.ts (src/database/operations/listItems.ts)"]
 end
-AUTH --> DB
-LISTS --> DB
-LIST_ITEMS --> DB
-PROFILE --> DB
-PREFS --> DB
-FIRST --> DB
-REACT --> USEAUTH
-REACT --> USEUSER
-USEAUTH --> AUTH
-USEUSER --> AUTH
+subgraph "React Integration"
+OBS_QUERY["use-observable-query.ts"]
+USE_AUTH["use-auth.ts"]
+USE_USER["use-user.ts"]
+LIST_LOGICS["use-list-page-logics.ts"]
+end
+subgraph "Auth System"
+AUTH_STATE["authState.ts"]
+AUTH_ACTIONS["auth.ts"]
+SESSION_STORE["session-store.ts"]
+end
+DB --> SCHEMA
+DB --> MIGRATIONS
+DB --> SYNC
+DB --> PROFILE_MODEL
+DB --> LIST_MODEL
+DB --> ITEM_MODEL
+PROFILE_MODEL --> PROFILES_OP
+LIST_MODEL --> LISTS_OP
+ITEM_MODEL --> ITEMS_OP
+OBS_QUERY --> DB
+LIST_LOGICS --> OBS_QUERY
+USE_AUTH --> AUTH_STATE
+USE_USER --> AUTH_STATE
+AUTH_ACTIONS --> AUTH_STATE
+SESSION_STORE --> DB
+SYNC --> AUTH_ACTIONS
 ```
 
 **Diagram sources**
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profile.ts:10-19](file://src/data/states/profile.ts#L10-L19)
-- [user-preferences.ts:12-25](file://src/data/states/user-preferences.ts#L12-L25)
-- [first-access.ts:7-16](file://src/data/states/first-access.ts#L7-L16)
-- [database.ts:9-29](file://src/data/database.ts#L9-L29)
-- [use-auth.ts:19-26](file://src/hooks/use-auth.ts#L19-L28)
-- [use-user.ts:8-12](file://src/hooks/use-user.ts#L8-L12)
+- [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
+- [profiles.ts:6-62](file://src/database/operations/profiles.ts#L6-L62)
+- [lists.ts:6-65](file://src/database/operations/lists.ts#L6-L65)
+- [listItems.ts:6-79](file://src/database/operations/listItems.ts#L6-L79)
+- [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
+- [use-auth.ts:24-47](file://src/hooks/use-auth.ts#L24-L47)
+- [use-user.ts:8-40](file://src/hooks/use-user.ts#L8-L40)
+- [authState.ts:23-67](file://src/features/auth/authState.ts#L23-L67)
+- [auth.ts:14-108](file://src/data/actions/auth.ts#L14-L108)
+- [session-store.ts:7-25](file://src/data/session-store.ts#L7-L25)
 
 **Section sources**
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [user-preferences.ts:1-28](file://src/data/states/user-preferences.ts#L1-L28)
-- [first-access.ts:1-17](file://src/data/states/first-access.ts#L1-L17)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [use-auth.ts:1-261](file://src/hooks/use-auth.ts#L1-L261)
-- [use-user.ts:1-85](file://src/hooks/use-user.ts#L1-L85)
-- [RULES.md:42-77](file://__docs__/RULES.md#L42-L77)
-- [new-screen.md:145-491](file://.github/agents/new-screen.md#L145-L491)
+- [index.ts:1-33](file://src/database/index.ts#L1-L33)
+- [schema.ts:1-46](file://src/database/schema.ts#L1-L46)
+- [migrations.ts:1-17](file://src/database/migrations.ts#L1-L17)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
+- [Profile.ts:1-21](file://src/database/models/Profile.ts#L1-L21)
+- [List.ts:1-23](file://src/database/models/List.ts#L1-L23)
+- [ListItem.ts:1-20](file://src/database/models/ListItem.ts#L1-L20)
+- [profiles.ts:1-62](file://src/database/operations/profiles.ts#L1-L62)
+- [lists.ts:1-65](file://src/database/operations/lists.ts#L1-L65)
+- [listItems.ts:1-79](file://src/database/operations/listItems.ts#L1-L79)
+- [use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
+- [use-auth.ts:1-47](file://src/hooks/use-auth.ts#L1-L47)
+- [use-user.ts:1-40](file://src/hooks/use-user.ts#L1-L40)
+- [authState.ts:1-67](file://src/features/auth/authState.ts#L1-L67)
+- [auth.ts:1-108](file://src/data/actions/auth.ts#L1-L108)
+- [session-store.ts:1-25](file://src/data/session-store.ts#L1-L25)
 
 ## Core Components
-- Global observables: Each domain defines a root observable (e.g., auth$, lists$, listItems$, profiles$, userPreferences$, firstAccess$). These are the single sources of truth for their respective domains.
-- Synced transport: The database module configures supabaseSynced to enable automatic bidirectional synchronization with Supabase and persistence with MMKV.
-- React tracking: enableReactTracking ensures that components subscribed via useValue or observer automatically re-render on state changes.
-- Hooks: Feature-specific hooks (e.g., useAuth, useUser) expose typed APIs to read/write state and orchestrate side effects.
+- **WatermelonDB Models**: Typed database models (Profile, List, ListItem) with decorators defining table schemas and relationships
+- **Database Configuration**: Platform-specific adapters (SQLite for mobile, LokiJS for web) with schema and migration support
+- **Database Operations**: CRUD operations for each model with transaction-safe write operations
+- **Real-time Synchronization**: WatermelonDB sync with Supabase using custom RPC functions for bidirectional data sync
+- **React Integration**: Custom hooks for database queries and model observables with automatic UI updates
 
 Key implementation patterns:
-- State declaration: observable(...) or observable(supabaseSynced({...})).
-- Subscriptions: useValue(state.field) in components.
-- Writes: state.field.set(...) or nested set/update patterns.
-- Persistence: synced({ persist: { name, plugin, retrySync } }) for offline-first behavior.
+- **Model Definition**: Using decorators (@text, @field, @date, @children, @relation) to define table schemas
+- **Database Queries**: Using Query builder (Q.where, Q.eq) for filtering and fetching data
+- **Write Operations**: Using database.write() blocks for transaction-safe mutations
+- **Observables**: Using useObservableQuery hook to subscribe to database changes
+- **Synchronization**: Using synchronize() function with pull/push handlers for real-time sync
 
 **Section sources**
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profile.ts:10-19](file://src/data/states/profile.ts#L10-L19)
-- [user-preferences.ts:12-25](file://src/data/states/user-preferences.ts#L12-L25)
-- [first-access.ts:7-16](file://src/data/states/first-access.ts#L7-L16)
-- [database.ts:9-29](file://src/data/database.ts#L9-L29)
-- [use-auth.ts:19-26](file://src/hooks/use-auth.ts#L19-L28)
-- [use-user.ts:8-12](file://src/hooks/use-user.ts#L8-L12)
-- [RULES.md:42-77](file://__docs__/RULES.md#L42-L77)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
+- [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+- [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
 
 ## Architecture Overview
-The LegendAppState architecture integrates three pillars:
-- Reactive state: Observables emit changes when fields mutate.
-- Transport layer: supabaseSynced coordinates reads/writes with Supabase and persists data locally.
-- React integration: enableReactTracking wires state changes to component reactivity.
+The LegendAppState architecture now follows WatermelonDB's database-first approach with three main pillars:
+- **Database Models**: Typed models with decorators defining schema and relationships
+- **Database Operations**: Transaction-safe CRUD operations with query builders
+- **Real-time Synchronization**: WatermelonDB sync with Supabase for bidirectional data synchronization
 
 ```mermaid
 sequenceDiagram
 participant UI as "React Component"
-participant Hook as "Feature Hook"
-participant State as "Legend Observable"
-participant Sync as "supabaseSynced"
-participant DB as "Supabase"
-participant Store as "MMKV"
-UI->>Hook : "subscribe via useValue(state.field)"
-Hook->>State : "read current value"
-UI->>Hook : "call action"
-Hook->>State : "write via .set()/.update()"
-State->>Sync : "enqueue change"
-Sync->>DB : "apply mutation"
-DB-->>Sync : "ack"
-Sync->>Store : "persist change"
-Sync-->>State : "reflect remote/local updates"
-State-->>UI : "trigger re-render"
+participant Hook as "Custom Hook"
+participant Query as "useObservableQuery"
+participant DB as "WatermelonDB"
+participant Sync as "synchronize"
+participant Supabase as "Supabase RPC"
+UI->>Hook : "useObservableQuery(listsQuery)"
+Hook->>Query : "subscribe to query"
+Query->>DB : "observe() subscription"
+DB-->>Query : "emit snapshot"
+Query-->>Hook : "return records"
+Hook-->>UI : "render with data"
+UI->>Hook : "perform database operation"
+Hook->>DB : "database.write() block"
+DB->>DB : "transaction-safe mutation"
+DB-->>Query : "notify observers"
+Query-->>Hook : "emit updated records"
+Hook-->>UI : "re-render with new data"
+Sync->>Supabase : "pullChanges(lastPulledAt)"
+Supabase-->>Sync : "changes + timestamp"
+Sync->>DB : "apply pull changes"
+DB-->>Query : "notify observers"
+Query-->>Hook : "emit updated records"
 ```
 
 **Diagram sources**
-- [database.ts:9-29](file://src/data/database.ts#L9-L29)
-- [use-auth.ts:29-74](file://src/hooks/use-auth.ts#L29-L74)
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
+- [use-observable-query.ts:7-10](file://src/hooks/use-observable-query.ts#L7-L10)
+- [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+- [sync.ts:17-24](file://src/database/sync.ts#L17-L24)
 
 ## Detailed Component Analysis
 
-### Authentication State (auth$)
-- Purpose: Holds user, session, initialization, and loading flags.
-- Persistence: user field is persisted via synced with MMKV.
-- Initialization flow: Components read isInitialized and isLoading via useValue; hooks set these flags during async operations.
-
-```mermaid
-flowchart TD
-Start(["Auth Hook Action"]) --> SetLoading["Set isLoading=true"]
-SetLoading --> CheckUser{"Has user?"}
-CheckUser --> |No| MarkInit["Set isInitialized=true<br/>Set isLoading=false"]
-CheckUser --> |Yes| Guest{"Is guest?"}
-Guest --> |Yes| FetchRestore["Fetch/restore user"]
-Guest --> |No| CheckSession["Get Supabase session"]
-FetchRestore --> UpdateUser["Set user/session<br/>Set isInitialized=true<br/>Set isLoading=false"]
-CheckSession --> HasSession{"Session exists?"}
-HasSession --> |Yes| Sync["Sync with Supabase"]
-Sync --> ApplyUser["Set user/session<br/>Set isInitialized=true<br/>Set isLoading=false"]
-HasSession --> |No| PatchGuest["Patch user to guest<br/>Set isInitialized=true<br/>Set isLoading=false"]
-MarkInit --> End(["Done"])
-UpdateUser --> End
-ApplyUser --> End
-PatchGuest --> End
-```
-
-**Diagram sources**
-- [use-auth.ts:29-74](file://src/hooks/use-auth.ts#L29-L74)
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-
-**Section sources**
-- [auth.ts:8-33](file://src/data/states/auth.ts#L8-L33)
-- [use-auth.ts:19-74](file://src/hooks/use-auth.ts#L19-L74)
-
-### Lists State (lists$)
-- Purpose: Realtime, persisted map of lists scoped to the current user.
-- Sync configuration: Uses supabaseSynced with select/filter, actions, persistence, and realtime filters derived from getCurrentUserId.
-- Access pattern: Components subscribe to lists$ and read nested fields (e.g., list items).
-
-```mermaid
-sequenceDiagram
-participant Comp as "List Page"
-participant Lists as "lists$"
-participant DB as "Supabase"
-participant Sync as "supabaseSynced"
-participant Store as "MMKV"
-Comp->>Lists : "subscribe via useValue(lists$)"
-Lists->>Sync : "initial load with select/filter"
-Sync->>DB : "query lists for profile_id"
-DB-->>Sync : "rows"
-Sync->>Store : "persist"
-Sync-->>Lists : "emit snapshot"
-Lists-->>Comp : "render lists"
-DB-->>Sync : "realtime updates"
-Sync-->>Lists : "apply delta"
-Lists-->>Comp : "re-render affected lists"
-```
-
-**Diagram sources**
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [database.ts:31-35](file://src/data/database.ts#L31-L35)
-
-**Section sources**
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-
-### List Items State (listItems$)
-- Purpose: Realtime, persisted map of list items scoped to the current user.
-- Sync configuration: Similar to lists$ but tailored for list_items collection.
-
-**Section sources**
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-
-### Profiles State (profiles$) and CRUD Utilities
-- Purpose: Manages the current user’s profile with automatic sync and persistence.
-- Utilities: getProfile, createProfile, updateProfile, deleteProfile encapsulate observable mutations and conversion between camelCase and snake_case.
-- Persistence: profiles$ is persisted with retrySync enabled.
-
-```mermaid
-flowchart TD
-A["createProfile(params)"] --> GenId["Generate ID"]
-GenId --> Convert["Convert to snake_case"]
-Convert --> Put["Put into profiles$ by ID"]
-Put --> ReturnCamel["Return camelCase profile"]
-B["updateProfile(updates)"] --> Get["Get current profile"]
-Get --> Mutate["Mutate fields via profiles$[id].field.set()"]
-Mutate --> Persist["Persist via synced"]
-Persist --> ReturnUpdated["Return updated profile"]
-C["deleteProfile()"] --> Find["Find current profile ID"]
-Find --> Remove["profiles$[id].delete()"]
-Remove --> Done["Return success"]
-```
-
-**Diagram sources**
-- [profile.ts:61-103](file://src/data/states/profile.ts#L61-L103)
-- [profile.ts:121-159](file://src/data/states/profile.ts#L121-L159)
-- [profile.ts:171-186](file://src/data/states/profile.ts#L171-L186)
-
-**Section sources**
-- [profile.ts:10-19](file://src/data/states/profile.ts#L10-L19)
-- [profile.ts:33-48](file://src/data/states/profile.ts#L33-L48)
-- [profile.ts:61-103](file://src/data/states/profile.ts#L61-L103)
-- [profile.ts:121-159](file://src/data/states/profile.ts#L121-L159)
-- [profile.ts:171-186](file://src/data/states/profile.ts#L171-L186)
-
-### User Preferences State (userPreferences$)
-- Purpose: Stores theme, color scheme, and background color with persisted synced state.
-- Usage: Components can subscribe to preferences and update them via set.
-
-**Section sources**
-- [user-preferences.ts:6-27](file://src/data/states/user-preferences.ts#L6-L27)
-
-### First Access State (firstAccess$)
-- Purpose: Tracks whether the user has completed first access, persisted via synced with MMKV.
-- Usage: Used to drive onboarding flows.
-
-**Section sources**
-- [first-access.ts:5-16](file://src/data/states/first-access.ts#L5-L16)
-
-### Database Configuration (supabaseSynced and enableReactTracking)
-- Purpose: Centralizes Legend App sync configuration for Supabase, including persistence, merge mode, generated IDs, and retry policies.
-- React tracking: enableReactTracking warns when state reads are used without proper tracking, ensuring reliable reactivity.
+### Database Configuration and Models
+- **Platform Adapters**: SQLiteAdapter for mobile devices with JSI enabled, LokiJSAdapter for web with IndexedDB support
+- **Model Schemas**: Typed decorators define column types, indexes, and relationships between models
+- **Associations**: Models define has_many and belongs_to relationships for complex queries
 
 ```mermaid
 classDiagram
-class SupabaseSynced {
-+configureSynced(plugin, options)
-+generateId()
-+mode : "merge"
-+as : "Map"
-+changesSince : "last-sync"
-+fieldCreatedAt : "created_at"
-+fieldUpdatedAt : "updated_at"
-+fieldDeleted : "deleted"
-+retry : { infinite : true }
+class Database {
++adapter : Adapter
++modelClasses : Model[]
++write(callback)
++get(modelName)
++get(modelClass)
 }
-class EnableReactTracking {
-+warnMissingUse : true
+class Profile {
++table : "profiles"
++userId : string
++name : string
++avatarUrl : string?
++bio : string?
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++lists : Query~List~
 }
-SupabaseSynced <.. EnableReactTracking : "configured together"
+class List {
++table : "lists"
++profileId : string
++title : string
++accentColor : string
++icon : string
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++profile : Profile
++listItems : Query~ListItem~
+}
+class ListItem {
++table : "list_items"
++profileId : string
++listId : string
++title : string?
++price : number?
++amount : number?
++isChecked : boolean
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++list : List
+}
+Database --> Profile
+Database --> List
+Database --> ListItem
+Profile --> List : "has_many"
+List --> ListItem : "has_many"
+List --> Profile : "belongs_to"
+ListItem --> List : "belongs_to"
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [database.ts:9-11](file://src/data/database.ts#L9-L11)
+- [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
+- [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
 
-### Hooks Integration (useAuth, useUser)
-- Purpose: Provide typed, reactive accessors to auth state and user operations.
-- Pattern: Subscribe via useValue, then call state setters or perform async actions that update observables.
+### Authentication State (authState.ts)
+- **Purpose**: Manages user authentication state with secure storage and subscription pattern
+- **Persistence**: Uses SecureStore for encrypted user data storage
+- **Real-time Updates**: Subscriptions notify components when auth state changes
+- **Integration**: Works alongside WatermelonDB for user-scoped data operations
+
+```mermaid
+flowchart TD
+Start(["Auth Hook Action"]) --> LoadUser["Load persisted user"]
+LoadUser --> CheckUser{"Has user?"}
+CheckUser --> |Yes| SetState["Set auth state"]
+CheckUser --> |No| CheckSession["Check Supabase session"]
+CheckSession --> HasSession{"Has session?"}
+HasSession --> |Yes| SyncUser["Sync with Supabase"]
+SyncUser --> SetState
+HasSession --> |No| CreateGuest["Create guest user"]
+CreateGuest --> SetState
+SetState --> Notify["Notify subscribers"]
+Notify --> End(["Ready"])
+```
+
+**Diagram sources**
+- [authState.ts:44-54](file://src/features/auth/authState.ts#L44-L54)
+- [auth.ts:14-28](file://src/data/actions/auth.ts#L14-L28)
 
 **Section sources**
-- [use-auth.ts:19-261](file://src/hooks/use-auth.ts#L19-L261)
-- [use-user.ts:8-85](file://src/hooks/use-user.ts#L8-L85)
+- [authState.ts:19-67](file://src/features/auth/authState.ts#L19-L67)
+- [auth.ts:14-108](file://src/data/actions/auth.ts#L14-L108)
+
+### Lists Operations (lists.ts)
+- **Purpose**: Provides CRUD operations for shopping lists with transaction safety
+- **Query Builder**: Uses Q.where for filtering by profile_id and deleted_at status
+- **Transaction Safety**: All operations wrapped in database.write() blocks
+- **Relationships**: Supports nested queries through model associations
+
+```mermaid
+sequenceDiagram
+participant Hook as "useListPageLogics"
+participant Op as "lists.ts"
+participant DB as "WatermelonDB"
+participant Model as "List Model"
+Hook->>Op : "getListsByProfile(profileId)"
+Op->>DB : "get('lists').query()"
+DB->>Model : "returns Query<List>"
+Model-->>Op : "Query object"
+Op-->>Hook : "Query<List>"
+Hook->>Op : "createList(params)"
+Op->>DB : "database.write()"
+DB->>Model : "create(record)"
+Model-->>DB : "List instance"
+DB-->>Op : "commit transaction"
+Op-->>Hook : "List instance"
+```
+
+**Diagram sources**
+- [lists.ts:6-10](file://src/database/operations/lists.ts#L6-L10)
+- [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+
+**Section sources**
+- [lists.ts:6-65](file://src/database/operations/lists.ts#L6-L65)
+- [use-list-page-logics.ts:22-24](file://src/features/lists/hooks/use-list-page-logics.ts#L22-L24)
+
+### List Items Operations (listItems.ts)
+- **Purpose**: Handles individual list item operations with comprehensive CRUD support
+- **Toggle Operations**: Specialized toggleCheckListItem for quick state changes
+- **Partial Updates**: Supports selective field updates with validation
+- **Price Calculations**: Integrates with utility functions for total calculations
+
+**Section sources**
+- [listItems.ts:6-79](file://src/database/operations/listItems.ts#L6-L79)
+- [use-list-page-logics.ts:35-43](file://src/features/lists/hooks/use-list-page-logics.ts#L35-L43)
+
+### Profiles Operations (profiles.ts)
+- **Purpose**: Manages user profile data with soft deletion support
+- **User Mapping**: Maps Supabase user_id to local profile records
+- **CRUD Operations**: Full lifecycle management with transaction safety
+- **Association Support**: Enables profile-scoped queries across related models
+
+**Section sources**
+- [profiles.ts:6-62](file://src/database/operations/profiles.ts#L6-L62)
+
+### Database Synchronization (sync.ts)
+- **Purpose**: Implements bidirectional synchronization between WatermelonDB and Supabase
+- **Custom RPC**: Uses pull/push RPC functions for change tracking
+- **Real-time Events**: Subscribes to Supabase postgres_changes channel
+- **Conflict Resolution**: Handles concurrent modifications with WatermelonDB sync
+
+```mermaid
+flowchart TD
+A["User Operation"] --> B["Database Write"]
+B --> C["Local Changes"]
+C --> D["Pull Changes"]
+D --> E["Supabase RPC pull"]
+E --> F["Apply Remote Changes"]
+F --> G["Push Local Changes"]
+G --> H["Supabase RPC push"]
+H --> I["Conflict Resolution"]
+I --> J["Commit Sync"]
+J --> K["Notify Observers"]
+K --> L["UI Update"]
+```
+
+**Diagram sources**
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
+- [sync.ts:36-49](file://src/database/sync.ts#L36-L49)
+
+**Section sources**
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
+
+### React Integration (use-observable-query.ts)
+- **Purpose**: Provides React hooks for subscribing to database queries
+- **Automatic Updates**: Subscribes to query.observe() and updates component state
+- **Cleanup**: Properly unsubscribes from database changes on component unmount
+- **Type Safety**: Generic typing ensures type-safe database operations
+
+**Section sources**
+- [use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
 
 ## Dependency Analysis
-LegendAppState depends on:
-- Legend App observables and synced transport for reactive state and persistence.
-- Supabase for backend synchronization and real-time events.
-- React tracking to propagate state changes to components.
+LegendAppState now depends on:
+- **WatermelonDB**: Core database framework with platform adapters
+- **Supabase**: Backend-as-a-Service for authentication and real-time synchronization
+- **React Hooks**: Custom hooks for database integration and state management
+- **Secure Storage**: Expo SecureStore for encrypted user data persistence
 
 ```mermaid
 graph LR
-React["React Runtime"] --> Tracking["enableReactTracking"]
-Tracking --> Hooks["useAuth/useUser"]
-Hooks --> States["auth$, lists$, listItems$, profiles$, userPreferences$, firstAccess$"]
-States --> Synced["supabaseSynced"]
-Synced --> Supabase["Supabase Backend"]
-Synced --> MMKV["Local Persistence"]
+React["React Components"] --> Hooks["Custom Hooks"]
+Hooks --> WatermelonDB["WatermelonDB"]
+WatermelonDB --> Models["Database Models"]
+Models --> Operations["Database Operations"]
+Operations --> Supabase["Supabase Backend"]
+Supabase --> Auth["Authentication"]
+Supabase --> Sync["Real-time Sync"]
+Auth --> AuthState["Auth State Management"]
+Sync --> DatabaseSync["Database Synchronization"]
+DatabaseSync --> WatermelonDB
 ```
 
 **Diagram sources**
-- [database.ts:9-29](file://src/data/database.ts#L9-L29)
-- [use-auth.ts:19-26](file://src/hooks/use-auth.ts#L19-L26)
-- [use-user.ts:8-12](file://src/hooks/use-user.ts#L8-L12)
+- [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
+- [authState.ts:23-67](file://src/features/auth/authState.ts#L23-L67)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
 
 **Section sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [use-auth.ts:19-26](file://src/hooks/use-auth.ts#L19-L26)
-- [use-user.ts:8-12](file://src/hooks/use-user.ts#L8-L12)
+- [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [authState.ts:19-67](file://src/features/auth/authState.ts#L19-L67)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
 
 ## Performance Considerations
-- Minimize writes: Batch updates using nested set operations to reduce re-renders.
-- Scope subscriptions: Subscribe only to the fields needed to avoid unnecessary re-renders.
-- Retry and merge: supabaseSynced uses merge mode and retry policies to handle network flakiness efficiently.
-- Persistence: Persisted synced state reduces redundant fetches and supports offline-first workflows.
-- Realtime filtering: Use server-side filters (e.g., profile_id) to limit dataset size and improve responsiveness.
-
-[No sources needed since this section provides general guidance]
+- **Query Optimization**: Use indexed columns (profile_id, list_id) for faster filtering
+- **Batch Operations**: Group related operations within database.write() blocks
+- **Lazy Loading**: Use model associations to load related data on-demand
+- **Memory Management**: Proper cleanup of database subscriptions in useEffect
+- **Offline-First**: Leverage WatermelonDB's local-first architecture for responsive UI
+- **Real-time Filtering**: Use server-side filtering with Supabase for large datasets
 
 ## Troubleshooting Guide
 Common issues and remedies:
-- Missing useValue warnings: enableReactTracking warns when state reads occur outside tracked contexts. Wrap reads in observer or use useValue to resolve.
-- No re-render after mutation: Ensure the component subscribes to the exact observable path being mutated.
-- Offline sync delays: Verify persisted sync is enabled and retry policies are configured.
-- Realtime not updating: Confirm realtime filter matches current user and backend events are firing.
-- Type mismatches: Remember Supabase uses snake_case while TypeScript uses camelCase; use conversion helpers when reading/writing raw objects.
+- **Database Not Initialized**: Ensure database is initialized before use and adapters are properly configured
+- **Query Subscription Issues**: Verify useObservableQuery receives proper Query objects and subscriptions are cleaned up
+- **Sync Conflicts**: Monitor sync logs for conflict resolution and handle concurrent modifications
+- **Platform Differences**: Test SQLite vs LokiJS behavior differences between mobile and web
+- **Model Relationships**: Ensure associations are properly defined and indexed for optimal query performance
+- **Transaction Errors**: Wrap all write operations in database.write() blocks to prevent partial updates
 
 **Section sources**
-- [database.ts:9-11](file://src/data/database.ts#L9-L11)
-- [profile.ts:33-48](file://src/data/states/profile.ts#L33-L48)
-- [profile.ts:121-159](file://src/data/states/profile.ts#L121-L159)
-- [new-screen.md:455-461](file://.github/agents/new-screen.md#L455-L461)
+- [index.ts:24-27](file://src/database/index.ts#L24-L27)
+- [use-observable-query.ts:7-10](file://src/hooks/use-observable-query.ts#L7-L10)
+- [sync.ts:36-49](file://src/database/sync.ts#L36-L49)
 
 ## Conclusion
-LegendAppState provides a robust, reactive foundation for PowerLists. By centralizing state in observable roots, configuring synced transport for Supabase and persistence, and enabling React tracking, the system delivers automatic UI updates, offline-first behavior, and scalable data flows. Following the documented patterns ensures predictable state management, maintainable components, and efficient performance.
-
-[No sources needed since this section summarizes without analyzing specific files]
+LegendAppState has evolved from a reactive state management system to a robust WatermelonDB-based architecture. The new system provides better performance, offline-first capabilities, and more reliable data synchronization. By leveraging typed models, transaction-safe operations, and real-time synchronization, the system delivers a scalable foundation for PowerLists with improved developer experience and user experience.
 
 ## Appendices
 
 ### Practical Examples Index
-- Declaring a new synced observable: See the pattern in [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26).
-- Subscribing in a component: See [use-auth.ts:20-22](file://src/hooks/use-auth.ts#L20-L22).
-- Writing to state: See [use-auth.ts:31](file://src/hooks/use-auth.ts#L31) and [use-auth.ts:53](file://src/hooks/use-auth.ts#L53).
-- CRUD with profiles: See [profile.ts:61-103](file://src/data/states/profile.ts#L61-L103), [profile.ts:121-159](file://src/data/states/profile.ts#L121-L159), [profile.ts:171-186](file://src/data/states/profile.ts#L171-L186).
-- Realtime filtering: See [lists.ts:17-21](file://src/data/states/lists.ts#L17-L21) and [list-items.ts:17-21](file://src/data/states/list-items.ts#L17-L21).
-- Persistence keys: See [auth.ts:25-28](file://src/data/states/auth.ts#L25-L28), [user-preferences.ts:19-23](file://src/data/states/user-preferences.ts#L19-L23), [first-access.ts:10-14](file://src/data/states/first-access.ts#L10-L14).
+- **Database Configuration**: See [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- **Model Definition**: See [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- **Query Operations**: See [lists.ts:6-10](file://src/database/operations/lists.ts#L6-L10)
+- **Write Operations**: See [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+- **Observable Queries**: See [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
+- **Authentication State**: See [authState.ts:23-67](file://src/features/auth/authState.ts#L23-L67)
+- **Synchronization**: See [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
 
 **Section sources**
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [use-auth.ts:20-22](file://src/hooks/use-auth.ts#L20-L22)
-- [use-auth.ts:31](file://src/hooks/use-auth.ts#L31)
-- [use-auth.ts:53](file://src/hooks/use-auth.ts#L53)
-- [profile.ts:61-103](file://src/data/states/profile.ts#L61-L103)
-- [profile.ts:121-159](file://src/data/states/profile.ts#L121-L159)
-- [profile.ts:171-186](file://src/data/states/profile.ts#L171-L186)
-- [list-items.ts:17-21](file://src/data/states/list-items.ts#L17-L21)
-- [auth.ts:25-28](file://src/data/states/auth.ts#L25-L28)
-- [user-preferences.ts:19-23](file://src/data/states/user-preferences.ts#L19-L23)
-- [first-access.ts:10-14](file://src/data/states/first-access.ts#L10-L14)
+- [index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [lists.ts:6-10](file://src/database/operations/lists.ts#L6-L10)
+- [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+- [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
+- [authState.ts:23-67](file://src/features/auth/authState.ts#L23-L67)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)

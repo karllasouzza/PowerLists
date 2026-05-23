@@ -2,17 +2,29 @@
 
 <cite>
 **Referenced Files in This Document**
+- [src/database/sync.ts](file://src/database/sync.ts)
+- [src/database/index.ts](file://src/database/index.ts)
+- [src/database/schema.ts](file://src/database/schema.ts)
+- [src/database/models/List.ts](file://src/database/models/List.ts)
+- [src/database/models/ListItem.ts](file://src/database/models/ListItem.ts)
+- [src/database/models/Profile.ts](file://src/database/models/Profile.ts)
+- [src/database/operations/lists.ts](file://src/database/operations/lists.ts)
+- [src/database/operations/listItems.ts](file://src/database/operations/listItems.ts)
+- [src/hooks/use-observable-query.ts](file://src/hooks/use-observable-query.ts)
 - [src/services/sync.ts](file://src/services/sync.ts)
-- [src/data/database.ts](file://src/data/database.ts)
-- [src/data/states/lists.ts](file://src/data/states/lists.ts)
-- [src/data/states/list-items.ts](file://src/data/states/list-items.ts)
-- [src/data/actions/lists.ts](file://src/data/actions/lists.ts)
-- [src/data/actions/list-items.ts](file://src/data/actions/list-items.ts)
 - [src/lib/supabase/supabase.ts](file://src/lib/supabase/supabase.ts)
-- [src/lib/supabase/utils.ts](file://src/lib/supabase/utils.ts)
-- [src/data/storage.ts](file://src/data/storage.ts)
-- [src/services/toast.ts](file://src/services/toast.ts)
+- [src/features/lists/hooks/use-list-page-logics.ts](file://src/features/lists/hooks/use-list-page-logics.ts)
+- [src/features/list/hooks/use-list-items-page-logics.ts](file://src/features/list/hooks/use-list-items-page-logics.ts)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Complete restructuring from Legend App's merge mode to WatermelonDB's reactive query patterns
+- Replaced MMKV persistence with WatermelonDB's built-in persistence layer
+- Eliminated custom merge mode configuration in favor of WatermelonDB's native conflict resolution
+- Updated synchronization architecture to use WatermelonDB's synchronize function
+- Removed Legend App State observables and replaced with WatermelonDB queries
+- Updated conflict resolution to leverage WatermelonDB's built-in timestamp-based resolution
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -26,348 +38,349 @@
 9. [Conclusion](#conclusion)
 
 ## Introduction
-This document explains the synchronization strategies and conflict resolution mechanisms used in the application. It focuses on:
-- Merge mode configuration and its impact on synchronization
-- Timestamp-based conflict resolution using created_at and updated_at
-- Last-sync tracking to minimize redundant data transfers
-- Retry mechanisms and error handling for robust offline and online workflows
-- Conflict detection and resolution priorities
-- Practical examples of sync operations, conflict scenarios, and troubleshooting steps
+This document explains the synchronization strategies and conflict resolution mechanisms used in the application following the complete migration from Legend App's merge mode to WatermelonDB's database-centric approach. The new architecture leverages WatermelonDB's reactive query patterns, built-in conflict resolution, and native synchronization capabilities to provide robust offline-first synchronization.
+
+Key aspects of the new approach:
+- Reactive query patterns with automatic UI updates
+- Built-in conflict resolution using WatermelonDB's synchronize function
+- Database-centric architecture with WatermelonDB as the single source of truth
+- Real-time synchronization through Supabase RPC functions
+- Automatic persistence without external storage plugins
 
 ## Project Structure
-The synchronization stack is built around LegendApp State’s Supabase plugin with persistent storage via MMKV. Two primary observable stores are configured:
-- Lists store: synchronized with the lists table and filtered per user
-- List items store: synchronized with the list_items table and filtered per user
-
-Persistence, merge mode, and last-sync tracking are centrally configured in the database module. Guest-to-user data migration is handled by a dedicated service.
+The synchronization stack is now built around WatermelonDB's database-centric architecture with reactive queries. The system consists of:
+- WatermelonDB database with SQLite/LokiJS adapters
+- Reactive query hooks for real-time UI updates
+- Supabase RPC-based synchronization functions
+- Native WatermelonDB conflict resolution
+- Automatic persistence through WatermelonDB's built-in storage
 
 ```mermaid
 graph TB
-subgraph "Local Layer"
-L1["lists$ observable<br/>Merge Mode + Last-Sync"]
-L2["listItems$ observable<br/>Merge Mode + Last-Sync"]
-P["MMKV Persist Plugin"]
+subgraph "WatermelonDB Layer"
+W1["Database Instance<br/>SQLite/LokiJS Adapter"]
+W2["Models (List, ListItem, Profile)<br/>Built-in Persistence"]
+W3["Reactive Queries<br/>useObservableQuery Hook"]
 end
 subgraph "Network Layer"
 S["Supabase Client"]
-TBL1["lists table"]
-TBL2["list_items table"]
+RPC["RPC Functions<br/>pull(), push()"]
 end
-subgraph "Utilities"
-U1["convertToSupabaseFormat / convertFromSupabaseFormat"]
-U2["Storage Abstraction (MMKV)"]
+subgraph "Application Layer"
+A1["useListPageLogics<br/>useListItemsPageLogics"]
+A2["Operations Layer<br/>CRUD Operations"]
 end
-L1 --> S
-L2 --> S
-S --> TBL1
-S --> TBL2
-L1 --- P
-L2 --- P
-L1 --- U1
-L2 --- U1
-P --- U2
+W1 --> W2
+W2 --> W3
+W3 --> A1
+A1 --> A2
+A2 --> W1
+W1 --> S
+S --> RPC
+RPC --> W1
 ```
 
 **Diagram sources**
-- [src/data/states/lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [src/data/states/list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [src/data/database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [src/lib/supabase/supabase.ts:21-28](file://src/lib/supabase/supabase.ts#L21-L28)
-- [src/lib/supabase/utils.ts:1-9](file://src/lib/supabase/utils.ts#L1-L9)
-- [src/data/storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [src/database/index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [src/database/models/List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [src/hooks/use-observable-query.ts:4-12](file://src/hooks/use-observable-query.ts#L4-L12)
+- [src/database/sync.ts:15-30](file://src/database/sync.ts#L15-L30)
+- [src/lib/supabase/supabase.ts:15-22](file://src/lib/supabase/supabase.ts#L15-L22)
 
 **Section sources**
-- [src/data/states/lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [src/data/states/list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [src/data/database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [src/lib/supabase/supabase.ts:1-29](file://src/lib/supabase/supabase.ts#L1-L29)
-- [src/lib/supabase/utils.ts:1-9](file://src/lib/supabase/utils.ts#L1-L9)
-- [src/data/storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [src/database/index.ts:1-33](file://src/database/index.ts#L1-L33)
+- [src/database/schema.ts:1-46](file://src/database/schema.ts#L1-L46)
+- [src/hooks/use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
+- [src/database/sync.ts:1-57](file://src/database/sync.ts#L1-L57)
 
 ## Core Components
-- Merge mode configuration: Ensures local and remote changes coexist and are merged deterministically.
-- Timestamp fields: created_at and updated_at are used to detect and resolve conflicts.
-- Last-sync tracking: ChangesSince “last-sync” limits fetches to incremental updates.
-- Persistent storage: MMKV persists observables to disk with retry on sync failures.
-- Realtime filtering: Stores subscribe to user-scoped filters to receive only relevant events.
-- Retry policy: Infinite retries for network and transient failures.
+The new architecture is built around four core components:
 
-These components collectively provide robust offline-first synchronization with deterministic conflict resolution.
+- **WatermelonDB Database**: Central database instance with platform-specific adapters (SQLite for mobile, LokiJS for web)
+- **Reactive Query System**: Automatic UI updates through useObservableQuery hook and WatermelonDB's observe() method
+- **Supabase RPC Synchronization**: Custom pull() and push() RPC functions for bidirectional sync
+- **Native Conflict Resolution**: Built-in timestamp-based conflict resolution through WatermelonDB's synchronize function
+
+These components work together to provide automatic, conflict-free synchronization without manual merge mode configuration.
 
 **Section sources**
-- [src/data/database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [src/data/states/lists.ts:16-21](file://src/data/states/lists.ts#L16-L21)
-- [src/data/states/list-items.ts:13-17](file://src/data/states/list-items.ts#L13-L17)
+- [src/database/index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [src/hooks/use-observable-query.ts:4-12](file://src/hooks/use-observable-query.ts#L4-L12)
+- [src/database/sync.ts:15-30](file://src/database/sync.ts#L15-L30)
 
 ## Architecture Overview
-The synchronization architecture leverages LegendApp State’s Supabase plugin to keep local observables in sync with Supabase tables. Persistence and merge mode are configured globally, while actions update observables, triggering sync automatically.
+The new architecture follows WatermelonDB's database-centric approach where the database serves as the single source of truth. Application logic interacts with WatermelonDB models directly, which automatically sync with Supabase through RPC functions. Reactive queries ensure the UI updates automatically when data changes.
 
 ```mermaid
 sequenceDiagram
-participant UI as "UI"
-participant Actions as "Data Actions"
-participant Store as "Observable Store"
-participant Sync as "LegendApp Sync"
-participant DB as "Supabase"
-UI->>Actions : "User triggers action (create/update/delete)"
-Actions->>Store : "Update observable (merge mode)"
-Store->>Sync : "Change detected"
-Sync->>DB : "Push change (retry infinite)"
-DB-->>Sync : "Acknowledge"
-Sync-->>Store : "Apply remote changes"
-Store-->>UI : "Re-render with latest state"
+participant UI as "UI Components"
+participant Hooks as "useObservableQuery"
+participant DB as "WatermelonDB Models"
+participant Sync as "syncDatabase()"
+participant RPC as "Supabase RPC"
+UI->>Hooks : "Subscribe to reactive query"
+Hooks->>DB : "Query observe()"
+DB-->>Hooks : "Stream of changes"
+Hooks-->>UI : "Automatic UI updates"
+UI->>DB : "User modifies data"
+DB->>Sync : "Trigger sync (auto)"
+Sync->>RPC : "push(changes)"
+RPC-->>Sync : "Acknowledge"
+Sync->>DB : "Apply remote changes"
+DB-->>Hooks : "Notify subscribers"
+Hooks-->>UI : "UI updates with latest data"
 ```
 
 **Diagram sources**
-- [src/data/actions/lists.ts:79-122](file://src/data/actions/lists.ts#L79-L122)
-- [src/data/actions/list-items.ts:53-104](file://src/data/actions/list-items.ts#L53-L104)
-- [src/data/states/lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [src/data/states/list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [src/data/database.ts:13-29](file://src/data/database.ts#L13-L29)
+- [src/features/lists/hooks/use-list-page-logics.ts:23-24](file://src/features/lists/hooks/use-list-page-logics.ts#L23-L24)
+- [src/features/list/hooks/use-list-items-page-logics.ts:32-33](file://src/features/list/hooks/use-list-items-page-logics.ts#L32-L33)
+- [src/hooks/use-observable-query.ts:7-9](file://src/hooks/use-observable-query.ts#L7-L9)
+- [src/database/sync.ts:8-34](file://src/database/sync.ts#L8-L34)
 
 ## Detailed Component Analysis
 
-### Merge Mode Configuration and Last-Sync Tracking
-- Merge mode: Set to “merge” globally, ensuring local and remote changes are combined rather than overwritten.
-- Last-sync tracking: changesSince “last-sync” ensures only incremental changes are fetched after the initial sync.
-- Field mapping: created_at, updated_at, and deleted fields are mapped for conflict detection and lifecycle management.
-- Retry policy: Infinite retries for transient failures, with persistence enabling recovery after restart.
+### WatermelonDB Database Configuration and Schema
+The database is configured with platform-specific adapters and includes three main models with proper associations and indexing for optimal performance.
 
 ```mermaid
-flowchart TD
-Start(["Sync Initialization"]) --> LoadLast["Load last-sync timestamp"]
-LoadLast --> FetchChanges["Fetch changesSince last-sync"]
-FetchChanges --> ApplyRemote["Apply remote changes (merge)"]
-ApplyRemote --> Persist["Persist to MMKV"]
-Persist --> TriggerLocal["Trigger local observable updates"]
-TriggerLocal --> End(["Ready"])
+classDiagram
+class Database {
++adapter : SQLiteAdapter|LokiJSAdapter
++modelClasses : Array
++schema : AppSchema
+}
+class List {
++id : string
++profileId : string
++title : string
++accentColor : string
++icon : string
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++profile : Profile
++listItems : Query~ListItem~
+}
+class ListItem {
++id : string
++profileId : string
++listId : string
++title : string?
++price : number?
++amount : number?
++isChecked : boolean
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++list : List
+}
+class Profile {
++id : string
++userId : string
++name : string
++avatarUrl : string?
++bio : string?
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++lists : Query~List~
+}
+Database --> List
+Database --> ListItem
+Database --> Profile
+List --> Profile : belongs_to
+List --> ListItem : has_many
+Profile --> List : has_many
 ```
 
 **Diagram sources**
-- [src/data/database.ts:20-29](file://src/data/database.ts#L20-L29)
-- [src/data/states/lists.ts:16-16](file://src/data/states/lists.ts#L16-L16)
-- [src/data/states/list-items.ts:13-13](file://src/data/states/list-items.ts#L13-L13)
+- [src/database/index.ts:29-32](file://src/database/index.ts#L29-L32)
+- [src/database/models/List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [src/database/models/ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
+- [src/database/models/Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
 
 **Section sources**
-- [src/data/database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [src/data/states/lists.ts:16-16](file://src/data/states/lists.ts#L16-L16)
-- [src/data/states/list-items.ts:13-13](file://src/data/states/list-items.ts#L13-L13)
+- [src/database/index.ts:12-32](file://src/database/index.ts#L12-L32)
+- [src/database/schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [src/database/models/List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [src/database/models/ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
+- [src/database/models/Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
 
-### Timestamp-Based Conflict Resolution
-- created_at: Used to establish baseline ordering for records.
-- updated_at: Used to detect newer remote changes versus local modifications.
-- Merge semantics: Local updates are merged with remote updates; the most recent updated_at wins for conflict resolution.
-- Deleted records: The deleted field marks logical deletions; merge mode handles restoration or suppression appropriately.
+### Reactive Query Patterns and UI Integration
+The application uses a custom hook that subscribes to WatermelonDB queries and provides automatic UI updates. This replaces the previous Legend App State observables with a more efficient reactive pattern.
+
+```mermaid
+flowchart TD
+Start(["Component Mount"]) --> Query["Create WatermelonDB Query"]
+Query --> Observe["query.observe().subscribe()"]
+Observe --> Subscribe["Subscribe to changes"]
+Subscribe --> Render["Render with initial data"]
+Render --> Change{"Data change?"}
+Change --> |Yes| Update["Update state with new data"]
+Update --> Render
+Change --> |No| Wait["Wait for next change"]
+Wait --> Change
+```
+
+**Diagram sources**
+- [src/hooks/use-observable-query.ts:7-10](file://src/hooks/use-observable-query.ts#L7-L10)
+
+**Section sources**
+- [src/hooks/use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
+- [src/features/lists/hooks/use-list-page-logics.ts:23-24](file://src/features/lists/hooks/use-list-page-logics.ts#L23-L24)
+- [src/features/list/hooks/use-list-items-page-logics.ts:32-33](file://src/features/list/hooks/use-list-items-page-logics.ts#L32-L33)
+
+### Supabase RPC-Based Synchronization
+The synchronization system uses custom Supabase RPC functions for bidirectional data synchronization. The pull() function retrieves changes since the last sync, while push() sends local changes to the server.
+
+```mermaid
+sequenceDiagram
+participant App as "Application"
+participant DB as "WatermelonDB"
+participant Sync as "syncDatabase()"
+participant RPC as "Supabase RPC"
+App->>DB : "User performs CRUD operation"
+DB->>Sync : "Automatic sync triggered"
+Sync->>RPC : "push({ changes })"
+RPC-->>Sync : "Success response"
+Sync->>RPC : "pull({ last_pulled_at })"
+RPC-->>Sync : "{ changes, timestamp }"
+Sync->>DB : "Apply remote changes"
+DB-->>App : "Reactive updates"
+```
+
+**Diagram sources**
+- [src/database/sync.ts:15-30](file://src/database/sync.ts#L15-L30)
+
+**Section sources**
+- [src/database/sync.ts:1-57](file://src/database/sync.ts#L1-L57)
+- [src/lib/supabase/supabase.ts:15-22](file://src/lib/supabase/supabase.ts#L15-L22)
+
+### Native Conflict Resolution and Timestamp Management
+WatermelonDB provides built-in conflict resolution through its synchronize function. The system automatically handles timestamp-based conflict resolution, ensuring that the most recent changes take precedence without manual merge mode configuration.
 
 ```mermaid
 flowchart TD
 A["Local Change"] --> B["Remote Change"]
-B --> C{"Which has newer updated_at?"}
-C --> |Local| D["Keep local with updated_at"]
-C --> |Remote| E["Apply remote with updated_at"]
-D --> F["Persist and notify"]
-E --> F["Persist and notify"]
+B --> C["WatermelonDB synchronize()"]
+C --> D{"Compare timestamps"}
+D --> |Local newer| E["Keep local changes"]
+D --> |Remote newer| F["Apply remote changes"]
+D --> |Equal| G["Merge based on sendCreatedAsUpdated"]
+E --> H["Persist to database"]
+F --> H
+G --> H
+H --> I["Notify reactive subscribers"]
+I --> J["Update UI automatically"]
 ```
 
 **Diagram sources**
-- [src/data/database.ts:22-25](file://src/data/database.ts#L22-L25)
-- [src/lib/supabase/utils.ts:1-9](file://src/lib/supabase/utils.ts#L1-L9)
+- [src/database/sync.ts:29](file://src/database/sync.ts#L29)
 
 **Section sources**
-- [src/data/database.ts:22-25](file://src/data/database.ts#L22-L25)
-- [src/lib/supabase/utils.ts:1-9](file://src/lib/supabase/utils.ts#L1-L9)
+- [src/database/sync.ts:15-30](file://src/database/sync.ts#L15-L30)
 
-### Realtime Filtering and Incremental Fetching
-- Realtime filter: Each store applies a user-scoped filter to receive only relevant events.
-- Selective fetching: Lists store fetches nested list_items to maintain referential integrity.
-- Filtered reads: Actions filter local data by list_id to avoid cross-list contamination.
-
-```mermaid
-sequenceDiagram
-participant Store as "lists$ / listItems$"
-participant Supabase as "Supabase"
-Store->>Supabase : "Subscribe with user filter"
-Supabase-->>Store : "Realtime events (filtered)"
-Store->>Store : "Apply changes (merge)"
-```
-
-**Diagram sources**
-- [src/data/states/lists.ts:10-21](file://src/data/states/lists.ts#L10-L21)
-- [src/data/states/list-items.ts:9-21](file://src/data/states/list-items.ts#L9-L21)
-
-**Section sources**
-- [src/data/states/lists.ts:10-21](file://src/data/states/lists.ts#L10-L21)
-- [src/data/states/list-items.ts:9-21](file://src/data/states/list-items.ts#L9-L21)
-
-### Retry Mechanisms and Error Handling
-- Infinite retry: Both global and per-store retry policies ensure eventual consistency.
-- Persistence: MMKV persists observables so changes are not lost across app restarts.
-- Action-level error handling: Actions wrap operations and return structured results with errors.
-- Toast notifications: UI feedback for success and error outcomes.
+### Guest Data Migration Service
+The migration service demonstrates practical conflict-free ownership transfer using WatermelonDB's reactive patterns. The service queries for guest data, prompts the user for migration, and updates ownership through WatermelonDB's write transactions.
 
 ```mermaid
 flowchart TD
-Op["Operation Attempt"] --> Net["Network Call"]
-Net --> Ok{"Success?"}
-Ok --> |Yes| Persist["Persist to MMKV"]
-Ok --> |No| Retry["Retry (infinite)"]
-Retry --> Net
-Persist --> Notify["Notify UI"]
-Notify --> Done(["Done"])
+A["User authenticates"] --> B["Check for guest data"]
+B --> C{"Has guest data?"}
+C --> |No| D["Return silently"]
+C --> |Yes| E["Prompt migration dialog"]
+E --> F{"User chooses migrate?"}
+F --> |No| G["Discard local data"]
+F --> |Yes| H["Query guest lists"]
+H --> I["Database.write() transaction"]
+I --> J["Update profile_id for each list"]
+J --> K["Automatic sync to Supabase"]
+K --> L["Show success toast"]
 ```
 
 **Diagram sources**
-- [src/data/database.ts:26-28](file://src/data/database.ts#L26-L28)
-- [src/data/states/lists.ts:22-24](file://src/data/states/lists.ts#L22-L24)
-- [src/data/states/list-items.ts:14-16](file://src/data/states/list-items.ts#L14-L16)
-- [src/services/toast.ts:24-43](file://src/services/toast.ts#L24-L43)
+- [src/services/sync.ts:103-151](file://src/services/sync.ts#L103-L151)
 
 **Section sources**
-- [src/data/database.ts:26-28](file://src/data/database.ts#L26-L28)
-- [src/data/states/lists.ts:22-24](file://src/data/states/lists.ts#L22-L24)
-- [src/data/states/list-items.ts:14-16](file://src/data/states/list-items.ts#L14-L16)
-- [src/services/toast.ts:24-43](file://src/services/toast.ts#L24-L43)
-
-### Offline Synchronization Workflows
-- Offline edits: Users can create, update, and delete items while offline; changes persist locally.
-- Background sync: On connectivity restore, pending changes are retried until acknowledged.
-- Incremental sync: Subsequent syncs fetch only changesSince last-sync, minimizing bandwidth.
-- Real-time updates: When online, realtime filters ensure immediate propagation of other clients’ changes.
-
-```mermaid
-stateDiagram-v2
-[*] --> Offline
-Offline --> Online : "Connect"
-Online --> Offline : "Disconnect"
-Online --> Online : "Sync (retry infinite)"
-Offline --> Offline : "Local edits (persist)"
-```
-
-**Diagram sources**
-- [src/data/database.ts:17-17](file://src/data/database.ts#L17-L17)
-- [src/data/states/lists.ts:16-16](file://src/data/states/lists.ts#L16-L16)
-- [src/data/states/list-items.ts:13-13](file://src/data/states/list-items.ts#L13-L13)
-
-**Section sources**
-- [src/data/database.ts:17-17](file://src/data/database.ts#L17-L17)
-- [src/data/states/lists.ts:16-16](file://src/data/states/lists.ts#L16-L16)
-- [src/data/states/list-items.ts:13-13](file://src/data/states/list-items.ts#L13-L13)
-
-### Conflict Detection and Resolution Algorithms
-- Conflict detection: Occurs when local and remote records share the same id but differ in updated_at timestamps.
-- Resolution priority: The record with the later updated_at timestamp prevails.
-- Merge behavior: Non-conflicting fields are preserved; conflicting fields adopt the remote value.
-- Deletions: Logical deletions are respected; merging restores or suppresses as appropriate.
-
-```mermaid
-flowchart TD
-Start(["Detect Conflict"]) --> Compare["Compare updated_at"]
-Compare --> Newer{"Which is newer?"}
-Newer --> |Local| KeepLocal["Keep local record"]
-Newer --> |Remote| ApplyRemote["Apply remote record"]
-KeepLocal --> Persist["Persist and notify"]
-ApplyRemote --> Persist
-Persist --> End(["Resolved"])
-```
-
-**Diagram sources**
-- [src/data/database.ts:22-25](file://src/data/database.ts#L22-L25)
-
-**Section sources**
-- [src/data/database.ts:22-25](file://src/data/database.ts#L22-L25)
+- [src/services/sync.ts:43-205](file://src/services/sync.ts#L43-L205)
 
 ### Practical Examples
 
-#### Example 1: Creating a List (Offline-First)
-- Action: createNewList constructs a payload and writes to the lists$ observable.
-- Behavior: The write triggers sync; if offline, changes persist locally and retry indefinitely.
-- Outcome: Remote acknowledgment updates the observable and UI.
+#### Example 1: Creating a List with Reactive Updates
+The new approach eliminates the need for manual observable management. Components simply subscribe to reactive queries, and WatermelonDB handles all synchronization automatically.
 
 **Section sources**
-- [src/data/actions/lists.ts:79-122](file://src/data/actions/lists.ts#L79-L122)
-- [src/data/states/lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [src/data/database.ts:26-28](file://src/data/database.ts#L26-L28)
+- [src/features/lists/hooks/use-list-page-logics.ts:23-24](file://src/features/lists/hooks/use-list-page-logics.ts#L23-L24)
+- [src/database/operations/lists.ts](file://src/database/operations/lists.ts)
 
-#### Example 2: Updating a List Item (Conflict Scenario)
-- Action: updateListItem merges partial updates and writes to listItems$.
-- Conflict scenario: If another client updated the same item with a later updated_at, the remote change takes precedence.
-- Outcome: The observable reflects the newer remote state after merge.
+#### Example 2: Real-time List Item Updates
+Components automatically receive updates when other clients modify data. The reactive query system ensures UI consistency without manual state management.
 
 **Section sources**
-- [src/data/actions/list-items.ts:132-166](file://src/data/actions/list-items.ts#L132-L166)
-- [src/data/states/list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [src/data/database.ts:22-25](file://src/data/database.ts#L22-L25)
+- [src/features/list/hooks/use-list-items-page-logics.ts:32-33](file://src/features/list/hooks/use-list-items-page-logics.ts#L32-L33)
+- [src/database/operations/listItems.ts:52-78](file://src/database/operations/listItems.ts#L52-L78)
 
-#### Example 3: Guest Data Migration to User Account
-- Service: SyncService detects guest lists and migrates them by updating profile_id.
-- Behavior: Updates trigger automatic sync; user sees a success/error toast.
-- Outcome: Guest lists become user-owned and synchronized.
+#### Example 3: Guest to User Data Migration
+The migration service demonstrates seamless data ownership transfer using WatermelonDB's transaction system and automatic synchronization.
 
 **Section sources**
-- [src/services/sync.ts:48-201](file://src/services/sync.ts#L48-L201)
-- [src/services/toast.ts:24-43](file://src/services/toast.ts#L24-L43)
+- [src/services/sync.ts:167-203](file://src/services/sync.ts#L167-L203)
 
 ## Dependency Analysis
-The synchronization pipeline depends on:
-- Supabase client configured with MMKV-backed auth storage
-- LegendApp State configured with merge mode, last-sync, and retry
-- Utility functions to normalize key casing between local and remote formats
-- Storage abstraction for persistence and debugging
+The new architecture has simplified dependencies focused on WatermelonDB and Supabase integration:
 
 ```mermaid
 graph LR
-A["actions/*"] --> B["states/*"]
-B --> C["database.ts (supabaseSynced)"]
-C --> D["Supabase Client"]
-C --> E["MMKV Persist"]
-F["lib/supabase/utils.ts"] --> A
-G["data/storage.ts"] --> E
-H["lib/supabase/supabase.ts"] --> D
+A["features/*"] --> B["hooks/use-observable-query.ts"]
+B --> C["database/index.ts"]
+C --> D["database/models/*.ts"]
+D --> E["database/operations/*.ts"]
+E --> F["database/sync.ts"]
+F --> G["lib/supabase/supabase.ts"]
+H["services/sync.ts"] --> C
+I["hooks/*"] --> B
 ```
 
 **Diagram sources**
-- [src/data/actions/lists.ts:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [src/data/actions/list-items.ts:1-193](file://src/data/actions/list-items.ts#L1-L193)
-- [src/data/states/lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [src/data/states/list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [src/data/database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [src/lib/supabase/utils.ts:1-9](file://src/lib/supabase/utils.ts#L1-L9)
-- [src/data/storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [src/lib/supabase/supabase.ts:1-29](file://src/lib/supabase/supabase.ts#L1-L29)
+- [src/features/lists/hooks/use-list-page-logics.ts:7-8](file://src/features/lists/hooks/use-list-page-logics.ts#L7-L8)
+- [src/hooks/use-observable-query.ts:2](file://src/hooks/use-observable-query.ts#L2)
+- [src/database/index.ts:1-33](file://src/database/index.ts#L1-L33)
+- [src/database/sync.ts:1-57](file://src/database/sync.ts#L1-L57)
+- [src/lib/supabase/supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
 
 **Section sources**
-- [src/data/actions/lists.ts:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [src/data/actions/list-items.ts:1-193](file://src/data/actions/list-items.ts#L1-L193)
-- [src/data/states/lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [src/data/states/list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [src/data/database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [src/lib/supabase/utils.ts:1-9](file://src/lib/supabase/utils.ts#L1-L9)
-- [src/data/storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [src/lib/supabase/supabase.ts:1-29](file://src/lib/supabase/supabase.ts#L1-L29)
+- [src/features/lists/hooks/use-list-page-logics.ts:1-90](file://src/features/lists/hooks/use-list-page-logics.ts#L1-L90)
+- [src/features/list/hooks/use-list-items-page-logics.ts:1-128](file://src/features/list/hooks/use-list-items-page-logics.ts#L1-L128)
+- [src/hooks/use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
+- [src/database/index.ts:1-33](file://src/database/index.ts#L1-L33)
+- [src/database/sync.ts:1-57](file://src/database/sync.ts#L1-L57)
+- [src/lib/supabase/supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
 
 ## Performance Considerations
-- Incremental sync: Using changesSince “last-sync” reduces payload sizes after the first sync.
-- Realtime filtering: Per-user filters minimize event volume and processing overhead.
-- Merge mode: Reduces write conflicts and network round-trips by combining changes.
-- Retry policy: Infinite retries improve reliability at the cost of continuous background work; monitor connectivity to avoid excessive contention.
-- Persistence: MMKV reduces cold-start sync time by preloading known state.
+The new WatermelonDB-based architecture provides several performance improvements:
 
-[No sources needed since this section provides general guidance]
+- **Automatic Persistence**: WatermelonDB handles all persistence automatically without external storage plugins
+- **Efficient Reactive Queries**: useObservableQuery provides optimized subscription management
+- **Built-in Conflict Resolution**: Eliminates the overhead of manual merge mode processing
+- **Platform Optimization**: SQLite adapter for mobile provides native performance, LokiJS for web compatibility
+- **Reduced Memory Usage**: Reactive queries stream only necessary data to components
+- **Automatic Indexing**: WatermelonDB schema defines optimal indexes for query performance
 
 ## Troubleshooting Guide
-Common issues and resolutions:
-- No sync after offline: Verify persistence is enabled and retry is infinite. Confirm last-sync timestamp is present.
-- Conflicts not resolving: Ensure updated_at is being updated on server-side and that merge mode is active.
-- Stale UI after remote change: Confirm realtime filters are applied and observable updates propagate.
-- Guest migration errors: Check guestId and userId correctness; review toast messages for error details.
-- Storage corruption or stale keys: Use storage debug utilities to inspect keys and clear selectively.
+Common issues and resolutions in the new WatermelonDB architecture:
+
+- **No data loading**: Verify database initialization and schema version match
+- **Reactive queries not updating**: Check query subscriptions and ensure proper cleanup in useEffect
+- **Sync not working**: Verify Supabase RPC functions exist and credentials are correct
+- **Conflicts occurring**: Review WatermelonDB's automatic conflict resolution behavior
+- **Performance issues**: Check query complexity and ensure proper indexing on frequently queried fields
+- **Migration failures**: Verify guest data exists and user authentication state is correct
 
 **Section sources**
-- [src/data/database.ts:26-28](file://src/data/database.ts#L26-L28)
-- [src/data/states/lists.ts:16-16](file://src/data/states/lists.ts#L16-L16)
-- [src/data/states/list-items.ts:13-13](file://src/data/states/list-items.ts#L13-L13)
-- [src/services/sync.ts:102-150](file://src/services/sync.ts#L102-L150)
-- [src/data/storage.ts:54-62](file://src/data/storage.ts#L54-L62)
+- [src/database/index.ts:12-27](file://src/database/index.ts#L12-L27)
+- [src/hooks/use-observable-query.ts:7-10](file://src/hooks/use-observable-query.ts#L7-L10)
+- [src/database/sync.ts:15-30](file://src/database/sync.ts#L15-L30)
+- [src/services/sync.ts:167-203](file://src/services/sync.ts#L167-L203)
 
 ## Conclusion
-The application employs a robust offline-first synchronization strategy centered on merge mode, timestamp-based conflict resolution, and last-sync tracking. Persistence and infinite retry ensure resilience against network interruptions, while realtime filtering and selective fetching optimize performance. The guest-to-user migration service demonstrates practical conflict-free ownership transfer. Together, these mechanisms maintain data consistency and provide a reliable user experience across online and offline scenarios.
+The migration from Legend App's merge mode to WatermelonDB's reactive query patterns represents a fundamental shift toward a more robust, maintainable synchronization architecture. The new approach eliminates manual merge mode configuration, provides automatic conflict resolution, and offers superior performance through reactive queries and built-in persistence. The database-centric design ensures data consistency while simplifying application logic and reducing the potential for synchronization errors.
