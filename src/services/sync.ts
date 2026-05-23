@@ -1,5 +1,7 @@
+import { Q } from '@nozbe/watermelondb';
 import { Alert } from 'react-native';
-import { lists$ } from '@/data/states/lists';
+import { database } from '@/database';
+import { List as ListModel } from '@/database/models/List';
 import { showToast } from './toast';
 
 interface MigrationDataParams {
@@ -21,7 +23,7 @@ interface MigrationResult {
  *
  * @remarks
  * - All methods catch errors internally and provide safe fallback returns
- * - Relies on LegendApp State management for automatic Supabase synchronization
+ * - Uses WatermelonDB for local data operations
  * - Uses native Alert dialogs for user interaction on mobile platforms
  *
  * @example
@@ -47,10 +49,10 @@ export class SyncService {
    */
   async hasGuestData(guestId: string): Promise<boolean> {
     try {
-      const listsData = lists$.get();
-      const listsArray = Object.values(listsData || {});
-
-      const guestLists = listsArray.filter((list: any) => list.profile_id === guestId);
+      const listsCollection = database.get<ListModel>('lists');
+      const guestLists = await listsCollection
+        .query(Q.where('profile_id', guestId), Q.where('deleted_at', Q.eq(null)))
+        .fetch();
 
       return guestLists.length > 0;
     } catch (error) {
@@ -67,11 +69,10 @@ export class SyncService {
    */
   async getGuestListsCount(guestId: string): Promise<number> {
     try {
-      const listsData = lists$.get();
-      const listsArray = Object.values(listsData || {});
-
-      // Conta listas do guest
-      const guestLists = listsArray.filter((list: any) => list.profile_id === guestId);
+      const listsCollection = database.get<ListModel>('lists');
+      const guestLists = await listsCollection
+        .query(Q.where('profile_id', guestId), Q.where('deleted_at', Q.eq(null)))
+        .fetch();
 
       return guestLists.length;
     } catch (error) {
@@ -159,19 +160,16 @@ export class SyncService {
    * @throws Does not throw; errors are caught and returned in the result object
    *
    * @remarks
-   * - This method automatically syncs changes to Supabase through the LegendApp State
+   * - This method uses WatermelonDB for local updates which sync to Supabase
    * - If no lists are found for the guest, returns success with 0 items migrated
    * - The migration updates the `profile_id` field of each list to the new user ID
    */
   async migrateGuestDataToUser({ guestId, userId }: MigrationDataParams): Promise<MigrationResult> {
     try {
-      const listsData = lists$.get();
-      const listsArray = Object.entries(listsData || {});
-
-      // Filtra listas do guest
-      const guestLists = listsArray.filter(
-        ([_, list]: [string, any]) => list.profile_id === guestId,
-      );
+      const listsCollection = database.get<ListModel>('lists');
+      const guestLists = await listsCollection
+        .query(Q.where('profile_id', guestId), Q.where('deleted_at', Q.eq(null)))
+        .fetch();
 
       if (guestLists.length === 0) {
         return {
@@ -180,11 +178,15 @@ export class SyncService {
         };
       }
 
-      // Atualiza profile_id de cada lista
-      // O LegendApp State sincroniza automaticamente com Supabase
-      for (const [listId] of guestLists) {
-        lists$[listId].profile_id.set(userId);
-      }
+      // Atualiza profile_id de cada lista via WatermelonDB
+      await database.write(async () => {
+        for (const list of guestLists) {
+          await list.update((record) => {
+            record.profileId = userId;
+            record.updatedAt = new Date();
+          });
+        }
+      });
 
       return {
         success: true,
