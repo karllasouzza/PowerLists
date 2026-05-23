@@ -1,4 +1,4 @@
-import type { List, ListItem } from '@/data/types';
+import type { List, ListItem } from '@/types';
 import { DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 import { Decimal } from 'decimal.js';
 

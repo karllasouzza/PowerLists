@@ -1,10 +1,12 @@
-import { useValue } from '@legendapp/state/react';
+import { Q } from '@nozbe/watermelondb';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 
-import { listItems$ } from '@/data/states/list-items';
-import type { ListItem } from '@/data/types';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import type { ListItem } from '@/types';
+import { database } from '@/database';
+import { ListItem as ListItemModel } from '@/database/models/ListItem';
+import { getCurrentUserId } from '@/features/auth/authState';
+import { useObservableQuery } from '@/hooks/use-observable-query';
 
 import type { DashboardItemVariation, VariationTab } from '../types';
 import {
@@ -15,36 +17,37 @@ import {
   splitItemVariations,
 } from '../utils';
 
-const normalizeItem = (item: Partial<ListItem>): ListItem => {
-  return {
-    id: item.id ?? '',
-    listId: item.listId ?? '',
-    profileId: item.profileId ?? '',
-    title: item.title ?? '',
-    price: item.price ?? 0,
-    amount: item.amount ?? 0,
-    isChecked: item.isChecked ?? false,
-    createdAt: item.createdAt ?? new Date().toISOString(),
-    updatedAt: item.updatedAt,
-    deleted: item.deleted,
-  };
-};
-
 export const useItemVariationsPageLogics = () => {
   const router = useRouter();
   const { period: periodParam } = useLocalSearchParams<{ period?: string }>();
   const [tab, setTab] = useState<VariationTab>('decreases');
 
   const period = parseDashboardPeriod(periodParam);
-  const listItemsState = useValue(listItems$.get());
-  const isLoading = listItemsState === null;
 
-  const allItems = useMemo(() => {
-    const rawItems = Object.values(listItemsState ?? {});
-    const formattedItems = convertFromSupabaseFormat(rawItems) as Partial<ListItem>[];
+  const userId = getCurrentUserId() ?? '';
+  const itemsQuery = useMemo(
+    () =>
+      database
+        .get<ListItemModel>('list_items')
+        .query(Q.where('profile_id', userId), Q.where('deleted_at', Q.eq(null))),
+    [userId],
+  );
+  const itemsRaw = useObservableQuery<ListItemModel>(itemsQuery);
+  const isLoading = itemsRaw === null;
 
-    return formattedItems.map(normalizeItem);
-  }, [listItemsState]);
+  const allItems = useMemo((): ListItem[] => {
+    return itemsRaw.map((model) => ({
+      id: model.id,
+      listId: model.listId,
+      profileId: model.profileId,
+      title: model.title,
+      price: model.price,
+      amount: model.amount,
+      isChecked: model.isChecked,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt ?? undefined,
+    }));
+  }, [itemsRaw]);
 
   const periodItems = useMemo(() => filterItemsByPeriod(allItems, period), [allItems, period]);
 
