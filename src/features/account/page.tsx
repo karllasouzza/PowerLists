@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { IconLogout } from '@tabler/icons-react-native';
-import { observer } from '@legendapp/state/react';
-import { isGuestUser } from '@/data/types/user';
-import { TopBar } from '@/components/top-bar';
+import { isGuestUser } from '@/types/user';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 
@@ -15,7 +13,7 @@ import { PasswordSecurityModal } from './components/password-security-modal';
 import useProfileData from './use-profile-data';
 import { Icon } from '@/components/ui/icon';
 
-const AccountScreen = observer(() => {
+const AccountScreen = () => {
   const { profile, user, signOut, theme, colorScheme, setTheme, setColorScheme } = useProfileData();
 
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -25,7 +23,7 @@ const AccountScreen = observer(() => {
     ? user.name || 'Usuário'
     : profile?.name || user?.email?.split('@')[0] || 'Usuário';
   const displayEmail = isGuestUser(user) ? user.email || '' : user?.email || '';
-  const avatarUrl = profile?.avatar_url || null;
+  const avatarUrl = profile?.avatarUrl || null;
 
   return (
     <View className="h-full w-full bg-background">
@@ -59,11 +57,12 @@ const AccountScreen = observer(() => {
         onOpenChange={setProfileModalOpen}
         currentName={displayName}
         currentEmail={displayEmail}
+        profileId={profile?.id}
       />
 
       <PasswordSecurityModal open={passwordModalOpen} onOpenChange={setPasswordModalOpen} />
     </View>
   );
-});
+};
 
 export default AccountScreen;

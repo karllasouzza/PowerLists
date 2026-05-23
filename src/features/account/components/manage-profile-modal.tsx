@@ -7,8 +7,8 @@ import {
 } from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { updateEmail } from '@/data/actions/profile';
-import { updateProfile } from '@/data/states/profile';
+import { updateProfile } from '@/database/operations/profiles';
+import { updateEmail } from '@/database/operations/profile';
 import { showToast } from '@/services/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
@@ -30,6 +30,7 @@ type ManageProfileModalProps = {
   onOpenChange: (open: boolean) => void;
   currentName: string;
   currentEmail: string;
+  profileId?: string;
 };
 
 export function ManageProfileModal({
@@ -37,6 +38,7 @@ export function ManageProfileModal({
   onOpenChange,
   currentName,
   currentEmail,
+  profileId,
 }: ManageProfileModalProps) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -72,13 +74,15 @@ export function ManageProfileModal({
       }
 
       const results = await Promise.all([
-        nameChanged ? updateProfile({ name: data.name }) : Promise.resolve({ profile: null }),
+        nameChanged && profileId
+          ? updateProfile(profileId, { name: data.name })
+          : Promise.resolve(null),
         emailChanged
           ? updateEmail(data.currentPassword!, data.email)
           : Promise.resolve({ error: null }),
       ]);
 
-      const profileResult = results[0] as { profile: unknown };
+      const profileResult = results[0];
       const emailResult = results[1] as { error: string | null };
 
       if (emailResult.error) {
@@ -90,7 +94,7 @@ export function ManageProfileModal({
         return;
       }
 
-      if (nameChanged && !profileResult.profile) {
+      if (nameChanged && !profileResult) {
         showToast({ type: 'error', title: 'Erro ao atualizar nome' });
         return;
       }
