@@ -21,6 +21,5 @@ module.exports = {
     // Use an inline manual mock for react-native-reanimated to avoid
     // pulling in react-native ESM dependencies from the official mock
     '^react-native-reanimated$': '<rootDir>/__mocks__/react-native-reanimated.cjs',
-    '^react-native-mmkv$': '<rootDir>/__mocks__/react-native-mmkv.cjs',
   },
 };
