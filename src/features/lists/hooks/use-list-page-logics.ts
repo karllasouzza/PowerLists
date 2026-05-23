@@ -1,14 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useSelector, useValue } from '@legendapp/state/react';
+import { Q } from '@nozbe/watermelondb';
 
-import { listItems$ } from '@/data/states/list-items';
-import { lists$ } from '@/data/states/lists';
-import type { List } from '@/data/types';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import { database } from '@/database';
+import { List as ListModel } from '@/database/models/List';
+import { ListItem as ListItemModel } from '@/database/models/ListItem';
+import { useObservableQuery } from '@/hooks/use-observable-query';
+import { getCurrentUserId } from '@/features/auth/authState';
+import { getListsByProfile } from '@/database/operations/lists';
 import { formatCurrency } from '@/utils/formatters';
 
 import { filterListsByQuery } from '../utils/list-filters';
-import { buildTotalsByListId, type RawListItem } from '../utils/list-totals';
+import { buildTotalsByListId } from '../utils/list-totals';
 
 export const useListPageLogics = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,32 +18,40 @@ export const useListPageLogics = () => {
   const [isUpdateOpen, setUpdateOpen] = useState(false);
   const [isDeleteOpen, setDeleteOpen] = useState(false);
   const [activeListId, setActiveListId] = useState<string>();
-  const listsRaw = useValue(lists$);
 
-  const isLoading = listsRaw === null || listsRaw === undefined;
+  const userId = getCurrentUserId() ?? '';
+  const listsQuery = useMemo(() => getListsByProfile(userId), [userId]);
+  const listsRaw = useObservableQuery<ListModel>(listsQuery);
 
-  const listFormatted = useMemo(
-    () => convertFromSupabaseFormat(Object.values(listsRaw || {})) as List[],
-    [listsRaw],
+  const itemsQuery = useMemo(
+    () =>
+      database
+        .get<ListItemModel>('list_items')
+        .query(Q.where('profile_id', userId), Q.where('deleted_at', Q.eq(null))),
+    [userId],
   );
+  const itemsRaw = useObservableQuery<ListItemModel>(itemsQuery);
 
-  const totalsByListId = useSelector(() => {
-    const rawListItems = Object.values(listItems$.get() ?? {}) as RawListItem[];
-    return buildTotalsByListId(rawListItems);
-  });
+  const totalsByListId = useMemo(() => {
+    return buildTotalsByListId(
+      itemsRaw.map((item) => ({
+        list_id: item.listId,
+        price: item.price,
+        amount: item.amount,
+      })),
+    );
+  }, [itemsRaw]);
 
   const filteredLists = useMemo(
-    () => filterListsByQuery(listFormatted, searchQuery),
-    [listFormatted, searchQuery],
+    () => filterListsByQuery(listsRaw as any, searchQuery),
+    [listsRaw, searchQuery],
   );
 
   const formattedTotalsByListId = useMemo(() => {
     const totals: Record<string, string> = {};
-
     for (const list of filteredLists) {
       totals[list.id] = formatCurrency(totalsByListId[list.id] ?? 0);
     }
-
     return totals;
   }, [filteredLists, totalsByListId]);
 
@@ -62,11 +72,9 @@ export const useListPageLogics = () => {
   return {
     lists: filteredLists,
     listTotalsById: formattedTotalsByListId,
-    isLoading,
-
+    isLoading: false,
     searchQuery,
     setSearchQuery,
-
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,

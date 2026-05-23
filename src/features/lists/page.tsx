@@ -1,9 +1,6 @@
 import React, { Suspense, useCallback } from 'react';
-import { View } from 'react-native';
-import { LegendList } from '@legendapp/list';
-import { observer } from '@legendapp/state/react';
+import { View, FlatList } from 'react-native';
 
-import type { List } from '@/data/types';
 import { CardListSkeletonList } from '@/features/lists/components/card-list-skeleton';
 import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
@@ -13,21 +10,17 @@ import { IconPlus } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
 import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
 
-const LIST_CARD_ESTIMATED_ITEM_SIZE = 96;
-const LIST_CARD_DRAW_DISTANCE = 700;
-
 const AsyncCardList = React.lazy(async () => {
   const module = await import('@/features/lists/components/card-list');
   return { default: module.CardList };
 });
 
-const HomeScreen = observer(() => {
+const HomeScreen = () => {
   const {
     searchQuery,
     setSearchQuery,
     lists,
     listTotalsById,
-    isLoading,
     isCreateOpen,
     setCreateOpen,
     isUpdateOpen,
@@ -41,7 +34,7 @@ const HomeScreen = observer(() => {
   } = useListPageLogics();
 
   const renderList = useCallback(
-    (list: List) => (
+    (list: any) => (
       <AsyncCardList
         list={list}
         totalPrice={listTotalsById[list.id] ?? 'R$ 0,00'}
@@ -66,24 +59,17 @@ const HomeScreen = observer(() => {
         searchPlaceholder="Procurando por algo?"
       />
 
-      {isLoading ? (
-        <CardListSkeletonList />
-      ) : (
-        <Suspense fallback={<CardListSkeletonList />}>
-          <LegendList
-            data={lists}
-            renderItem={({ item }) => renderList(item)}
-            estimatedItemSize={LIST_CARD_ESTIMATED_ITEM_SIZE}
-            drawDistance={LIST_CARD_DRAW_DISTANCE}
-            className="flex flex-1 w-full h-full"
-            keyExtractor={(item) => item.id}
-            extraData={listTotalsById}
-            recycleItems
-            onScrollBeginDrag={handleListScrollStart}
-            ListFooterComponent={<View className="h-20" />}
-          />
-        </Suspense>
-      )}
+      <Suspense fallback={<CardListSkeletonList />}>
+        <FlatList
+          data={lists}
+          renderItem={({ item }) => renderList(item)}
+          keyExtractor={(item) => item.id}
+          extraData={listTotalsById}
+          onScrollBeginDrag={handleListScrollStart}
+          ListFooterComponent={<View className="h-20" />}
+          className="flex flex-1 w-full h-full"
+        />
+      </Suspense>
 
       <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />
 
@@ -92,6 +78,6 @@ const HomeScreen = observer(() => {
       <ListDeleteModal open={isDeleteOpen} listId={activeListId} onOpenChange={setDeleteOpen} />
     </View>
   );
-});
+};
 
 export default HomeScreen;

@@ -4,7 +4,7 @@ import { IconShoppingCart } from '@tabler/icons-react-native';
 import { useRouter } from 'expo-router';
 
 import { cn } from '@/lib/utils';
-import type { List } from '@/data/types';
+import type { List } from '@/types';
 
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';

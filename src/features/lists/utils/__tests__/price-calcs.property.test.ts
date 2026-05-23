@@ -1,4 +1,4 @@
-import type { ListItem } from '@/data/types';
+import type { ListItem } from '@/types';
 import { describe, expect, it } from '@jest/globals';
 import { Decimal } from 'decimal.js';
 import { array, assert, boolean, integer, option, property, record, uuid } from 'fast-check';
@@ -36,7 +36,14 @@ const listItemArb = record<ListItem>({
       nil: null,
     },
   ),
-  deleted: option(boolean(), { nil: null }),
+  deletedAt: option(
+    integer({ min: 1, max: 999_999 }).map(
+      (value) => `2026-04-05T12:${String(value % 60).padStart(2, '0')}:00.000Z`,
+    ),
+    {
+      nil: null,
+    },
+  ),
 });
 
 describe('price-calcs.calculateTotal', () => {
@@ -52,7 +59,7 @@ describe('price-calcs.calculateTotal', () => {
         isChecked: false,
         createdAt: '2026-04-05T10:00:00.000Z',
         updatedAt: null,
-        deleted: null,
+        deletedAt: null,
       },
       {
         id: '2',
@@ -64,7 +71,7 @@ describe('price-calcs.calculateTotal', () => {
         isChecked: false,
         createdAt: '2026-04-05T10:01:00.000Z',
         updatedAt: null,
-        deleted: null,
+        deletedAt: null,
       },
     ];
 

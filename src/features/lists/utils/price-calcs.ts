@@ -1,4 +1,4 @@
-import { ListItem } from '@/data/types';
+import { ListItem } from '@/types';
 import { Decimal } from 'decimal.js';
 
 export const calculateTotal = (items: ListItem[]) => {

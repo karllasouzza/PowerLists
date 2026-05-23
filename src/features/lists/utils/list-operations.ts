@@ -1,17 +1,18 @@
-import {
-  createNewList,
-  updateList as editListAction,
-  deleteList as deleteListAction,
-} from '@/data/actions/lists';
+import { createList, updateList, deleteList } from '@/database/operations/lists';
 import { showToast } from '@/services';
+import { getCurrentUserId } from '@/features/auth/authState';
 import { FormData } from '../types';
 
 export const handleAddNewList = async (data: FormData) => {
   try {
-    const { newList } = await createNewList({
+    const userId = getCurrentUserId();
+    if (!userId) throw new Error('User not authenticated');
+
+    const newList = await createList({
       title: data.title,
       accentColor: data.color || 'primary',
       icon: data.icon || 'cart',
+      profileId: userId,
     });
 
     if (!newList) throw new Error('Failed to create list');
@@ -35,8 +36,7 @@ export const handleAddNewList = async (data: FormData) => {
 
 export const handleEditList = async (listEditId: string, data: FormData) => {
   try {
-    const { editList } = await editListAction({
-      id: listEditId,
+    const editList = await updateList(listEditId, {
       title: data.title,
       accentColor: data.color || 'primary',
       icon: data.icon || 'cart',
@@ -63,8 +63,8 @@ export const handleEditList = async (listEditId: string, data: FormData) => {
 
 export const handleDeleteList = async (id: string) => {
   try {
-    const success = await deleteListAction({ id });
-    if (!success) throw new Error('Failed to delete list');
+    const result = await deleteList(id);
+    if (!result) throw new Error('Failed to delete list');
     return { success: true };
   } catch {
     return { success: false };

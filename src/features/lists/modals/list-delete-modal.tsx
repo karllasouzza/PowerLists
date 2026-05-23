@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { useValue } from '@legendapp/state/react';
 
 import {
   AppModal,
@@ -9,10 +8,9 @@ import {
   AppModalHeader,
   AppModalFooter,
 } from '@/components/molecules/app-modal';
-import { lists$ } from '@/data/states/lists';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
-import { List } from '@/data/types';
 import { handleDeleteList } from '@/features/lists/utils/list-operations';
+import { database } from '@/database';
+import { List as ListModel } from '@/database/models/List';
 
 type ListDeleteModalProps = {
   open: boolean;
@@ -22,10 +20,19 @@ type ListDeleteModalProps = {
 
 export function ListDeleteModal({ open, listId, onOpenChange }: ListDeleteModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentList, setCurrentList] = useState<ListModel | null>(null);
 
-  const listsRaw = useValue(lists$);
-  const lists = convertFromSupabaseFormat(Object.values(listsRaw || {})) as List[];
-  const currentList = lists.find((list) => list.id === listId);
+  useEffect(() => {
+    if (listId) {
+      database
+        .get<ListModel>('lists')
+        .find(listId)
+        .then(setCurrentList)
+        .catch(() => setCurrentList(null));
+    } else {
+      setCurrentList(null);
+    }
+  }, [listId]);
 
   const handleDelete = async () => {
     if (!listId) return;

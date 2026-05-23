@@ -3,7 +3,6 @@ import { ScrollView, TextInput, View } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useValue } from '@legendapp/state/react';
 
 import {
   AppModal,
@@ -23,9 +22,8 @@ import {
   LIST_ACCENT_COLOR_TOKENS,
   getAccentColorToken,
 } from '@/features/lists/utils/accent-colors';
-import { lists$ } from '@/data/states/lists';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
-import { List } from '@/data/types';
+import { database } from '@/database';
+import { List as ListModel } from '@/database/models/List';
 
 const listFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -43,11 +41,20 @@ type ListUpdateModalProps = {
 
 export function ListUpdateModal({ open, listId, onOpenChange }: ListUpdateModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentList, setCurrentList] = useState<ListModel | null>(null);
   const titleRef = useRef<TextInput>(null);
 
-  const listsRaw = useValue(lists$);
-  const lists = convertFromSupabaseFormat(Object.values(listsRaw || {})) as List[];
-  const currentList = lists.find((list) => list.id === listId);
+  useEffect(() => {
+    if (listId) {
+      database
+        .get<ListModel>('lists')
+        .find(listId)
+        .then(setCurrentList)
+        .catch(() => setCurrentList(null));
+    } else {
+      setCurrentList(null);
+    }
+  }, [listId]);
 
   const {
     control,
