@@ -1,21 +1,16 @@
 import React, { useCallback, useMemo } from 'react';
-import { View } from 'react-native';
-import { LegendList } from '@legendapp/list';
+import { View, FlatList } from 'react-native';
 
 import { closeOpenedSwipeable } from '@/components/swipeable';
 
 import { ListItemsEmptyComponent } from './list-items-empty-component';
-import { ListItem } from '@/data/types';
 
 type ListItemsContentProps = {
-  readonly items: ListItem[];
+  readonly items: any[];
   readonly accentBgClassName: string;
   readonly accentForegroundClassName: string;
-  readonly renderItem: (item: ListItem) => React.ReactElement;
+  readonly renderItem: (item: any) => React.ReactElement;
 };
-
-const LIST_ITEM_ESTIMATED_SIZE = 96;
-const LIST_ITEM_DRAW_DISTANCE = 800;
 
 export function ListItemsContent({
   items,
@@ -32,15 +27,12 @@ export function ListItemsContent({
   }, []);
 
   return (
-    <LegendList
+    <FlatList
       data={data}
-      estimatedItemSize={LIST_ITEM_ESTIMATED_SIZE}
-      drawDistance={LIST_ITEM_DRAW_DISTANCE}
       renderItem={({ item }) => renderItem(item)}
       className="flex-1 flex w-full h-full py-2"
       keyExtractor={(item) => item.id}
       extraData={listExtraData}
-      recycleItems
       onScrollBeginDrag={handleListScrollStart}
       ListFooterComponent={<View className="h-44" />}
       ListEmptyComponent={() => (

@@ -15,7 +15,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
-import { createNewListItem } from '@/data/actions/list-items';
+import { createListItem } from '@/database/operations/listItems';
+import { getCurrentUserId } from '@/features/auth/authState';
 import { showToast } from '@/services';
 import { formatBRL, parseBRLToNumber } from '@/utils/currency';
 
@@ -77,17 +78,20 @@ export function ItemCreateModal({
   };
 
   const onSubmit = async (data: ItemFormData) => {
+    const userId = getCurrentUserId();
+    if (!userId) return;
+
     setIsSubmitting(true);
     try {
-      const success = await createNewListItem({
+      const item = await createListItem({
         title: data.title,
         price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
         listId,
-        profileId: '',
+        profileId: userId,
         isChecked: false,
       });
-      if (success) {
+      if (item) {
         closeModal();
         return;
       }

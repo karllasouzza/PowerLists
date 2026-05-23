@@ -1,4 +1,3 @@
-import { observer } from '@legendapp/state/react';
 import { IconRobotFace, IconPlus } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React, { Suspense, useCallback } from 'react';
@@ -11,11 +10,10 @@ import { ListItemsFooter, ListItemSkeletonList, ListItemsSortBar } from './compo
 import ListItemCard from './components/list-item-card';
 import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
-import { ListItem } from '@/data/types';
 
 const AsyncListItemsContent = React.lazy(() => import('./components/list-items-content'));
 
-const ListItemsScreen = observer(() => {
+const ListItemsScreen = () => {
   const {
     listId,
     currentList,
@@ -43,7 +41,7 @@ const ListItemsScreen = observer(() => {
   } = useListItemsPageLogics();
 
   const renderItem = useCallback(
-    (item: ListItem) => (
+    (item: any) => (
       <ListItemCard
         key={item.id}
         id={item.id}
@@ -152,6 +150,6 @@ const ListItemsScreen = observer(() => {
       <ItemDeleteModal open={isDeleteOpen} itemId={activeItemId} onOpenChange={setDeleteOpen} />
     </View>
   );
-});
+};
 
 export default ListItemsScreen;

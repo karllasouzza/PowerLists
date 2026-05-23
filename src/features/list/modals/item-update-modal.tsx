@@ -16,8 +16,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
 
-import { updateListItem } from '@/data/actions/list-items';
-import { ListItem } from '@/data/types';
+import { updateListItem } from '@/database/operations/listItems';
+import { ListItem } from '@/types';
 import { showToast } from '@/services';
 import { formatBRL, numberToBRLInput, parseBRLToNumber } from '@/utils/currency';
 
@@ -90,14 +90,13 @@ export function ItemUpdateModal({
 
     setIsSubmitting(true);
     try {
-      const success = await updateListItem({
-        id: currentItem.id,
+      const updated = await updateListItem(currentItem.id, {
         title: data.title,
         price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
         isChecked: currentItem.isChecked ?? false,
       });
-      if (success) onOpenChange(false);
+      if (updated) onOpenChange(false);
     } catch {
       showToast({
         type: 'error',
