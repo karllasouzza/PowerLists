@@ -37,7 +37,7 @@ export type Database = {
         Row: {
           amount: number | null;
           created_at: string | null;
-          deleted: boolean | null;
+          deleted_at: string | null;
           id: string;
           is_checked: boolean;
           list_id: string;
@@ -49,7 +49,7 @@ export type Database = {
         Insert: {
           amount?: number | null;
           created_at?: string | null;
-          deleted?: boolean | null;
+          deleted_at?: string | null;
           id?: string;
           is_checked?: boolean;
           list_id: string;
@@ -61,7 +61,7 @@ export type Database = {
         Update: {
           amount?: number | null;
           created_at?: string | null;
-          deleted?: boolean | null;
+          deleted_at?: string | null;
           id?: string;
           is_checked?: boolean;
           list_id?: string;
@@ -91,7 +91,7 @@ export type Database = {
         Row: {
           accent_color: string | null;
           created_at: string | null;
-          deleted: boolean | null;
+          deleted_at: string | null;
           icon: string | null;
           id: string;
           profile_id: string;
@@ -101,7 +101,7 @@ export type Database = {
         Insert: {
           accent_color?: string | null;
           created_at?: string | null;
-          deleted?: boolean | null;
+          deleted_at?: string | null;
           icon?: string | null;
           id?: string;
           profile_id: string;
@@ -111,7 +111,7 @@ export type Database = {
         Update: {
           accent_color?: string | null;
           created_at?: string | null;
-          deleted?: boolean | null;
+          deleted_at?: string | null;
           icon?: string | null;
           id?: string;
           profile_id?: string;
@@ -133,7 +133,7 @@ export type Database = {
           avatar_url: string | null;
           bio: string | null;
           created_at: string;
-          deleted: boolean | null;
+          deleted_at: string | null;
           id: string;
           name: string;
           updated_at: string | null;
@@ -142,7 +142,7 @@ export type Database = {
           avatar_url?: string | null;
           bio?: string | null;
           created_at?: string;
-          deleted?: boolean | null;
+          deleted_at?: string | null;
           id: string;
           name: string;
           updated_at?: string | null;
@@ -151,7 +151,7 @@ export type Database = {
           avatar_url?: string | null;
           bio?: string | null;
           created_at?: string;
-          deleted?: boolean | null;
+          deleted_at?: string | null;
           id?: string;
           name?: string;
           updated_at?: string | null;

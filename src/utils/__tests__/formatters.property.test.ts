@@ -1,4 +1,4 @@
-import type { ListItem } from '@/data/types';
+import type { ListItem } from '@/types';
 import { calculateTotal, formatCurrency, parseAmount, parsePrice } from '@/utils/formatters';
 import { describe, expect, it } from '@jest/globals';
 import { Decimal } from 'decimal.js';

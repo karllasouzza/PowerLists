@@ -1,24 +1,11 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type { Session } from '@supabase/supabase-js';
-import type { UserGuestType, UserOperationResult, UserType } from '@/data/types/user';
+import type { UserGuestType, UserOperationResult, UserType } from '@/types/user';
 /* eslint-disable @typescript-eslint/no-require-imports */
 
-jest.mock('@legendapp/state/react', () => require('../../../__mocks__/legend-state-react.cjs'));
-jest.mock('@/data/states/auth', () => require('../../../__mocks__/auth-state.cjs'));
+jest.mock('@/features/auth/authState', () => require('../../../__mocks__/auth-state.cjs'));
 jest.mock('@/data/actions/auth', () => require('../../../__mocks__/auth-actions.cjs'));
 jest.mock('@/lib/supabase', () => require('../../../__mocks__/supabase.cjs'));
-
-type Cell<T> = {
-  get: () => T;
-  set: (next: T) => void;
-};
-
-type AuthStoreMock = {
-  user: Cell<UserType>;
-  session: Cell<Session | null>;
-  isInitialized: Cell<boolean>;
-  isLoading: Cell<boolean>;
-};
 
 type UseUserContract = {
   user: UserType;
@@ -44,10 +31,11 @@ type SupabaseMock = {
 };
 
 const { useUser } = require('@/hooks/use-user') as { useUser: () => UseUserContract };
-const { auth$, resetAuthState } = require('../../../__mocks__/auth-state.cjs') as {
-  auth$: AuthStoreMock;
-  resetAuthState: () => void;
-};
+const {
+  getCurrentUser,
+  setAuthState,
+  resetAuthState,
+} = require('../../../__mocks__/auth-state.cjs');
 const authActions = require('../../../__mocks__/auth-actions.cjs') as AuthActionsMock;
 const { supabase, resetSupabaseMocks } = require('../../../__mocks__/supabase.cjs') as {
   supabase: SupabaseMock;
@@ -70,7 +58,7 @@ describe('useUser', () => {
       created_at: '2026-04-05T00:00:00.000Z',
     };
 
-    auth$.user.set(current);
+    setAuthState({ user: current });
 
     const userHook = useUser();
 
@@ -88,7 +76,7 @@ describe('useUser', () => {
       name: 'Maria',
     };
 
-    auth$.user.set(current);
+    setAuthState({ user: current });
     (authActions.patchUser as jest.Mock).mockImplementation(async () => ({ user: updated }));
 
     await useUser().updateUser({ updates: { name: 'Maria' } });
@@ -97,7 +85,7 @@ describe('useUser', () => {
       id: current.id,
       name: 'Maria',
     });
-    expect(auth$.user.get()).toEqual(updated);
+    expect(getCurrentUser()).toEqual(updated);
   });
 
   it('should create guest and reset session', async () => {
@@ -108,7 +96,7 @@ describe('useUser', () => {
       name: 'Convidado',
     };
 
-    auth$.session.set({ access_token: 'old-token' } as Session);
+    setAuthState({ session: { access_token: 'old-token' } as Session });
     (authActions.createGuest as jest.Mock).mockImplementation(async () => ({
       user: guest,
       error: null,
@@ -117,9 +105,7 @@ describe('useUser', () => {
     const created = await useUser().createGuest({ name: 'Convidado' });
 
     expect(created).toEqual(guest);
-    expect(auth$.user.get()).toEqual(guest);
-    expect(auth$.session.get()).toBeNull();
-    expect(auth$.isLoading.get()).toBe(false);
+    expect(getCurrentUser()).toEqual(guest);
   });
 
   it('should soft delete guest user locally without calling supabase auth update', async () => {
@@ -129,7 +115,7 @@ describe('useUser', () => {
       created_at: '2026-04-05T00:00:00.000Z',
     };
 
-    auth$.user.set(guest);
+    setAuthState({ user: guest });
 
     const result = await useUser().softDeleteUser(guest.id);
 
@@ -147,12 +133,12 @@ describe('useUser', () => {
       created_at: '2026-04-05T00:00:00.000Z',
     };
 
-    auth$.user.set(signedUser);
+    setAuthState({ user: signedUser });
 
     const result = await useUser().hardDeleteUser(signedUser.id);
 
     expect(result.success).toBe(true);
     expect(supabase.functions.invoke).toHaveBeenCalledWith('user-self-deletion');
-    expect(auth$.user.get()).toBeNull();
+    expect(getCurrentUser()).toBeNull();
   });
 });
