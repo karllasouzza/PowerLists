@@ -15,10 +15,18 @@
 - [src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts](file://src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts)
 - [__mocks__/auth-actions.cjs](file://__mocks__/auth-actions.cjs)
 - [__mocks__/auth-state.cjs](file://__mocks__/auth-state.cjs)
-- [__mocks__/react-native-mmkv.cjs](file://__mocks__/react-native-mmkv.cjs)
 - [__mocks__/react-native-reanimated.cjs](file://__mocks__/react-native-reanimated.cjs)
+- [__mocks__/services.cjs](file://__mocks__/services.cjs)
 - [__mocks__/supabase.cjs](file://__mocks__/supabase.cjs)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Updated mock implementation documentation to reflect simplified auth-state mock using explicit user/session state and listener pattern
+- Removed references to deprecated mock files (__mocks__/legend-state-react.cjs, __mocks__/react-native-mmkv.cjs, __mocks__/storage.cjs)
+- Updated authentication hook tests to demonstrate new explicit state management approach
+- Enhanced mock architecture documentation to show cleaner separation between auth actions, state, and services
+- Updated troubleshooting guidance to reflect current mock setup patterns
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -34,6 +42,8 @@
 
 ## Introduction
 This document describes the testing strategy for PowerLists, focusing on Jest configuration, unit and behavior testing, property-based testing, and CI-ready workflows. It explains how authentication hooks, state management functions, and UI components are tested, along with mocking patterns for external dependencies, test coverage expectations, and debugging techniques.
+
+**Updated** The testing infrastructure has been significantly refactored with simplified mock implementations and improved state management patterns.
 
 ## Project Structure
 The repository organizes tests by feature and domain:
@@ -60,7 +70,7 @@ end
 subgraph "Mocks"
 M1["__mocks__/auth-actions.cjs"]
 M2["__mocks__/auth-state.cjs"]
-M3["__mocks__/react-native-mmkv.cjs"]
+M3["__mocks__/services.cjs"]
 M4["__mocks__/react-native-reanimated.cjs"]
 M5["__mocks__/supabase.cjs"]
 end
@@ -85,62 +95,67 @@ T2 --> M5
 ```
 
 **Diagram sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [src/utils/__tests__/currency.property.test.ts:1-43](file://src/utils/__tests__/currency.property.test.ts#L1-L43)
 - [src/utils/__tests__/formatters.property.test.ts:1-88](file://src/utils/__tests__/formatters.property.test.ts#L1-L88)
 - [src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts:1-71](file://src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts#L1-L71)
 - [src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts:1-204](file://src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts#L1-L204)
 - [src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts:1-22](file://src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts#L1-L22)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
 
 **Section sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
 - [package.json:1-118](file://package.json#L1-L118)
 
 ## Core Components
 - Jest configurations:
   - Property-based tests: configured to run files matching the pattern for property tests and to transform TypeScript with ts-jest.
-  - Behavior tests: configured to run React component tests with JSX enabled and to mock reanimated and MMKV via moduleNameMapper.
+  - Behavior tests: configured to run React component tests with JSX enabled and to mock reanimated via moduleNameMapper.
 - Test suites:
   - Authentication hook tests validate initialization, sign-in flows, sign-out, and password reset.
   - User hook tests validate user retrieval, updates, guest creation, and deletion flows.
   - Property-based tests validate numeric precision, aggregation correctness, and robustness against random inputs.
 - Mock ecosystem:
-  - Inline mocks replace platform-specific libraries and third-party services to keep tests deterministic and fast.
+  - Simplified inline mocks replace platform-specific libraries and third-party services to keep tests deterministic and fast.
+  - Explicit state management with listener pattern for auth-state mock.
   - Reset helpers ensure clean state between tests.
 
+**Updated** Mock implementations have been streamlined with explicit user/session state management and simplified architecture.
+
 **Section sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [src/utils/__tests__/currency.property.test.ts:1-43](file://src/utils/__tests__/currency.property.test.ts#L1-L43)
 - [src/utils/__tests__/formatters.property.test.ts:1-88](file://src/utils/__tests__/formatters.property.test.ts#L1-L88)
 - [src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts:1-71](file://src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts#L1-L71)
 - [src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts:1-204](file://src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts#L1-L204)
 - [src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts:1-22](file://src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts#L1-L22)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
 
 ## Architecture Overview
 The testing architecture separates concerns into:
 - Property-based tests for pure functions and aggregations.
 - Behavior tests for hooks and UI logic with mocked dependencies.
-- Mocks for platform libraries and external services.
+- Simplified mock system for platform libraries and external services.
+
+**Updated** Architecture now features explicit state management with listener pattern and reduced complexity.
 
 ```mermaid
 graph TB
@@ -163,8 +178,8 @@ end
 subgraph "Mocks"
 MA["auth-actions.cjs"]
 MS["auth-state.cjs"]
-MR["react-native-mmkv.cjs"]
-ME["react-native-reanimated.cjs"]
+SV["services.cjs"]
+MR["react-native-reanimated.cjs"]
 SU["supabase.cjs"]
 end
 RC --> PC
@@ -177,30 +192,30 @@ RB --> BU
 RS --> RB
 BA --> MA
 BA --> MS
+BA --> SV
 BA --> MR
-BA --> ME
 BA --> SU
 BU --> MA
 BU --> MS
+BU --> SV
 BU --> MR
-BU --> ME
 BU --> SU
 ```
 
 **Diagram sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
 - [src/utils/__tests__/currency.property.test.ts:1-43](file://src/utils/__tests__/currency.property.test.ts#L1-L43)
 - [src/utils/__tests__/formatters.property.test.ts:1-88](file://src/utils/__tests__/formatters.property.test.ts#L1-L88)
 - [src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts:1-71](file://src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts#L1-L71)
 - [src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts:1-204](file://src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts#L1-L204)
 - [src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts:1-22](file://src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts#L1-L22)
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
 
@@ -210,11 +225,11 @@ BU --> SU
 - Property-based tests:
   - Run with Node environment and ts-jest.
   - Match files ending with .property.test.ts.
-  - Module name mapping includes a mock for react-native-mmkv.
+  - Module name mapping includes support for project aliases.
 - Behavior tests:
   - Run with Node environment and ts-jest with JSX enabled.
   - Match files ending with .test.tsx.
-  - Module name mapping includes mocks for react-native-reanimated and react-native-mmkv.
+  - Module name mapping includes mocks for react-native-reanimated.
   - Setup script mocks reanimated globally for behavior tests.
 
 ```mermaid
@@ -231,23 +246,25 @@ Run --> End(["Done"])
 ```
 
 **Diagram sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
 
 **Section sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
 
 ### Authentication Hook Tests
 - Purpose: Validate initialization, sign-in, sign-out, and password reset flows.
 - Mocks used:
-  - @legendapp/state/react, @/lib/supabase, @/data/actions/auth, @/services, @/data/storage, @/data/states/auth.
+  - @/lib/supabase, @/data/actions/auth, @/services, @/features/auth/authState.
 - Patterns:
-  - beforeEach clears and resets all mocks.
-  - Assertions check state cells, service calls, and toast notifications.
+  - beforeEach clears and resets all mocks using explicit reset functions.
+  - Assertions check explicit user/session state and service calls.
   - Edge cases covered: invalid credentials, guest migration, and session cleanup.
+
+**Updated** Authentication tests now use simplified auth-state mock with explicit state management and listener pattern.
 
 ```mermaid
 sequenceDiagram
@@ -255,8 +272,8 @@ participant T as "Test"
 participant H as "useAuth hook"
 participant A as "auth-actions.cjs"
 participant S as "supabase.cjs"
-participant ST as "storage.cjs"
-participant SS as "services.cjs"
+participant ST as "auth-state.cjs"
+participant SV as "services.cjs"
 T->>H : "fetchUserDataAsync()"
 H->>A : "fetchOrRestoreUser()"
 A-->>H : "{ user : null }"
@@ -264,37 +281,40 @@ H-->>T : "false"
 T->>H : "signInWithPassword({email,password})"
 H->>A : "signInWithPassword()"
 A-->>H : "{ user, error }"
-H->>SS : "SyncService"
-H->>SS : "promptDataMigration(guestId,userId)"
+H->>SV : "SyncService"
+H->>SV : "promptDataMigration(guestId,userId)"
 H->>S : "auth.updateUser(...)"
+H->>ST : "setAuthState({user,session})"
 H-->>T : "true"
 T->>H : "signOut()"
 H->>A : "performSignOut()"
-H->>ST : "clearAllStorage()"
+H->>ST : "clearAuthState()"
 H-->>T : "true"
 ```
 
 **Diagram sources**
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 
 **Section sources**
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 
 ### User Hook Tests
 - Purpose: Validate user retrieval, updates, guest creation, and deletion flows.
 - Mocks used:
-  - @legendapp/state/react, @/data/states/auth, @/data/actions/auth, @/lib/supabase.
+  - @/features/auth/authState, @/data/actions/auth, @/lib/supabase.
 - Patterns:
-  - Uses cell-based state to simulate current user/session.
+  - Uses explicit cell-based state to simulate current user/session with listener pattern.
   - Verifies local vs remote behavior differences (e.g., guest soft delete does not call remote auth).
+
+**Updated** User tests now demonstrate the simplified auth-state mock with explicit state management.
 
 ```mermaid
 sequenceDiagram
@@ -302,32 +322,37 @@ participant T as "Test"
 participant U as "useUser hook"
 participant A as "auth-actions.cjs"
 participant S as "supabase.cjs"
+participant ST as "auth-state.cjs"
 T->>U : "updateUser({ name })"
 U->>A : "patchUser({ id, name })"
 A-->>U : "{ user }"
+U->>ST : "setAuthState({user})"
 U-->>T : "state updated"
 T->>U : "createGuest({ name })"
 U->>A : "createGuest()"
 A-->>U : "{ user }"
+U->>ST : "setAuthState({user})"
 U-->>T : "guest created and session cleared"
 T->>U : "softDeleteUser(id)"
+U->>ST : "setAuthState({user : deletedUser})"
 U-->>T : "local deletion, no remote call"
 T->>U : "hardDeleteUser(id)"
 U->>S : "functions.invoke('user-self-deletion')"
+U->>ST : "clearAuthState()"
 U-->>T : "success and local state cleared"
 ```
 
 **Diagram sources**
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
 
 **Section sources**
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
 
 ### Property-Based Testing Patterns
 - Currency utilities:
@@ -370,22 +395,28 @@ Fail --> End
 - [src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts:1-22](file://src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts#L1-L22)
 
 ### Mock Implementations and External Dependencies
-- react-native-mmkv:
-  - In-memory Map-backed implementation for storage APIs.
-- react-native-reanimated:
-  - Minimal mock replicating shared values and animation functions without importing RN.
-- auth-actions and auth-state:
+- Simplified auth-state:
+  - Explicit user/session state with listener pattern instead of createCell approach.
+  - Provides getCurrentUser, getCurrentSession, setAuthState, clearAuthState, and subscribe methods.
+  - Reset function clears state and removes all listeners.
+- auth-actions and services:
   - Cell-based reactive store and action mocks with reset helpers.
+  - Services mock includes SyncService factory and promptDataMigration function.
+- react-native-reanimated:
+  - Minimal manual mock replicating shared values and animation functions without importing RN.
 - supabase:
   - Auth and functions mocks with default implementations and reset helpers.
+
+**Updated** Mock implementations have been significantly simplified with explicit state management and removed deprecated dependencies.
 
 ```mermaid
 classDiagram
 class AuthState {
-+user
-+session
-+isInitialized
-+isLoading
++getCurrentUser()
++getCurrentSession()
++setAuthState({user, session})
++clearAuthState()
++subscribe(listener)
 +resetAuthState()
 }
 class AuthActions {
@@ -393,23 +424,25 @@ class AuthActions {
 +syncWithSupabase()
 +patchUser()
 +signInWithPassword()
++handleError()
++createSupabaseUser()
 +performSignOut()
 +createGuest()
 +resetAuthActionMocks()
 }
+class Services {
++showToast()
++SyncService()
++promptDataMigration()
++resetServiceMocks()
+}
 class Supabase {
++auth.getSession()
++auth.getUser()
++auth.resetPasswordForEmail()
 +auth.updateUser()
 +functions.invoke()
 +resetSupabaseMocks()
-}
-class MMKV {
-+getString()
-+set()
-+delete()
-+contains()
-+getAllKeys()
-+clearAll()
-+addOnValueChangedListener()
 }
 class Reanimated {
 +useSharedValue()
@@ -423,44 +456,46 @@ class Reanimated {
 }
 AuthState <.. AuthActions : "used by tests"
 AuthActions <.. Supabase : "called by hooks"
-MMKV <.. Tests : "moduleNameMapper"
+Services <.. Tests : "used by hooks"
 Reanimated <.. Tests : "moduleNameMapper/setup"
 ```
 
 **Diagram sources**
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
 
 **Section sources**
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
 
 ## Dependency Analysis
 - Test-to-mock coupling:
-  - Authentication and user tests depend on a small set of inline mocks to isolate Supabase, storage, services, and state.
+  - Authentication and user tests depend on a streamlined set of inline mocks to isolate Supabase, services, and state management.
 - External dependency isolation:
-  - react-native-mmkv and react-native-reanimated are mocked to avoid platform-specific runtime dependencies in Node.
+  - react-native-reanimated is mocked to avoid platform-specific runtime dependencies in Node.
 - Test environment separation:
   - Property-based and behavior tests use separate configs to tailor transform and module mapping.
+
+**Updated** Dependency analysis reflects simplified mock architecture with explicit state management.
 
 ```mermaid
 graph LR
 UA["use-auth.test.tsx"] --> MA["auth-actions.cjs"]
 UA --> MS["auth-state.cjs"]
+UA --> SV["services.cjs"]
 UA --> SU["supabase.cjs"]
-UA --> MR["react-native-mmkv.cjs"]
-UA --> ME["react-native-reanimated.cjs"]
+UA --> MR["react-native-reanimated.cjs"]
 UU["use-user.test.tsx"] --> MA
 UU --> MS
+UU --> SV
 UU --> SU
 UU --> MR
-UU --> ME
 CUR["currency.property.test.ts"] --> DEC["decimal.js"]
 FOR["formatters.property.test.ts"] --> DEC
 LTL["use-list-page-logics.property.test.ts"] --> DEC
@@ -469,22 +504,22 @@ PAR["parse-transcript.property.test.ts"]
 ```
 
 **Diagram sources**
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [src/utils/__tests__/currency.property.test.ts:1-43](file://src/utils/__tests__/currency.property.test.ts#L1-L43)
 - [src/utils/__tests__/formatters.property.test.ts:1-88](file://src/utils/__tests__/formatters.property.test.ts#L1-L88)
 - [src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts:1-71](file://src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts#L1-L71)
 - [src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts:1-204](file://src/features/dashboard/utils/__tests__/dashboard-metrics.property.test.ts#L1-L204)
 - [src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts:1-22](file://src/features/voice-assistant/utils/__tests__/parse-transcript.property.test.ts#L1-L22)
 - [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
 
 **Section sources**
-- [src/hooks/__tests__/use-auth.test.tsx:1-189](file://src/hooks/__tests__/use-auth.test.tsx#L1-L189)
-- [src/hooks/__tests__/use-user.test.tsx:1-159](file://src/hooks/__tests__/use-user.test.tsx#L1-L159)
+- [src/hooks/__tests__/use-auth.test.tsx:1-167](file://src/hooks/__tests__/use-auth.test.tsx#L1-L167)
+- [src/hooks/__tests__/use-user.test.tsx:1-145](file://src/hooks/__tests__/use-user.test.tsx#L1-L145)
 - [src/utils/__tests__/currency.property.test.ts:1-43](file://src/utils/__tests__/currency.property.test.ts#L1-L43)
 - [src/utils/__tests__/formatters.property.test.ts:1-88](file://src/utils/__tests__/formatters.property.test.ts#L1-L88)
 - [src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts:1-71](file://src/features/lists/hooks/__tests__/use-list-page-logics.property.test.ts#L1-L71)
@@ -494,31 +529,38 @@ PAR["parse-transcript.property.test.ts"]
 ## Performance Considerations
 - Keep tests synchronous where possible; only use async when interacting with mocked services.
 - Prefer property-based tests for numeric precision and edge cases to reduce brittle unit tests.
-- Avoid heavy setup in beforeEach; rely on reset helpers to minimize overhead.
+- Avoid heavy setup in beforeEach; rely on explicit reset helpers to minimize overhead.
 - Use moduleNameMapper to avoid loading heavy platform libraries during tests.
+
+**Updated** Performance considerations now reflect simplified mock architecture with explicit state management.
 
 ## Troubleshooting Guide
 Common issues and resolutions:
 - Reanimated errors in behavior tests:
   - Ensure jest.behavior.setup.cjs is applied and react-native-reanimated is mocked via moduleNameMapper.
-- MMKV-related failures:
-  - Verify react-native-mmkv is mocked; confirm createMMKV is returning a valid instance.
 - Supabase method not called:
   - Confirm mocks are reset before each test and that the hook under test calls the expected method.
 - State not updating:
-  - Ensure auth-state cell mocks are reset and that the hook reads from the mocked store.
+  - Ensure auth-state explicit state management is properly initialized and that the hook reads from the mocked store.
 - flaky property-based tests:
   - Add explicit preconditions (e.g., skip non-finite values) and increase seed stability for reproducibility.
+- Mock reset failures:
+  - Verify explicit resetAuthState, resetAuthActionMocks, resetServiceMocks, and resetSupabaseMocks are called in beforeEach.
+
+**Updated** Troubleshooting guide now addresses simplified mock reset patterns and explicit state management.
 
 **Section sources**
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
-- [__mocks__/react-native-mmkv.cjs:1-24](file://__mocks__/react-native-mmkv.cjs#L1-L24)
 - [__mocks__/react-native-reanimated.cjs:1-72](file://__mocks__/react-native-reanimated.cjs#L1-L72)
 - [__mocks__/supabase.cjs:1-36](file://__mocks__/supabase.cjs#L1-L36)
-- [__mocks__/auth-state.cjs:1-34](file://__mocks__/auth-state.cjs#L1-L34)
+- [__mocks__/auth-state.cjs:1-42](file://__mocks__/auth-state.cjs#L1-L42)
+- [__mocks__/services.cjs:1-28](file://__mocks__/services.cjs#L1-L28)
+- [__mocks__/auth-actions.cjs:1-50](file://__mocks__/auth-actions.cjs#L1-L50)
 
 ## Conclusion
-PowerLists employs a layered testing strategy: property-based tests for numeric correctness, behavior tests for hooks and UI logic, and a comprehensive mock suite for platform and external dependencies. The Jest configurations and setup scripts ensure reliable, fast, and deterministic test runs suitable for CI.
+PowerLists employs a streamlined testing strategy: property-based tests for numeric correctness, behavior tests for hooks and UI logic, and a simplified mock suite for platform and external dependencies. The refactored Jest configurations and setup scripts ensure reliable, fast, and deterministic test runs suitable for CI with explicit state management patterns.
+
+**Updated** The testing strategy now features simplified mock implementations with explicit state management, reducing complexity while maintaining comprehensive test coverage.
 
 ## Appendices
 
@@ -528,8 +570,8 @@ PowerLists employs a layered testing strategy: property-based tests for numeric 
 - Behavior tests should validate observable side effects (state updates, service calls, toasts).
 
 ### Writing Effective Tests
-- Use beforeEach to reset mocks and state; use afterEach to restore spies.
-- Prefer assertions on observable outcomes (state cells, service calls) rather than internal implementation details.
+- Use beforeEach to reset mocks using explicit reset functions; use afterEach to restore spies.
+- Prefer assertions on observable outcomes (explicit state getters, service calls) rather than internal implementation details.
 - For hooks, test both happy and error paths; simulate network/service failures via mocks.
 
 ### Debugging Test Failures
@@ -543,8 +585,10 @@ PowerLists employs a layered testing strategy: property-based tests for numeric 
   - Behavior tests with jest.behavior.config.cjs and jest.behavior.setup.cjs.
 - Ensure environment variables and secrets are mocked or stubbed in CI.
 
+**Updated** CI workflows now support the simplified mock architecture with explicit state management.
+
 **Section sources**
-- [jest.config.cjs:1-23](file://jest.config.cjs#L1-L23)
-- [jest.behavior.config.cjs:1-27](file://jest.behavior.config.cjs#L1-L27)
+- [jest.config.cjs:1-22](file://jest.config.cjs#L1-L22)
+- [jest.behavior.config.cjs:1-26](file://jest.behavior.config.cjs#L1-L26)
 - [jest.behavior.setup.cjs:1-4](file://jest.behavior.setup.cjs#L1-L4)
 - [package.json:1-118](file://package.json#L1-L118)

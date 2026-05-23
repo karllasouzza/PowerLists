@@ -2,19 +2,31 @@
 
 <cite>
 **Referenced Files in This Document**
-- [storage.ts](file://src/data/storage.ts)
-- [database.ts](file://src/data/database.ts)
-- [session-store.ts](file://src/data/session-store.ts)
-- [sync.ts](file://src/services/sync.ts)
-- [auth.ts](file://src/data/states/auth.ts)
+- [supabase.ts](file://src/lib/supabase/supabase.ts)
+- [database.ts](file://src/database/index.ts)
+- [sync.ts](file://src/database/sync.ts)
+- [auth.ts](file://src/database/operations/auth.ts)
 - [lists.ts](file://src/data/states/lists.ts)
 - [list-items.ts](file://src/data/states/list-items.ts)
 - [profile.ts](file://src/data/states/profile.ts)
 - [lists actions](file://src/data/actions/lists.ts)
 - [list-items actions](file://src/data/actions/list-items.ts)
-- [supabase client](file://src/lib/supabase/supabase.ts)
+- [use-auth.ts](file://src/hooks/use-auth.ts)
+- [use-observable-query.ts](file://src/hooks/use-observable-query.ts)
+- [profiles operations](file://src/database/operations/profiles.ts)
+- [schema.ts](file://src/database/schema.ts)
+- [migrations.ts](file://src/database/migrations.ts)
 - [RULES.md](file://__docs__/RULES.md)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Updated persistence mechanism from MMKV-based local storage to WatermelonDB with SQLite/LokiJS adapters
+- Replaced ObservablePersistMMKV plugin with WatermelonDB local database persistence
+- Updated Supabase client configuration to use secureStoreAdapter for enhanced token management
+- Revised offline-first architecture to leverage WatermelonDB's built-in offline capabilities
+- Updated data hydration strategies to work with WatermelonDB's observable query system
+- Removed MMKV-specific configuration and replaced with database adapter configuration
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -28,513 +40,398 @@
 9. [Conclusion](#conclusion)
 
 ## Introduction
-This document explains the MMKV-based local persistence implementation powering offline-first data management in the application. It covers the ObservablePersistMMKV plugin configuration, offline-first architecture, data hydration strategies, session storage management, local caching, conflict resolution between local and cloud data, persistence configuration, data serialization, and performance optimizations. It also includes examples of local data operations, sync triggers, and offline functionality implementation.
+This document explains the WatermelonDB-based local persistence implementation powering offline-first data management in the application. It covers the new Supabase client configuration using secureStoreAdapter for enhanced security, offline-first architecture with WatermelonDB's built-in capabilities, data hydration strategies through observable queries, local data caching with SQLite/LokiJS adapters, conflict resolution between local and cloud data, persistence configuration, data serialization, and performance optimizations. It also includes examples of local data operations, sync triggers, and offline functionality implementation.
 
 ## Project Structure
 The persistence stack is organized around:
-- A dedicated MMKV wrapper for low-level storage operations and debugging
-- LegendApp State stores configured with Supabase sync and MMKV persistence
-- A Supabase client configured to use MMKV for auth session persistence
-- Services orchestrating migration and sync behaviors
+- A dedicated WatermelonDB instance with SQLite adapter for mobile and LokiJS for web
+- Supabase client configured to use secureStoreAdapter for auth session persistence
+- Database synchronization service managing pull/push operations and realtime subscriptions
+- Observable query hooks for reactive data access and hydration
+- Feature-specific data operations leveraging WatermelonDB's ORM capabilities
 
 ```mermaid
 graph TB
-subgraph "Persistence Layer"
-MMKV["MMKV Instance<br/>storage.ts"]
-MMKVAdapter["MMKV Adapter<br/>mmkvStorage"]
+subgraph "Database Layer"
+WatermelonDB["WatermelonDB Instance<br/>database.ts"]
+SQLiteAdapter["SQLite Adapter<br/>mobile"]
+LokiJSAdapter["LokiJS Adapter<br/>web"]
 end
-subgraph "LegendApp State"
-AuthState["Auth State<br/>auth.ts"]
+subgraph "Supabase Integration"
+SecureStoreAdapter["SecureStore Adapter<br/>secureStoreAdapter"]
+SupabaseClient["Supabase Client<br/>supabase.ts"]
+SyncService["Sync Service<br/>sync.ts"]
+end
+subgraph "Data Access Layer"
+ObservableQueries["Observable Queries<br/>use-observable-query.ts"]
+AuthOperations["Auth Operations<br/>auth.ts"]
+ProfileOperations["Profile Operations<br/>profiles operations"]
+end
+subgraph "Feature Layer"
 ListsState["Lists State<br/>lists.ts"]
 ListItemsState["List Items State<br/>list-items.ts"]
 ProfilesState["Profiles State<br/>profile.ts"]
-SyncedConfig["Supabase Sync Config<br/>database.ts"]
 end
-subgraph "Services"
-SyncService["SyncService<br/>sync.ts"]
-SessionStore["Session Store Reset<br/>session-store.ts"]
-end
-subgraph "Supabase Client"
-SupabaseClient["Supabase Client<br/>supabase.ts"]
-end
-MMKV --> MMKVAdapter
-MMKVAdapter --> SupabaseClient
-SyncedConfig --> AuthState
-SyncedConfig --> ListsState
-SyncedConfig --> ListItemsState
-SyncedConfig --> ProfilesState
-AuthState --> SessionStore
-ListsState --> SyncService
-ListItemsState --> SyncService
+WatermelonDB --> SQLiteAdapter
+WatermelonDB --> LokiJSAdapter
+SecureStoreAdapter --> SupabaseClient
+SupabaseClient --> SyncService
+SyncService --> WatermelonDB
+ObservableQueries --> WatermelonDB
+AuthOperations --> SupabaseClient
+ProfileOperations --> WatermelonDB
+ListsState --> ObservableQueries
+ListItemsState --> ObservableQueries
+ProfilesState --> ObservableQueries
 ```
 
 **Diagram sources**
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [sync.ts:1-203](file://src/services/sync.ts#L1-L203)
-- [session-store.ts:1-24](file://src/data/session-store.ts#L1-L24)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
+- [database.ts:12-32](file://src/database/index.ts#L12-L32)
+- [supabase.ts:9-22](file://src/lib/supabase/supabase.ts#L9-L22)
+- [sync.ts:8-56](file://src/database/sync.ts#L8-L56)
+- [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
+- [auth.ts:56-108](file://src/database/operations/auth.ts#L56-L108)
+- [profiles operations:6-62](file://src/database/operations/profiles.ts#L6-L62)
 
 **Section sources**
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [sync.ts:1-203](file://src/services/sync.ts#L1-L203)
-- [session-store.ts:1-24](file://src/data/session-store.ts#L1-L24)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
-- [RULES.md:42-77](file://__docs__/RULES.md#L42-L77)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
+- [use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
+- [auth.ts:1-108](file://src/database/operations/auth.ts#L1-L108)
+- [profiles operations:1-62](file://src/database/operations/profiles.ts#L1-L62)
 
 ## Core Components
-- MMKV storage wrapper: Provides encryption, key management, and a minimal adapter for external consumers.
-- Supabase sync configuration: Centralized LegendApp sync setup enabling offline-first with merge mode and metadata-based change tracking.
-- LegendApp state stores: Typed observable stores for lists, list items, profiles, and auth, each configured with MMKV persistence and Supabase sync.
-- Session store manager: Resets local stores when the user changes to avoid cross-session data leakage.
-- Sync service: Handles guest-to-user data migration and user-facing prompts for data synchronization.
+- WatermelonDB database: Provides SQLite adapter for mobile devices and LokiJS adapter for web browsers, enabling robust local data persistence with SQL-like querying capabilities.
+- Supabase client with secureStoreAdapter: Enhanced authentication session management using Expo SecureStore for improved token security and persistence.
+- Database synchronization service: Manages bidirectional sync between local database and Supabase backend through RPC calls and realtime subscriptions.
+- Observable query hooks: Reactive data access layer that automatically hydrates components when local data changes.
+- Feature-specific data operations: CRUD operations leveraging WatermelonDB's ORM for type-safe database interactions.
 
 **Section sources**
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [session-store.ts:1-24](file://src/data/session-store.ts#L1-L24)
-- [sync.ts:1-203](file://src/services/sync.ts#L1-L203)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
+- [use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
 
 ## Architecture Overview
-The system implements an offline-first architecture:
-- Local persistence: LegendApp stores persist to MMKV via ObservablePersistMMKV.
-- Cloud sync: Supabase sync manages real-time and background synchronization with merge semantics.
-- Conflict resolution: Merge mode and metadata fields (created_at, updated_at, deleted) drive deterministic reconciliation.
-- Hydration: Stores hydrate from MMKV on startup; Supabase sync fetches remote changes afterward.
-- Session isolation: Stores reset when the user changes to prevent cross-session contamination.
+The system implements an offline-first architecture with WatermelonDB:
+- Local persistence: WatermelonDB provides SQLite/LokiJS storage with automatic conflict resolution and transaction support.
+- Cloud sync: Supabase RPC endpoints handle bidirectional synchronization with merge semantics.
+- Conflict resolution: WatermelonDB's built-in conflict detection and resolution mechanisms work with Supabase's timestamp-based approach.
+- Hydration: Observable queries automatically update components when local data changes, with initial hydration from local database.
+- Session isolation: SecureStoreAdapter ensures authentication tokens are securely persisted and isolated per device.
 
 ```mermaid
 sequenceDiagram
 participant App as "App"
-participant Auth as "Auth State<br/>auth.ts"
-participant Lists as "Lists State<br/>lists.ts"
-participant Items as "List Items State<br/>list-items.ts"
-participant Profiles as "Profiles State<br/>profile.ts"
-participant SyncCfg as "Supabase Sync Config<br/>database.ts"
+participant Auth as "Auth Operations<br/>auth.ts"
+participant Database as "WatermelonDB<br/>database.ts"
+participant Sync as "Sync Service<br/>sync.ts"
 participant Supabase as "Supabase Client<br/>supabase.ts"
-participant MMKV as "MMKV<br/>storage.ts"
-App->>Auth : Initialize observable with persisted auth
-App->>Lists : Initialize observable with persisted lists
-App->>Items : Initialize observable with persisted list items
-App->>Profiles : Initialize observable with persisted profiles
-Auth->>MMKV : Read persisted auth
-Lists->>MMKV : Read persisted lists
-Items->>MMKV : Read persisted list items
-Profiles->>MMKV : Read persisted profiles
-App->>Supabase : Connect with MMKV-backed auth storage
-App->>SyncCfg : Configure synced stores with merge mode
-SyncCfg->>Supabase : Subscribe to changes and push local edits
-Supabase-->>SyncCfg : Remote changesets
-SyncCfg-->>Lists : Apply merges and updates
-SyncCfg-->>Items : Apply merges and updates
-SyncCfg-->>Profiles : Apply merges and updates
+participant SecureStore as "SecureStoreAdapter<br/>supabase.ts"
+App->>Auth : Initialize with session check
+Auth->>SecureStore : Check for existing session
+SecureStore-->>Auth : Return session data
+Auth->>Database : Hydrate from local storage
+Database-->>Auth : Return hydrated data
+App->>Sync : Start synchronization
+Sync->>Supabase : Call pull RPC with lastPulledAt
+Supabase-->>Sync : Return changes and timestamp
+Sync->>Database : Apply changes locally
+Sync->>Supabase : Call push RPC with local changes
+Supabase-->>Sync : Acknowledge successful sync
 ```
 
 **Diagram sources**
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [auth.ts:246-286](file://src/hooks/use-auth.ts#L246-L286)
+- [database.ts:29-32](file://src/database/index.ts#L29-L32)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
+- [supabase.ts:15-22](file://src/lib/supabase/supabase.ts#L15-L22)
 
 ## Detailed Component Analysis
 
-### MMKV Storage Wrapper
-- Initializes a single MMKV instance with optional encryption key from environment variables.
-- Exposes convenience APIs for clearing, key enumeration, selective deletions, and debugging.
-- Provides a minimal adapter compatible with external consumers (e.g., Expo Router).
+### WatermelonDB Database Configuration
+- Platform-specific adapters: SQLite adapter for mobile devices with JSI enabled for optimal performance, LokiJS adapter for web browsers using IndexedDB.
+- Schema definition: Three core tables (profiles, lists, list_items) with proper indexing and timestamp columns for conflict resolution.
+- Migration system: Versioned schema migrations handling table structure changes and column modifications.
 
 ```mermaid
 flowchart TD
-Start(["Initialize MMKV"]) --> CheckKey["Check encryption key env var"]
-CheckKey --> HasKey{"Encryption key present?"}
-HasKey --> |Yes| WithKey["Configure encryptionKey"]
-HasKey --> |No| NoKey["Proceed without encryption"]
-WithKey --> Build["Create MMKV instance"]
-NoKey --> Build
-Build --> Export["Export storage and adapter"]
+Start(["Initialize Database"]) --> CheckPlatform["Check Platform"]
+CheckPlatform --> IsWeb{"Is Web Platform?"}
+IsWeb --> |Yes| UseLokiJS["Configure LokiJS Adapter"]
+IsWeb --> |No| UseSQLite["Configure SQLite Adapter"]
+UseLokiJS --> SetupSchema["Setup Schema & Migrations"]
+UseSQLite --> SetupSchema
+SetupSchema --> CreateDatabase["Create Database Instance"]
+CreateDatabase --> Export["Export Database Instance"]
 ```
 
 **Diagram sources**
-- [storage.ts:10-23](file://src/data/storage.ts#L10-L23)
+- [database.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [migrations.ts:3-16](file://src/database/migrations.ts#L3-L16)
 
 **Section sources**
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [schema.ts:1-45](file://src/database/schema.ts#L1-L45)
+- [migrations.ts:1-16](file://src/database/migrations.ts#L1-L16)
 
-### Supabase Sync Configuration and Offline-First Behavior
-- Centralized sync configuration enables:
-  - Plugin: ObservablePersistMMKV for local persistence
-  - Mode: merge for deterministic reconciliation
-  - Metadata fields: created_at, updated_at, deleted for conflict resolution
-  - Retry policy: infinite retries for robustness
-  - Change tracking: last-sync boundary for incremental sync
-- Realtime filters scoped to current user via computed filters in state stores.
+### Supabase Client with SecureStoreAdapter
+- Enhanced authentication security: Uses Expo SecureStore for encrypted token storage instead of MMKV.
+- Automatic session management: Configured with auto-refresh token, persistent sessions, and URL session detection disabled.
+- Custom storage adapter: Implements getItem, setItem, and removeItem methods for seamless integration with Supabase auth.
 
 ```mermaid
 classDiagram
-class SupabaseSyncConfig {
-+plugin : ObservablePersistMMKV
-+mode : "merge"
-+as : "Map"
-+changesSince : "last-sync"
-+fieldCreatedAt : "created_at"
-+fieldUpdatedAt : "updated_at"
-+fieldDeleted : "deleted"
-+retry : { infinite : true }
+class SecureStoreAdapter {
++getItem(key : string) Promise~string~
++setItem(key : string, value : string) Promise~void~
++removeItem(key : string) Promise~void~
 }
-class ListsState {
-+collection : "lists"
-+filter : "profile_id=eq.<userId>"
-+persist : { name : "lists", retrySync : true }
-+realtime : { filter }
+class SupabaseClient {
++auth : AuthConfig
++storage : SecureStoreAdapter
++autoRefreshToken : true
++persistSession : true
 }
-class ListItemsState {
-+collection : "list_items"
-+filter : "profile_id=eq.<userId>"
-+persist : { name : "list_items" }
-+realtime : { filter }
-}
-class ProfilesState {
-+collection : "profiles"
-+filter : "id=eq.<userId>"
-+persist : { name : "profiles", retrySync : true }
-}
-SupabaseSyncConfig --> ListsState : "configures"
-SupabaseSyncConfig --> ListItemsState : "configures"
-SupabaseSyncConfig --> ProfilesState : "configures"
+SecureStoreAdapter --> SupabaseClient : "provides storage interface"
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profile.ts:10-20](file://src/data/states/profile.ts#L10-L20)
+- [supabase.ts:9-22](file://src/lib/supabase/supabase.ts#L9-L22)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
+- [supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
 
-### Auth State and Session Storage Management
-- Auth state persists under a named key using ObservablePersistMMKV.
-- Session store manager watches for user changes and resets local stores to prevent cross-session data leakage.
-- Supabase client uses MMKV adapter for auth session persistence to keep tokens and session data secure and available offline.
+### Database Synchronization Service
+- Bidirectional sync: Pull changes from Supabase backend and push local changes to cloud storage.
+- Realtime subscriptions: Monitors PostgreSQL changes and triggers sync when database events occur.
+- Error handling: Comprehensive error handling with retry logic and channel cleanup.
 
 ```mermaid
 sequenceDiagram
-participant Auth as "Auth State<br/>auth.ts"
-participant SessionMgr as "Session Store Manager<br/>session-store.ts"
-participant Stores as "Local Stores"
-participant Supabase as "Supabase Client<br/>supabase.ts"
-Auth->>SessionMgr : Observe user changes
-SessionMgr->>Stores : Reset lists, list items, profiles
-Supabase->>Supabase : Use MMKV adapter for auth storage
+participant Sync as "Sync Service<br/>sync.ts"
+participant Supabase as "Supabase RPC<br/>supabase.ts"
+participant Database as "WatermelonDB<br/>database.ts"
+Sync->>Supabase : pull(lastPulledAt)
+Supabase-->>Sync : changes, timestamp
+Sync->>Database : applyPullChanges(changes)
+Sync->>Supabase : push(changes)
+Supabase-->>Sync : success/error
+Sync->>Database : applyPushChanges(changes)
 ```
 
 **Diagram sources**
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [session-store.ts:10-23](file://src/data/session-store.ts#L10-L23)
-- [supabase client:9-28](file://src/lib/supabase/supabase.ts#L9-L28)
+- [sync.ts:15-34](file://src/database/sync.ts#L15-L34)
 
 **Section sources**
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [session-store.ts:1-24](file://src/data/session-store.ts#L1-L24)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
 
-### Data Hydration Strategies
-- Hydration occurs automatically when LegendApp observable stores initialize, reading persisted values from MMKV.
-- Supabase sync runs after hydration to fetch remote changes and reconcile differences using merge mode and metadata fields.
-- Realtime subscriptions ensure immediate updates for the current user’s scope.
+### Observable Query System for Data Hydration
+- Reactive data access: Observable queries automatically update components when underlying data changes.
+- Type-safe queries: Leverages WatermelonDB's Query API for efficient data retrieval and filtering.
+- Component integration: Hooks provide seamless integration between database queries and React components.
 
 ```mermaid
 flowchart TD
-Init(["App Start"]) --> Hydrate["Hydrate stores from MMKV"]
-Hydrate --> Connect["Connect to Supabase"]
-Connect --> Subscribe["Subscribe to realtime for current user"]
-Subscribe --> SyncLoop["Continuous sync with merge and metadata"]
-SyncLoop --> Ready(["Ready"])
+Component["React Component"] --> Hook["use-observable-query.ts"]
+Hook --> Query["Database Query"]
+Query --> Observable["Observable Subscription"]
+Observable --> ComponentUpdate["Component Re-render"]
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [lists.ts:17-21](file://src/data/states/lists.ts#L17-L21)
-- [list-items.ts:17-21](file://src/data/states/list-items.ts#L17-L21)
-- [profile.ts:16-18](file://src/data/states/profile.ts#L16-L18)
+- [use-observable-query.ts:4-13](file://src/hooks/use-observable-query.ts#L4-L13)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
+- [use-observable-query.ts:1-13](file://src/hooks/use-observable-query.ts#L1-L13)
 
-### Conflict Resolution Between Local and Cloud Data
-- Merge mode ensures local and remote changes are combined deterministically.
-- Metadata fields:
-  - created_at: Establishes baseline timestamps
-  - updated_at: Drives last-writer-wins within merge boundaries
-  - deleted: Supports tombstoning for soft-deleted records
-- Retry configuration with infinite retries minimizes transient conflicts.
+### Authentication and Session Management
+- Session persistence: SecureStoreAdapter ensures authentication tokens are securely stored and retrieved.
+- User state synchronization: Coordinates between local user state and Supabase authentication.
+- Guest vs authenticated user handling: Manages data migration between guest and authenticated states.
+
+```mermaid
+sequenceDiagram
+participant AuthHook as "use-auth.ts"
+participant SecureStore as "SecureStoreAdapter"
+participant Supabase as "Supabase Auth"
+participant Database as "WatermelonDB"
+AuthHook->>SecureStore : getSession()
+SecureStore-->>AuthHook : session data
+AuthHook->>Supabase : getUser()
+Supabase-->>AuthHook : user data
+AuthHook->>Database : sync user data
+AuthHook->>AuthHook : update local state
+```
+
+**Diagram sources**
+- [use-auth.ts:246-286](file://src/hooks/use-auth.ts#L246-L286)
+- [supabase.ts:15-22](file://src/lib/supabase/supabase.ts#L15-L22)
+
+**Section sources**
+- [use-auth.ts:1-286](file://src/hooks/use-auth.ts#L1-L286)
+
+### Data Operations and Conflict Resolution
+- CRUD operations: Type-safe operations for profiles, lists, and list items with proper error handling.
+- Conflict detection: WatermelonDB's built-in conflict resolution works with Supabase's timestamp-based approach.
+- Transaction support: Database write operations ensure data consistency and atomicity.
 
 ```mermaid
 flowchart TD
-LocalEdit["Local Edit"] --> Queue["Queue for Sync"]
-RemoteChange["Remote Change"] --> Queue
-Queue --> Merge["Merge Mode"]
-Merge --> Resolve["Resolve Timestamps and Tombstones"]
-Resolve --> Persist["Persist to MMKV"]
-Persist --> Push["Push to Supabase"]
+Create["Create Operation"] --> Validate["Validate Input"]
+Validate --> Write["Database Write Transaction"]
+Write --> Success["Success Response"]
+Write --> Error["Error Handling"]
+Error --> Rollback["Rollback Transaction"]
+Read["Read Operation"] --> Query["Database Query"]
+Query --> Result["Return Results"]
+Update["Update Operation"] --> Find["Find Record"]
+Find --> UpdateRecord["Update Record"]
+UpdateRecord --> Success
+Delete["Delete Operation"] --> SoftDelete["Soft Delete with Timestamp"]
+SoftDelete --> Success
 ```
 
 **Diagram sources**
-- [database.ts:20-28](file://src/data/database.ts#L20-L28)
+- [profiles operations:14-62](file://src/database/operations/profiles.ts#L14-L62)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-
-### Persistence Configuration and Data Serialization
-- Persistence names:
-  - Auth: local_user
-  - Lists: lists
-  - List Items: list_items
-  - Profiles: profiles
-  - First Access: app.first_access
-  - User Preferences: userPreferences
-- Serialization:
-  - Supabase expects snake_case column names; conversion helpers transform between camelCase (TS) and snake_case (DB).
-  - LegendApp stores serialize to MMKV automatically via ObservablePersistMMKV.
-
-```mermaid
-classDiagram
-class PersistenceNames {
-+auth : "local_user"
-+lists : "lists"
-+list_items : "list_items"
-+profiles : "profiles"
-+first_access : "app.first_access"
-+userPreferences : "userPreferences"
-}
-class Serialization {
-+convertToSupabaseFormat()
-+convertFromSupabaseFormat()
-}
-PersistenceNames --> Serialization : "used by stores"
-```
-
-**Diagram sources**
-- [auth.ts:25-27](file://src/data/states/auth.ts#L25-L27)
-- [lists.ts:16](file://src/data/states/lists.ts#L16)
-- [list-items.ts:13](file://src/data/states/list-items.ts#L13)
-- [profile.ts:18](file://src/data/states/profile.ts#L18)
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
-
-**Section sources**
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
+- [profiles operations:1-62](file://src/database/operations/profiles.ts#L1-L62)
 
 ### Examples of Local Data Operations and Sync Triggers
-- Create a list:
-  - Generate a local ID
-  - Convert to snake_case payload
-  - Set observable record (triggers sync)
-  - Return camelCase representation
-- Update a list item:
-  - Update fields using snake_case keys
-  - Trigger sync automatically
-- Delete a list:
-  - Delete observable record (triggers sync)
-- Reset stores:
-  - Clear observable store and remove persisted keys from MMKV
+- Create a list: Database write operation with automatic sync to Supabase backend.
+- Update a list item: Direct database update with immediate UI re-render through observable queries.
+- Delete a profile: Soft delete with timestamp tracking for proper conflict resolution.
+- Realtime updates: Database changes automatically trigger sync service and UI updates.
 
 ```mermaid
 sequenceDiagram
 participant UI as "UI Action"
-participant Lists as "Lists Actions<br/>lists actions"
-participant ListsStore as "Lists State<br/>lists.ts"
-participant Sync as "Supabase Sync<br/>database.ts"
-participant MMKV as "MMKV<br/>storage.ts"
-UI->>Lists : createNewList(...)
-Lists->>ListsStore : lists$[id].set(snake_case payload)
-ListsStore->>Sync : Trigger sync
-Sync->>MMKV : Persist changes locally
-Sync-->>ListsStore : Apply remote changes (merge)
+participant ListsState as "Lists State<br/>lists.ts"
+participant Database as "WatermelonDB<br/>database.ts"
+participant Sync as "Sync Service<br/>sync.ts"
+participant Supabase as "Supabase Backend<br/>supabase.ts"
+UI->>ListsState : createNewList()
+ListsState->>Database : database.write()
+Database-->>ListsState : success
+ListsState->>Sync : trigger sync
+Sync->>Supabase : push changes
+Supabase-->>Sync : acknowledge
+Sync->>Database : apply remote changes
+Database-->>UI : update observable
 ```
 
 **Diagram sources**
 - [lists actions:79-122](file://src/data/actions/lists.ts#L79-L122)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [sync.ts:25-34](file://src/database/sync.ts#L25-L34)
 
 **Section sources**
 - [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
 - [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
 
 ### Offline Functionality Implementation
-- Offline-first: Stores hydrate from MMKV immediately; sync runs in background.
-- Realtime: Subscriptions scoped to current user via computed filters.
-- Retry: Infinite retry policies ensure eventual consistency.
-- Auth sessions: Supabase client uses MMKV adapter to persist auth state securely.
+- Built-in offline support: WatermelonDB provides comprehensive offline capabilities with automatic conflict resolution.
+- Realtime subscriptions: PostgreSQL changes trigger immediate sync and UI updates when connectivity is restored.
+- Session persistence: SecureStoreAdapter ensures authentication state persists across app restarts.
+- Graceful degradation: Application continues to function with local data when backend is unavailable.
 
 ```mermaid
 flowchart TD
-Start(["App Start"]) --> LoadAuth["Load auth from MMKV"]
-LoadAuth --> LoadData["Load lists/items/profiles from MMKV"]
-LoadData --> Connect["Connect to Supabase"]
-Connect --> Realtime["Subscribe to user-scoped realtime"]
-Realtime --> BackgroundSync["Background sync with retry"]
-BackgroundSync --> OfflineReady(["Offline-ready state"])
+Start(["App Start"]) --> LoadSession["Load Session from SecureStore"]
+LoadSession --> InitDatabase["Initialize WatermelonDB"]
+InitDatabase --> StartSync["Start Sync Service"]
+StartSync --> Subscribe["Subscribe to Realtime"]
+Subscribe --> OfflineReady["Offline-Ready State"]
+OfflineReady --> NetworkCheck{"Network Available?"}
+NetworkCheck --> |Yes| SyncNow["Sync with Backend"]
+NetworkCheck --> |No| ContinueOffline["Continue Offline"]
+SyncNow --> ApplyChanges["Apply Remote Changes"]
+ApplyChanges --> ContinueOffline
 ```
 
 **Diagram sources**
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [lists.ts:17-21](file://src/data/states/lists.ts#L17-L21)
-- [list-items.ts:17-21](file://src/data/states/list-items.ts#L17-L21)
-- [profile.ts:16-18](file://src/data/states/profile.ts#L16-L18)
-- [database.ts:26-28](file://src/data/database.ts#L26-L28)
-- [supabase client:21-28](file://src/lib/supabase/supabase.ts#L21-L28)
+- [supabase.ts:15-22](file://src/lib/supabase/supabase.ts#L15-L22)
+- [database.ts:29-32](file://src/database/index.ts#L29-L32)
+- [sync.ts:36-49](file://src/database/sync.ts#L36-L49)
 
 **Section sources**
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
-
-### Guest-to-User Data Migration and Sync Triggers
-- Detects guest data in local stores and prompts the user to migrate to their authenticated account.
-- On confirmation, updates the profile_id of guest-owned lists and relies on LegendApp sync to propagate to Supabase.
-
-```mermaid
-sequenceDiagram
-participant User as "User"
-participant SyncSvc as "SyncService<br/>sync.ts"
-participant ListsStore as "Lists State<br/>lists.ts"
-participant Sync as "Supabase Sync<br/>database.ts"
-User->>SyncSvc : promptDataMigration(guestId, userId)
-SyncSvc->>ListsStore : Scan local lists for guestId
-ListsStore-->>SyncSvc : Found guest lists
-User->>SyncSvc : Confirm migration
-SyncSvc->>ListsStore : Update profile_id to userId
-ListsStore->>Sync : Trigger sync
-Sync-->>ListsStore : Apply remote updates
-```
-
-**Diagram sources**
-- [sync.ts:102-150](file://src/services/sync.ts#L102-L150)
-- [lists.ts:14](file://src/data/states/lists.ts#L14)
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-
-**Section sources**
-- [sync.ts:1-203](file://src/services/sync.ts#L1-L203)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
+- [supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
 
 ## Dependency Analysis
 - Coupling:
-  - States depend on the centralized supabaseSynced configuration.
-  - Actions depend on state stores and conversion helpers.
-  - Session store manager depends on auth$ to reset stores.
+  - Database operations depend on WatermelonDB schema and adapter configuration.
+  - Sync service coordinates between database and Supabase backend.
+  - Observable query hooks provide reactive data access to components.
 - Cohesion:
-  - storage.ts encapsulates MMKV concerns.
-  - database.ts centralizes sync configuration.
-  - supabase client integrates MMKV adapter for auth persistence.
+  - database.ts encapsulates database configuration and adapter selection.
+  - supabase.ts centralizes authentication configuration with secure storage.
+  - sync.ts manages all synchronization logic in a single module.
 - External dependencies:
-  - react-native-mmkv for local storage
-  - @legendapp/state for observable state and sync plugins
-  - @supabase/supabase-js for backend sync and auth
+  - @nozbe/watermelondb for local database operations and ORM
+  - expo-secure-store for enhanced authentication token security
+  - @supabase/supabase-js for backend synchronization and auth
 
 ```mermaid
 graph LR
-Storage["storage.ts"] --> MMKV["MMKV"]
-Database["database.ts"] --> Legend["@legendapp/state sync"]
-Legend --> SupabaseSynced["supabaseSynced config"]
-SupabaseSynced --> ListsState["lists.ts"]
-SupabaseSynced --> ListItemsState["list-items.ts"]
-SupabaseSynced --> ProfilesState["profile.ts"]
-SupabaseClient["supabase.ts"] --> MMKVAdapter["mmkvStorage adapter"]
-MMKVAdapter --> Storage
-AuthState["auth.ts"] --> SessionMgr["session-store.ts"]
-SessionMgr --> ListsState
-SessionMgr --> ListItemsState
-SessionMgr --> ProfilesState
+Database["database.ts"] --> WatermelonDB["WatermelonDB Core"]
+Database --> Adapters["SQLite/LokiJS Adapters"]
+Supabase["supabase.ts"] --> SecureStore["Expo SecureStore"]
+Supabase --> SupabaseJS["@supabase/supabase-js"]
+Sync["sync.ts"] --> Database
+Sync --> Supabase
+AuthOps["auth.ts"] --> Supabase
+AuthOps --> Database
+Observable["use-observable-query.ts"] --> Database
 ```
 
 **Diagram sources**
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [session-store.ts:1-24](file://src/data/session-store.ts#L1-L24)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
+- [auth.ts:1-108](file://src/database/operations/auth.ts#L1-L108)
 
 **Section sources**
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-- [profile.ts:1-194](file://src/data/states/profile.ts#L1-L194)
-- [supabase client:1-28](file://src/lib/supabase/supabase.ts#L1-L28)
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [session-store.ts:1-24](file://src/data/session-store.ts#L1-L24)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [supabase.ts:1-23](file://src/lib/supabase/supabase.ts#L1-L23)
+- [sync.ts:1-56](file://src/database/sync.ts#L1-L56)
+- [auth.ts:1-108](file://src/database/operations/auth.ts#L1-L108)
 
 ## Performance Considerations
-- Minimize unnecessary writes: Prefer batched updates and avoid frequent toggles that trigger redundant syncs.
-- Use pagination and targeted queries: Limit initial fetch sizes and rely on incremental sync.
-- Encryption overhead: Enabling encryption adds CPU cost; evaluate necessity for sensitive data.
-- Retry tuning: Infinite retries improve reliability but may increase network usage; monitor and adjust as needed.
-- Realtime filtering: Keep filters narrow to reduce payload sizes and processing overhead.
-- Hydration timing: Initialize stores early to allow background sync while UI renders.
-
-[No sources needed since this section provides general guidance]
+- Database optimization: SQLite adapter provides excellent performance on mobile devices with JSI enabled.
+- Query optimization: WatermelonDB's indexed columns and efficient query patterns minimize database overhead.
+- Memory management: Observable queries automatically clean up subscriptions when components unmount.
+- Network efficiency: Sync service implements batching and incremental sync to minimize bandwidth usage.
+- Security overhead: SecureStoreAdapter adds minimal performance cost compared to the security benefits.
+- Migration strategy: WatermelonDB migrations handle schema changes efficiently without data loss.
 
 ## Troubleshooting Guide
-- Symptom: Data not persisting across app restarts
-  - Verify persistence names and that ObservablePersistMMKV is configured for each store.
-  - Confirm encryption key environment variables are set consistently.
-- Symptom: Conflicts or unexpected merges
-  - Ensure merge mode and metadata fields are configured correctly.
-  - Review retry settings and network connectivity.
-- Symptom: Cross-session data leakage
-  - Confirm session store manager resets stores on user change.
-- Symptom: Auth session not restored
-  - Verify MMKV adapter is attached to Supabase client auth storage.
+- Symptom: Database initialization fails
+  - Verify platform detection logic and adapter configuration.
+  - Check schema version compatibility and migration status.
+- Symptom: Sync operations fail
+  - Verify Supabase RPC endpoints are accessible and returning expected data.
+  - Check network connectivity and realtime subscription status.
+- Symptom: Authentication issues
+  - Verify SecureStoreAdapter is properly configured and tokens are being stored.
+  - Check session persistence and auto-refresh token settings.
+- Symptom: Data conflicts or unexpected merges
+  - Review WatermelonDB conflict resolution settings and timestamp handling.
+  - Verify sync service is properly applying remote changes.
 - Debugging utilities:
-  - Use MMKV debugStorage to inspect stored keys and values.
-  - Inspect getAllStorageKeys and selectively delete keys for testing.
+  - Use database logs to trace query execution and performance.
+  - Monitor sync service logs for error messages and retry attempts.
+  - Check SecureStore for proper token persistence and retrieval.
 
 **Section sources**
-- [storage.ts:29-73](file://src/data/storage.ts#L29-L73)
-- [session-store.ts:10-23](file://src/data/session-store.ts#L10-L23)
-- [supabase client:9-28](file://src/lib/supabase/supabase.ts#L9-L28)
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
+- [database.ts:24-27](file://src/database/index.ts#L24-L27)
+- [sync.ts:13-34](file://src/database/sync.ts#L13-L34)
+- [supabase.ts:15-22](file://src/lib/supabase/supabase.ts#L15-L22)
 
 ## Conclusion
-The MMKV-based persistence layer delivers a robust offline-first experience by combining LegendApp’s observable stores, MMKV persistence, and Supabase sync with merge semantics. The architecture ensures reliable hydration, deterministic conflict resolution, and seamless migration of guest data to authenticated accounts, while maintaining strong isolation between user sessions.
+The WatermelonDB-based persistence layer delivers a robust offline-first experience by combining SQLite/LokiJS adapters, enhanced authentication with SecureStoreAdapter, and Supabase synchronization with conflict resolution. The architecture ensures reliable hydration through observable queries, automatic conflict detection, and seamless migration between guest and authenticated states, while maintaining strong security isolation and optimal performance across platforms.

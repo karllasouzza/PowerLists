@@ -2,22 +2,31 @@
 
 <cite>
 **Referenced Files in This Document**
-- [database.ts](file://src/data/database.ts)
-- [auth.ts](file://src/data/states/auth.ts)
-- [lists.ts](file://src/data/states/lists.ts)
-- [list-items.ts](file://src/data/states/list-items.ts)
-- [profiles.ts](file://src/data/states/profiles.ts)
-- [user-preferences.ts](file://src/data/states/user-preferences.ts)
-- [first-access.ts](file://src/data/states/first-access.ts)
-- [storage.ts](file://src/data/storage.ts)
-- [sync.ts](file://src/services/sync.ts)
-- [lists actions](file://src/data/actions/lists.ts)
-- [list-items actions](file://src/data/actions/list-items.ts)
+- [database.ts](file://src/database/index.ts)
+- [schema.ts](file://src/database/schema.ts)
+- [sync.ts](file://src/database/sync.ts)
+- [Profile.ts](file://src/database/models/Profile.ts)
+- [List.ts](file://src/database/models/List.ts)
+- [ListItem.ts](file://src/database/models/ListItem.ts)
+- [profiles.ts](file://src/database/operations/profiles.ts)
+- [lists.ts](file://src/database/operations/lists.ts)
+- [listItems.ts](file://src/database/operations/listItems.ts)
+- [auth.ts](file://src/database/operations/auth.ts)
+- [sync-service.ts](file://src/services/sync.ts)
+- [auth-state.ts](file://src/features/auth/authState.ts)
+- [use-auth.ts](file://src/hooks/use-auth.ts)
 - [lists page](file://src/features/lists/page.tsx)
 - [onboarding hook](file://src/features/onboarding/hooks/use-onboarding-first-access.ts)
-- [RULES.md](file://__docs__/RULES.md)
-- [new-screen.md](file://.github/agents/new-screen.md)
 </cite>
+
+## Update Summary
+**Changes Made**
+- Complete architectural transformation from LegendAppState to WatermelonDB-based database-first architecture
+- Replaced automatic bidirectional sync with explicit synchronize() function using Supabase RPC functions
+- Updated all state management components to use WatermelonDB models and operations
+- Removed LegendAppState stores and replaced with database-centric approach
+- Updated synchronization strategy to use pull/push RPC functions instead of automatic sync
+- Modified authentication state to use SecureStore persistence instead of MMKV
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -32,392 +41,397 @@
 10. [Appendices](#appendices)
 
 ## Introduction
-This document describes the PowerLists state management architecture built on LegendAppState. It explains the reactive state patterns, observer implementation, and automatic UI updates. It documents the centralized database structure, state synchronization strategies, and conflict resolution mechanisms. It details the dual-storage approach combining cloud-based Supabase synchronization with local MMKV persistence, and it covers state initialization, data hydration, and offline-first architecture. It also covers observer pattern usage, state subscription management, performance optimization techniques, integration with React components, state validation, and debugging strategies for reactive state management.
+This document describes the PowerLists state management architecture built on WatermelonDB database-first architecture. The system has been completely transformed from the previous LegendAppState approach to a database-centric design using WatermelonDB with explicit synchronization via Supabase RPC functions. This new architecture provides better transaction handling, improved error management, and more predictable state synchronization patterns.
+
+The system implements a dual-storage approach combining local WatermelonDB persistence with cloud-based Supabase synchronization through explicit sync functions. It maintains offline-first capabilities while providing controlled synchronization through the synchronize() function with pull/push RPC operations.
 
 ## Project Structure
-The state management system is organized around:
-- Centralized Supabase configuration and dual-storage setup
-- Feature-specific observable stores for domain entities
-- Action modules that encapsulate mutations and data transformations
-- Services that orchestrate cross-cutting state operations
-- React components that subscribe to state via the observer pattern
+The state management system is now organized around:
+- Centralized WatermelonDB configuration with SQLite/LokiJS adapters
+- Database-first architecture with explicit synchronization
+- Feature-specific database operations for domain entities
+- Authentication state with SecureStore persistence
+- Service layer for cross-cutting operations like guest-to-user data migration
+- React components that interact with database operations and sync service
 
 ```mermaid
 graph TB
-subgraph "LegendAppState Core"
-DB["configureSynced<br/>supabaseSynced"]
-AUTH["auth$"]
-PREF["userPreferences$"]
-FA["firstAccess$"]
+subgraph "WatermelonDB Core"
+DB["Database Instance"]
+SCHEMA["Database Schema v2"]
+ADAPTER["SQLite/LokiJS Adapter"]
 end
-subgraph "Domain Stores"
-LISTS["lists$"]
-ITEMS["listItems$"]
-PROFILES["profiles$"]
+subgraph "Models"
+PROFILE["Profile Model"]
+LIST["List Model"]
+ITEM["ListItem Model"]
 end
-subgraph "Actions"
-LACT["lists actions"]
-IACT["list-items actions"]
+subgraph "Operations"
+PROFOPS["profiles.ts"]
+LISTOPS["lists.ts"]
+ITEMOPS["listItems.ts"]
+AUTHOPS["auth.ts"]
 end
-subgraph "Services"
-SYNC["SyncService"]
+subgraph "Synchronization"
+SYNC["syncDatabase()"]
+PULL["pull RPC"]
+PUSH["push RPC"]
+REALTIME["Realtime Channel"]
+end
+subgraph "Authentication"
+AUTHSTATE["authState.ts"]
+USEAUTH["use-auth.ts"]
 end
 subgraph "React Integration"
 PAGE["Lists Page"]
 ONBOARD["Onboarding Hook"]
 end
-DB --> LISTS
-DB --> ITEMS
-DB --> PROFILES
-AUTH --> DB
-LACT --> LISTS
-IACT --> ITEMS
-SYNC --> LISTS
-PAGE --> LISTS
-ONBOARD --> FA
+DB --> PROFILE
+DB --> LIST
+DB --> ITEM
+PROFILE --> PROFOPS
+LIST --> LISTOPS
+ITEM --> ITEMOPS
+SYNC --> PULL
+SYNC --> PUSH
+REALTIME --> SYNC
+AUTHSTATE --> USEAUTH
+PAGE --> LISTOPS
+ONBOARD --> AUTHSTATE
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profiles.ts:10-19](file://src/data/states/profiles.ts#L10-L19)
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
-- [sync.ts:41-202](file://src/services/sync.ts#L41-L202)
-- [lists page:24-95](file://src/features/lists/page.tsx#L24-L95)
-- [onboarding hook:5-16](file://src/features/onboarding/hooks/use-onboarding-first-access.ts#L5-L16)
+- [database.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
+- [profiles.ts:6-62](file://src/database/operations/profiles.ts#L6-L62)
+- [lists.ts:6-64](file://src/database/operations/lists.ts#L6-L64)
+- [listItems.ts:6-78](file://src/database/operations/listItems.ts#L6-L78)
+- [sync.ts:8-34](file://src/database/sync.ts#L8-L34)
+- [auth-state.ts:23-66](file://src/features/auth/authState.ts#L23-L66)
+- [use-auth.ts:44-91](file://src/hooks/use-auth.ts#L44-L91)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [RULES.md:42-77](file://__docs__/RULES.md#L42-L77)
-- [new-screen.md:145-491](file://.github/agents/new-screen.md#L145-L491)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [schema.ts:1-46](file://src/database/schema.ts#L1-L46)
+- [sync.ts:1-57](file://src/database/sync.ts#L1-L57)
 
 ## Core Components
-- Centralized Supabase configuration with dual-storage enabled via MMKV
-- Global auth state with local persistence
-- Domain stores for lists, list items, and profiles
-- User preferences and first-access flags with persistence
-- Action modules for CRUD operations with conversion utilities
+- Centralized WatermelonDB configuration with platform-specific adapters (SQLite for mobile, LokiJS for web)
+- Database schema with version 2 supporting profiles, lists, and list_items tables
+- Explicit synchronization via synchronize() function with Supabase RPC pull/push operations
+- Authentication state with SecureStore persistence for user sessions
+- Database operations layer providing CRUD functionality with proper transaction handling
 - Service layer for cross-cutting operations like guest-to-user data migration
-- React integration via observer pattern and useValue hooks
+- React integration through database operations and sync service
 
 Key implementation patterns:
-- All global state is observable; reads use observer or useValue; writes use .set/.update
-- Supabase ↔ MMKV bidirectional sync with offline-first semantics
-- Snake_case to camelCase conversions for Supabase compatibility
+- All state is database-first with WatermelonDB as the single source of truth
+- Explicit synchronization through syncDatabase() function with proper error handling
+- Transaction-safe operations using database.write() blocks
+- Real-time subscription triggers manual sync via subscribeToRealtimeSync()
 
 **Section sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profiles.ts:10-19](file://src/data/states/profiles.ts#L10-L19)
-- [user-preferences.ts:12-25](file://src/data/states/user-preferences.ts#L12-L25)
-- [first-access.ts:7-16](file://src/data/states/first-access.ts#L7-L16)
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
-- [sync.ts:41-202](file://src/services/sync.ts#L41-L202)
-- [RULES.md:42-77](file://__docs__/RULES.md#L42-L77)
+- [database.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [sync.ts:8-34](file://src/database/sync.ts#L8-L34)
+- [auth-state.ts:23-66](file://src/features/auth/authState.ts#L23-L66)
+- [profiles.ts:25-34](file://src/database/operations/profiles.ts#L25-L34)
+- [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+- [listItems.ts:27-38](file://src/database/operations/listItems.ts#L27-L38)
 
 ## Architecture Overview
-The system uses LegendAppState’s synced stores to maintain a single source of truth. Each store is configured with:
-- Supabase collection mapping and filtering by current user
-- Local persistence via MMKV
-- Automatic real-time subscriptions
-- Conflict resolution via merge mode and timestamps
+The system uses WatermelonDB as the central database with explicit synchronization to Supabase. The architecture follows these principles:
+- Database-first design with WatermelonDB as the single source of truth
+- Explicit synchronization via synchronize() function with pull/push RPC operations
+- Transaction-safe operations using database.write() blocks
+- Real-time subscription triggers manual sync through subscribeToRealtimeSync()
+- Authentication state managed separately with SecureStore persistence
 
 ```mermaid
 sequenceDiagram
 participant UI as "React Component"
-participant Store as "LegendAppState Store"
-participant Sync as "supabaseSynced"
+participant DB as "WatermelonDB"
+participant Sync as "syncDatabase()"
+participant Pull as "pull RPC"
+participant Push as "push RPC"
 participant Supabase as "Supabase"
-participant MMKV as "MMKV"
-UI->>Store : "subscribe via observer/useValue"
-UI->>Store : "write via .set/.update"
-Store->>Sync : "persist + queue change"
-Sync->>MMKV : "persist locally"
-Sync->>Supabase : "push changes (merge mode)"
-Supabase-->>Sync : "realtime events"
-Sync-->>Store : "apply remote changes"
-Store-->>UI : "trigger re-render"
+UI->>DB : "database.write() transaction"
+DB->>Sync : "explicit sync trigger"
+Sync->>Pull : "pull changes since lastPulledAt"
+Pull->>Supabase : "RPC : pull(last_pulled_at)"
+Supabase-->>Pull : "changes + timestamp"
+Pull-->>Sync : "return changes"
+Sync->>DB : "apply remote changes"
+Sync->>Push : "push local changes"
+Push->>Supabase : "RPC : push(changes)"
+Supabase-->>Push : "acknowledge"
+Push-->>Sync : "success"
+Sync-->>DB : "update local state"
+DB-->>UI : "trigger re-render"
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profiles.ts:10-19](file://src/data/states/profiles.ts#L10-L19)
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
+- [sync.ts:15-30](file://src/database/sync.ts#L15-L30)
+- [sync.ts:17-28](file://src/database/sync.ts#L17-L28)
+- [database.ts:29-32](file://src/database/index.ts#L29-L32)
 
 ## Detailed Component Analysis
 
-### Centralized Supabase Configuration and Dual Storage
-- Configures supabaseSynced with:
-  - Persist plugin: ObservablePersistMMKV
-  - Retry behavior: infinite retries
-  - Mode: merge
-  - Field mappings: created_at, updated_at, deleted
-  - Changes since last sync
-  - Generates IDs via shared generator
-- Exposes getCurrentUserId to filter queries and real-time subscriptions by authenticated user
+### WatermelonDB Configuration and Database Schema
+The system uses WatermelonDB as the central database with platform-specific adapters:
+- SQLite adapter for mobile platforms with JSI enabled for performance
+- LokiJS adapter for web platforms with IndexedDB support
+- Database schema version 2 with three main tables: profiles, lists, and list_items
+- Proper indexing on foreign key columns (profile_id, list_id) for query performance
 
 ```mermaid
 flowchart TD
-Start(["Configure supabaseSynced"]) --> Setup["Set plugin: ObservablePersistMMKV<br/>retrySync: true"]
-Setup --> Mode["mode: merge<br/>as: Map"]
-Mode --> Fields["fieldCreatedAt/UpdatedAt/Deleted"]
-Fields --> Changes["changesSince: last-sync"]
-Changes --> Gen["generateId"]
-Gen --> Export["Export supabaseSynced"]
-Export --> UserId["getCurrentUserId() from auth$"]
+Start(["Initialize Database"]) --> Adapter{"Platform Check"}
+Adapter --> |Mobile| SQLite["SQLiteAdapter<br/>jsi: true<br/>onSetUpError handler"]
+Adapter --> |Web| Loki["LokiJSAdapter<br/>indexedDB support"]
+SQLite --> Schema["appSchema v2<br/>3 tables: profiles, lists, list_items"]
+Loki --> Schema
+Schema --> Models["Register Models:<br/>Profile, List, ListItem"]
+Models --> DB["Database Instance"]
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [database.ts:31-35](file://src/data/database.ts#L31-L35)
+- [database.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [schema.ts:1-46](file://src/database/schema.ts#L1-L46)
 
-### Auth State and Initialization
-- Global auth$ observable with:
-  - user: synced with local persistence
-  - session, isInitialized, isLoading: plain observables
-- Used by getCurrentUserId to scope queries and real-time filters
+### Database Models and Associations
+Each domain entity is represented as a WatermelonDB model with proper associations:
+- Profile model with has_many association to List model
+- List model with belongs_to Profile and has_many association to ListItem
+- ListItem model with belongs_to List relationship
+- All models include proper decorators for field types and relationships
 
 ```mermaid
 classDiagram
-class AuthState {
-+user
-+session
-+isInitialized
-+isLoading
+class Profile {
++table : "profiles"
++userId : string
++name : string
++avatarUrl : string?
++bio : string?
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++lists : Query~List~
 }
-class AuthStore {
-+user : synced(persist : MMKV)
-+session
-+isInitialized
-+isLoading
+class List {
++table : "lists"
++profileId : string
++title : string
++accentColor : string
++icon : string
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++profile : Profile
++listItems : Query~ListItem~
 }
-AuthStore --> AuthState : "exposes"
+class ListItem {
++table : "list_items"
++profileId : string
++listId : string
++title : string?
++price : number?
++amount : number?
++isChecked : boolean
++createdAt : Date
++updatedAt : Date
++deletedAt : number?
++list : List
+}
+Profile --> List : "has_many"
+List --> ListItem : "has_many"
+List --> Profile : "belongs_to"
+ListItem --> List : "belongs_to"
 ```
 
 **Diagram sources**
-- [auth.ts:8-20](file://src/data/states/auth.ts#L8-L20)
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
+- [Profile.ts:6-20](file://src/database/models/Profile.ts#L6-L20)
+- [List.ts:7-22](file://src/database/models/List.ts#L7-L22)
+- [ListItem.ts:6-19](file://src/database/models/ListItem.ts#L6-L19)
 
 **Section sources**
-- [auth.ts:1-34](file://src/data/states/auth.ts#L1-L34)
-- [database.ts:31-35](file://src/data/database.ts#L31-L35)
+- [Profile.ts:1-21](file://src/database/models/Profile.ts#L1-L21)
+- [List.ts:1-23](file://src/database/models/List.ts#L1-L23)
+- [ListItem.ts:1-20](file://src/database/models/ListItem.ts#L1-L20)
 
-### Lists Store and Real-Time Filtering
-- Lists store configured with:
-  - Collection: lists
-  - Select fields including nested list_items
-  - Filter by profile_id via getCurrentUserId
-  - Actions: read/create/update/delete
-  - Persistence: lists with retrySync
-  - Realtime filter scoped to current user
-  - Infinite retry policy
+### Database Operations Layer
+The operations layer provides transaction-safe CRUD functionality:
+- All write operations wrapped in database.write() blocks
+- Query operations using WatermelonDB's Query builder with proper filtering
+- Soft delete pattern using deleted_at field instead of hard deletion
+- Proper error handling and transaction rollback on failures
 
 ```mermaid
 sequenceDiagram
-participant Comp as "Lists Page"
-participant Lists as "lists$"
-participant Sync as "supabaseSynced"
-participant RT as "Realtime"
-participant MM as "MMKV"
-Comp->>Lists : "observer subscribes"
-Lists->>Sync : "subscribe to collection"
-Sync->>MM : "hydrate from local"
-Sync->>RT : "join channel filtered by profile_id"
-RT-->>Lists : "events for current user"
-Lists-->>Comp : "re-render"
+participant Comp as "Component"
+participant Ops as "Database Operations"
+participant DB as "WatermelonDB"
+participant TX as "Transaction Block"
+Comp->>Ops : "createList(params)"
+Ops->>TX : "database.write()"
+TX->>DB : "create record"
+DB-->>TX : "return created record"
+TX-->>Ops : "return record"
+Ops-->>Comp : "return created record"
 ```
 
 **Diagram sources**
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [lists page:24-95](file://src/features/lists/page.tsx#L24-L95)
+- [lists.ts:27-36](file://src/database/operations/lists.ts#L27-L36)
+- [profiles.ts:25-34](file://src/database/operations/profiles.ts#L25-L34)
+- [listItems.ts:27-38](file://src/database/operations/listItems.ts#L27-L38)
 
 **Section sources**
-- [lists.ts:1-27](file://src/data/states/lists.ts#L1-L27)
-- [lists page:24-95](file://src/features/lists/page.tsx#L24-L95)
+- [profiles.ts:1-63](file://src/database/operations/profiles.ts#L1-L63)
+- [lists.ts:1-65](file://src/database/operations/lists.ts#L1-L65)
+- [listItems.ts:1-79](file://src/database/operations/listItems.ts#L1-L79)
 
-### List Items Store and Offline-First Hydration
-- List items store configured with:
-  - Collection: list_items
-  - Filter by profile_id
-  - Actions: read/create/update/delete
-  - Persistence: list_items
-  - Infinite retry policy
-  - Realtime filter scoped to current user
-
-```mermaid
-flowchart TD
-Init["Initialize listItems$"] --> Persist["Persist: list_items"]
-Persist --> Filter["Filter: profile_id = currentUser"]
-Filter --> Actions["Actions: CRUD"]
-Actions --> Retry["Retry: infinite"]
-Retry --> RT["Realtime: profile_id filter"]
-```
-
-**Diagram sources**
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-
-**Section sources**
-- [list-items.ts:1-24](file://src/data/states/list-items.ts#L1-L24)
-
-### Profiles Store and Data Validation
-- Profiles store configured with:
-  - Collection: profiles
-  - Filter by id = getCurrentUserId()
-  - Actions: read/create/update/delete
-  - Persistence: profiles with retrySync
-- Helper functions:
-  - getProfile: returns camelCase profile
-  - createProfile: validates presence of user and name, converts to snake_case, sets in store
-  - updateProfile: updates selective fields, sets updated_at
-  - deleteProfile: deletes current profile
-  - resetProfilesStore: clears store and MMKV metadata
+### Explicit Synchronization with Supabase RPC
+The synchronization system uses explicit synchronize() function with Supabase RPC:
+- pull RPC function retrieves changes since lastPulledAt timestamp
+- push RPC function sends local changes to server
+- Real-time subscription triggers manual sync via subscribeToRealtimeSync()
+- Proper error handling and retry logic in isSyncing guard
 
 ```mermaid
 sequenceDiagram
-participant UI as "Profile UI"
-participant Profiles as "profiles$"
-participant Conv as "convertToSupabaseFormat"
-participant Store as "Legend Store"
-participant Supabase as "Supabase"
-UI->>Profiles : "createProfile(params)"
-Profiles->>Conv : "convertToSupabaseFormat()"
-Conv-->>Profiles : "snake_case payload"
-Profiles->>Store : "set(payload)"
-Store->>Supabase : "sync"
-Supabase-->>Store : "ack"
-Store-->>UI : "updated profile"
+participant App as "Application"
+participant Sync as "syncDatabase()"
+participant Pull as "pull RPC"
+participant Push as "push RPC"
+participant Server as "Supabase"
+App->>Sync : "manual sync trigger"
+Sync->>Pull : "pull(lastPulledAt)"
+Pull->>Server : "RPC call"
+Server-->>Pull : "changes + timestamp"
+Pull-->>Sync : "return changes"
+Sync->>Server : "push(changes)"
+Server-->>Push : "acknowledge"
+Push-->>Sync : "success"
+Sync-->>App : "sync complete"
 ```
 
 **Diagram sources**
-- [profiles.ts:10-19](file://src/data/states/profiles.ts#L10-L19)
-- [profiles.ts:61-103](file://src/data/states/profiles.ts#L61-L103)
-- [profiles.ts:121-159](file://src/data/states/profiles.ts#L121-L159)
-- [profiles.ts:171-186](file://src/data/states/profiles.ts#L171-L186)
+- [sync.ts:8-34](file://src/database/sync.ts#L8-L34)
+- [sync.ts:17-28](file://src/database/sync.ts#L17-L28)
 
 **Section sources**
-- [profiles.ts:1-194](file://src/data/states/profiles.ts#L1-L194)
+- [sync.ts:1-57](file://src/database/sync.ts#L1-L57)
 
-### User Preferences and First Access Flags
-- User preferences store with persisted defaults and retrySync
-- First access flag persisted under a dedicated key
-
-```mermaid
-classDiagram
-class UserPreferences {
-+theme
-+colorScheme
-+backgroundColor
-}
-class PreferencesStore {
-+persist : userPreferences
-+retrySync : true
-}
-class FirstAccessStore {
-+persist : app.first_access
-+retrySync : true
-}
-PreferencesStore --> UserPreferences : "initial values"
-```
-
-**Diagram sources**
-- [user-preferences.ts:12-25](file://src/data/states/user-preferences.ts#L12-L25)
-- [first-access.ts:7-16](file://src/data/states/first-access.ts#L7-L16)
-
-**Section sources**
-- [user-preferences.ts:1-27](file://src/data/states/user-preferences.ts#L1-L27)
-- [first-access.ts:1-16](file://src/data/states/first-access.ts#L1-L16)
-
-### Actions Modules and State Validation
-- Lists actions:
-  - getAllLists: hydrates from store, converts to camelCase
-  - createNewList: validates auth and fields, generates ID, sets in store
-  - updateList: updates selective fields, returns converted result
-  - deleteList: deletes by ID
-  - resetListStore: clears store and MMKV metadata
-- List items actions:
-  - getAllListItems, getListItemsByListId
-  - createNewListItem, toggleCheckListItem, updateListItem, deleteListItem
-  - resetListItemsStore: clears store and MMKV metadata
+### Authentication State Management
+Authentication state is now managed separately with SecureStore persistence:
+- Current user stored in memory with SecureStore backup
+- Session information persisted separately
+- Real-time subscription to authentication state changes
+- Support for both guest and authenticated user states
 
 ```mermaid
 flowchart TD
-A["createNewList"] --> V["Validate: user + fields"]
-V --> G["Generate ID"]
-G --> C["convertToSupabaseFormat"]
-C --> S["lists$[id].set()"]
-S --> R["Return camelCase result"]
+Init["Load Persisted User"] --> SecureStore["SecureStore.getItemAsync('powerlists_auth_user')"]
+SecureStore --> Found{"User Found?"}
+Found --> |Yes| Load["Parse and Set Current User"]
+Found --> |No| Empty["Empty Auth State"]
+Load --> Subscribe["Subscribe to Auth Changes"]
+Empty --> Subscribe
+Subscribe --> UI["React Components"]
 ```
 
 **Diagram sources**
-- [lists actions:79-122](file://src/data/actions/lists.ts#L79-L122)
-- [list-items actions:53-104](file://src/data/actions/list-items.ts#L53-L104)
+- [auth-state.ts:44-54](file://src/features/auth/authState.ts#L44-L54)
+- [auth-state.ts:23-42](file://src/features/auth/authState.ts#L23-L42)
 
 **Section sources**
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
+- [auth-state.ts:1-67](file://src/features/auth/authState.ts#L1-L67)
+- [use-auth.ts:44-91](file://src/hooks/use-auth.ts#L44-L91)
+
+### Database Operations and State Validation
+Database operations provide comprehensive CRUD functionality:
+- Create operations with proper field validation and timestamp setting
+- Update operations with selective field updates and timestamp refresh
+- Delete operations using soft delete pattern with proper cleanup
+- Query operations with proper filtering and ordering
+
+```mermaid
+flowchart TD
+A["createList"] --> B["database.write()"]
+B --> C["validate params"]
+C --> D["create record with timestamps"]
+D --> E["return created record"]
+E --> F["automatic sync to Supabase"]
+```
+
+**Diagram sources**
+- [lists.ts:16-36](file://src/database/operations/lists.ts#L16-L36)
+- [profiles.ts:14-35](file://src/database/operations/profiles.ts#L14-L35)
+- [listItems.ts:12-38](file://src/database/operations/listItems.ts#L12-L38)
+
+**Section sources**
+- [lists.ts:1-65](file://src/database/operations/lists.ts#L1-L65)
+- [profiles.ts:1-63](file://src/database/operations/profiles.ts#L1-L63)
+- [listItems.ts:1-79](file://src/database/operations/listItems.ts#L1-L79)
 
 ### Service Orchestration: Guest-to-User Data Migration
-- SyncService:
-  - hasGuestData: checks lists owned by guestId
-  - getGuestListsCount: counts guest-owned lists
-  - promptDataMigration: prompts user and migrates via store updates
-  - migrateGuestDataToUser: updates profile_id for all guest lists; LegendAppState auto-syncs to Supabase
+The SyncService handles cross-cutting operations with database operations:
+- Detects guest data using database queries
+- Prompts user for migration decision
+- Performs transaction-safe migration via database operations
+- Provides proper error handling and user feedback
 
 ```mermaid
 sequenceDiagram
 participant User as "User"
 participant Service as "SyncService"
-participant Store as "lists$"
-participant Supabase as "Supabase"
+participant DB as "Database"
+participant Ops as "Database Operations"
 User->>Service : "promptDataMigration(guestId, userId)"
-Service->>Store : "read lists"
-Service->>User : "show alert"
-User-->>Service : "confirm"
-Service->>Store : "for each guest list : update profile_id"
-Store->>Supabase : "sync changes"
-Supabase-->>Store : "ack"
+Service->>DB : "query guest lists"
+Service->>User : "show migration prompt"
+User-->>Service : "confirm migration"
+Service->>DB : "database.write() block"
+DB->>Ops : "update profile_id for each list"
+Ops-->>DB : "transaction complete"
+DB-->>Service : "migration complete"
 Service-->>User : "show success toast"
 ```
 
 **Diagram sources**
-- [sync.ts:102-150](file://src/services/sync.ts#L102-L150)
-- [sync.ts:166-201](file://src/services/sync.ts#L166-L201)
+- [sync-service.ts:103-151](file://src/services/sync.ts#L103-L151)
+- [sync-service.ts:167-203](file://src/services/sync.ts#L167-L203)
 
 **Section sources**
-- [sync.ts:1-203](file://src/services/sync.ts#L1-L203)
+- [sync-service.ts:1-205](file://src/services/sync.ts#L1-L205)
 
-### React Integration: Observer Pattern and UI Updates
-- Lists page:
-  - Uses observer to wrap the component
-  - Reads lists via useValue and computed totals
-  - Renders a virtualized list with LegendList
-- Onboarding hook:
-  - Subscribes to firstAccess$ via useValue
-  - Completes onboarding by calling action
+### React Integration: Database Operations and UI Updates
+React components now interact directly with database operations:
+- Components import specific database operations for data access
+- No more observer pattern or useValue hooks for state management
+- Direct database queries and mutations through operations layer
+- Manual sync triggers when needed for real-time updates
 
 ```mermaid
 sequenceDiagram
-participant Comp as "Lists Page"
-participant Obs as "observer"
-participant Store as "lists$"
-participant UI as "LegendList"
-Comp->>Obs : "wrap component"
-Obs->>Store : "subscribe"
-Store-->>Obs : "values"
-Obs->>UI : "render with data"
-UI-->>Comp : "re-render on changes"
+participant Comp as "React Component"
+participant Ops as "Database Operations"
+participant DB as "WatermelonDB"
+participant UI as "UI Components"
+Comp->>Ops : "getListItemsByListId(listId)"
+Ops->>DB : "query records"
+DB-->>Ops : "return records"
+Ops-->>Comp : "return records"
+Comp->>UI : "render with data"
+UI-->>Comp : "re-render on state changes"
 ```
 
 **Diagram sources**
@@ -429,107 +443,97 @@ UI-->>Comp : "re-render on changes"
 - [onboarding hook:1-16](file://src/features/onboarding/hooks/use-onboarding-first-access.ts#L1-L16)
 
 ## Dependency Analysis
-- LegendAppState core depends on:
-  - Supabase client
-  - MMKV persistence plugin
-  - Auth state for user scoping
-- Domain stores depend on:
-  - supabaseSynced configuration
-  - getCurrentUserId
-  - Supabase utilities for conversion
-- Actions depend on:
-  - Stores for mutation
-  - Conversion utilities
-  - Storage for cleanup
-- Services depend on:
-  - Stores for cross-cutting operations
-  - Toast service for feedback
+The new architecture has simplified dependencies:
+- Database layer depends on WatermelonDB core and platform adapters
+- Operations layer depends on database instance and model classes
+- Authentication layer depends on SecureStore and Supabase auth
+- Service layer depends on database operations and toast service
+- React components depend on specific database operations
 
 ```mermaid
 graph LR
-Supabase["Supabase Client"] --> DB["supabaseSynced"]
-MMKV["ObservablePersistMMKV"] --> DB
-Auth["auth$"] --> DB
-DB --> Lists["lists$"]
-DB --> Items["listItems$"]
-DB --> Profiles["profiles$"]
-Lists --> ListsAct["lists actions"]
-Items --> ItemsAct["list-items actions"]
-ListsAct --> Storage["MMKV"]
-ItemsAct --> Storage
-Profiles --> Storage
-Lists --> SyncSvc["SyncService"]
+WatermelonDB["@nozbe/watermelondb"] --> DB["Database Instance"]
+SQLite["@nozbe/watermelondb/adapters/sqlite"] --> DB
+Loki["@nozbe/watermelondb/adapters/lokijs"] --> DB
+Schema["Database Schema"] --> DB
+Models["Profile/List/ListItem Models"] --> DB
+DB --> Operations["Database Operations"]
+Operations --> Components["React Components"]
+AuthState["SecureStore"] --> AuthLayer["Authentication Layer"]
+AuthLayer --> Components
+Sync["syncDatabase()"] --> Supabase["Supabase RPC"]
+Operations --> Sync
 ```
 
 **Diagram sources**
-- [database.ts:13-29](file://src/data/database.ts#L13-L29)
-- [auth.ts:22-33](file://src/data/states/auth.ts#L22-L33)
-- [lists.ts:5-26](file://src/data/states/lists.ts#L5-L26)
-- [list-items.ts:5-23](file://src/data/states/list-items.ts#L5-L23)
-- [profiles.ts:10-19](file://src/data/states/profiles.ts#L10-L19)
-- [lists actions:1-211](file://src/data/actions/lists.ts#L1-L211)
-- [list-items actions:1-193](file://src/data/actions/list-items.ts#L1-L193)
-- [sync.ts:41-202](file://src/services/sync.ts#L41-L202)
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [database.ts:12-32](file://src/database/index.ts#L12-L32)
+- [schema.ts:3-45](file://src/database/schema.ts#L3-L45)
+- [auth-state.ts:44-54](file://src/features/auth/authState.ts#L44-L54)
+- [sync.ts:15-30](file://src/database/sync.ts#L15-L30)
 
 **Section sources**
-- [database.ts:1-36](file://src/data/database.ts#L1-L36)
-- [storage.ts:1-74](file://src/data/storage.ts#L1-L74)
+- [database.ts:1-33](file://src/database/index.ts#L1-L33)
+- [auth-state.ts:1-67](file://src/features/auth/authState.ts#L1-L67)
+- [sync.ts:1-57](file://src/database/sync.ts#L1-L57)
 
 ## Performance Considerations
-- Virtualization and rendering:
-  - Lists page uses a virtualized list with estimated item size and draw distance to minimize DOM overhead
-  - Recycle items enabled to reduce render churn
-- Reactive updates:
-  - Observer pattern ensures fine-grained re-renders only when subscribed values change
-  - useValue hook used for selective subscriptions
-- Persistence and hydration:
-  - MMKV persistence avoids expensive network calls on cold start
-  - Retry policies ensure eventual consistency without blocking UI
-- Network efficiency:
-  - Real-time filters scoped to current user reduce event volume
-  - Merge mode prevents redundant writes and conflicts
-
-[No sources needed since this section provides general guidance]
+- Database-first design eliminates reactive overhead:
+  - Direct database queries instead of observable stores
+  - Explicit transaction boundaries for batch operations
+  - Platform-specific adapters optimized for each environment
+- Query performance:
+  - Proper indexing on foreign key columns (profile_id, list_id)
+  - Efficient query patterns using WatermelonDB's Query builder
+  - Batch operations within database.write() blocks
+- Synchronization efficiency:
+  - Explicit sync triggers prevent unnecessary background sync
+  - Pull/push RPC operations with proper error handling
+  - Real-time subscription only triggers manual sync when needed
+- Memory management:
+  - SecureStore for persistent authentication state
+  - Lightweight in-memory state for current user/session
 
 ## Troubleshooting Guide
-- Observability:
-  - Use debugStorage to enumerate and inspect persisted keys and values
-  - Use getAllStorageKeys and deleteStorageKeys for targeted cleanup
-- State validation:
-  - Ensure convertToSupabaseFormat and convertFromSupabaseFormat are used consistently for mutations and reads
-  - Validate required fields before calling actions (e.g., createNewList requires title, accentColor, icon)
-- Conflict resolution:
-  - Merge mode and updated_at fields help resolve concurrent edits
-  - If conflicts occur, rely on retry policies and server timestamps
-- Offline-first:
-  - Confirm MMKV persistence is initialized and encryption key is configured if applicable
-  - Verify getCurrentUserId returns a valid user ID for proper filtering and real-time channels
-- React integration:
-  - Wrap components with observer and subscribe via useValue to avoid stale reads
-  - Avoid direct Supabase calls from components; always go through observable stores and actions
+- Database initialization:
+  - Verify SQLite/LokiJS adapter initialization based on platform
+  - Check database schema version matches expected version
+  - Ensure model classes are properly registered
+- Synchronization issues:
+  - Monitor isSyncing guard to prevent concurrent sync operations
+  - Check pull RPC function returns proper changes and timestamp
+  - Verify push RPC function acknowledges all changes
+- Authentication problems:
+  - Ensure SecureStore is properly initialized and accessible
+  - Verify authentication state persistence and restoration
+  - Check real-time subscription to authentication changes
+- Database operations:
+  - Wrap all write operations in database.write() blocks
+  - Handle transaction failures and rollbacks appropriately
+  - Use proper error handling for database queries
 
 **Section sources**
-- [storage.ts:25-74](file://src/data/storage.ts#L25-L74)
-- [lists actions:79-122](file://src/data/actions/lists.ts#L79-L122)
-- [database.ts:31-35](file://src/data/database.ts#L31-L35)
-- [RULES.md:42-77](file://__docs__/RULES.md#L42-L77)
+- [database.ts:24-27](file://src/database/index.ts#L24-L27)
+- [sync.ts:9-11](file://src/database/sync.ts#L9-L11)
+- [auth-state.ts:44-54](file://src/features/auth/authState.ts#L44-L54)
 
 ## Conclusion
-PowerLists leverages LegendAppState to deliver a robust, offline-first state management system. The combination of Supabase synchronization and MMKV persistence ensures reliable data availability and consistency across devices. The observer pattern and useValue hooks provide efficient, reactive UI updates. Centralized configuration, strict validation, and modular action/services layers keep the system maintainable and scalable.
-
-[No sources needed since this section summarizes without analyzing specific files]
+PowerLists has successfully transitioned from LegendAppState to a robust WatermelonDB-based database-first architecture. The new system provides better control over synchronization, improved transaction handling, and more predictable state management. The explicit synchronization approach with Supabase RPC functions offers better error management and debugging capabilities. The database-centric design with proper transaction boundaries ensures data integrity and consistency across devices.
 
 ## Appendices
-- State initialization and hydration:
-  - Stores initialize from persisted MMKV data and then synchronize with Supabase
-  - Auth state hydrates user/session and toggles isInitialized
-- Conflict resolution:
-  - Merge mode and updated_at fields coordinate remote and local changes
-  - Infinite retry policies ensure convergence
+- Database initialization and schema:
+  - WatermelonDB schema version 2 with proper table definitions
+  - Platform-specific adapter selection for optimal performance
+  - Migration support for schema evolution
+- Synchronization strategy:
+  - Explicit sync via synchronize() function with pull/push RPC
+  - Real-time subscription triggers manual sync
+  - Proper error handling and retry logic
+- Authentication management:
+  - SecureStore persistence for user sessions
+  - In-memory state management with real-time updates
+  - Support for guest and authenticated user states
 - Best practices:
-  - Prefer observable stores over direct Supabase calls
-  - Use convertToSupabaseFormat/convertFromSupabaseFormat for data shape consistency
-  - Scope queries and real-time filters to the current user
-
-[No sources needed since this section provides general guidance]
+  - Always use database.write() blocks for transactions
+  - Implement proper error handling for all database operations
+  - Use explicit sync triggers for real-time updates
+  - Leverage Soft delete pattern for data integrity
