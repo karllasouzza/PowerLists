@@ -99,4 +99,5 @@ const OnboardingContainer = ({ completeOnboarding }: SlidesProps) => {
   );
 };
 
+export { OnboardingContainer };
 export default memo(OnboardingContainer);
