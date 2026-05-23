@@ -1,42 +1,16 @@
-import { useValue } from '@legendapp/state/react';
+import { Q } from '@nozbe/watermelondb';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-import { listItems$ } from '@/data/states/list-items';
-import { lists$ } from '@/data/states/lists';
-import type { List, ListItem } from '@/data/types';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
+import type { List, ListItem } from '@/types';
+import { database } from '@/database';
+import { List as ListModel } from '@/database/models/List';
+import { ListItem as ListItemModel } from '@/database/models/ListItem';
+import { getCurrentUserId } from '@/features/auth/authState';
+import { getListsByProfile } from '@/database/operations/lists';
+import { useObservableQuery } from '@/hooks/use-observable-query';
 
 import type { DashboardPeriod } from '../types';
 import { buildDashboardSummary, getPeriodLabel } from '../utils';
-
-const normalizeList = (list: Partial<List>): List => {
-  return {
-    id: list.id ?? '',
-    title: list.title ?? 'Lista sem título',
-    accentColor: list.accentColor ?? 'primary',
-    icon: list.icon ?? 'cart',
-    profileId: list.profileId ?? '',
-    listItems: list.listItems,
-    createdAt: list.createdAt ?? new Date().toISOString(),
-    updatedAt: list.updatedAt,
-    deleted: list.deleted,
-  };
-};
-
-const normalizeItem = (item: Partial<ListItem>): ListItem => {
-  return {
-    id: item.id ?? '',
-    listId: item.listId ?? '',
-    profileId: item.profileId ?? '',
-    title: item.title ?? '',
-    price: item.price ?? 0,
-    amount: item.amount ?? 0,
-    isChecked: item.isChecked ?? false,
-    createdAt: item.createdAt ?? new Date().toISOString(),
-    updatedAt: item.updatedAt,
-    deleted: item.deleted,
-  };
-};
 
 export const useDashboardPageLogics = () => {
   const [period, setPeriod] = useState<DashboardPeriod>('all');
@@ -44,34 +18,59 @@ export const useDashboardPageLogics = () => {
     new Map<DashboardPeriod, ReturnType<typeof buildDashboardSummary>>(),
   );
 
-  const listsState = useValue(lists$.get());
-  const listItemsState = useValue(listItems$.get());
+  const userId = getCurrentUserId() ?? '';
 
-  const isLoading = listsState === null || listItemsState === null;
+  const listsQuery = useMemo(() => getListsByProfile(userId), [userId]);
+  const listsRaw = useObservableQuery<ListModel>(listsQuery);
 
-  const lists = useMemo(() => {
-    const rawLists = Object.values(listsState ?? {});
-    const formattedLists = convertFromSupabaseFormat(rawLists) as Partial<List>[];
+  const itemsQuery = useMemo(
+    () =>
+      database
+        .get<ListItemModel>('list_items')
+        .query(Q.where('profile_id', userId), Q.where('deleted_at', Q.eq(null))),
+    [userId],
+  );
+  const itemsRaw = useObservableQuery<ListItemModel>(itemsQuery);
 
-    return formattedLists.map(normalizeList).sort((a, b) => {
-      return (
-        new Date(b.updatedAt ?? b.createdAt).getTime() -
-        new Date(a.updatedAt ?? a.createdAt).getTime()
-      );
-    });
-  }, [listsState]);
+  const isLoading = listsRaw === null || itemsRaw === null;
 
-  const items = useMemo(() => {
-    const rawItems = Object.values(listItemsState ?? {});
-    const formattedItems = convertFromSupabaseFormat(rawItems) as Partial<ListItem>[];
+  const lists = useMemo((): List[] => {
+    return [...listsRaw]
+      .sort((a, b) => {
+        const aDate = (a.updatedAt ?? a.createdAt).getTime();
+        const bDate = (b.updatedAt ?? b.createdAt).getTime();
+        return bDate - aDate;
+      })
+      .map((model) => ({
+        id: model.id,
+        title: model.title,
+        accentColor: model.accentColor,
+        icon: model.icon,
+        profileId: model.profileId,
+        createdAt: model.createdAt,
+        updatedAt: model.updatedAt ?? undefined,
+      }));
+  }, [listsRaw]);
 
-    return formattedItems.map(normalizeItem).sort((a, b) => {
-      return (
-        new Date(b.updatedAt ?? b.createdAt).getTime() -
-        new Date(a.updatedAt ?? a.createdAt).getTime()
-      );
-    });
-  }, [listItemsState]);
+  const items = useMemo((): ListItem[] => {
+    return [...itemsRaw]
+      .sort((a, b) => {
+        const aDate = (a.updatedAt ?? a.createdAt).getTime();
+        const bDate = (b.updatedAt ?? b.createdAt).getTime();
+        return bDate - aDate;
+      })
+      .map((model) => ({
+        id: model.id,
+        listId: model.listId,
+        profileId: model.profileId,
+        title: model.title,
+        price: model.price,
+        amount: model.amount,
+        isChecked: model.isChecked,
+        createdAt: model.createdAt,
+        updatedAt: model.updatedAt ?? undefined,
+      }));
+  }, [itemsRaw]);
 
   useEffect(() => {
     summaryCacheRef.current.clear();

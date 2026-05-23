@@ -1,16 +1,25 @@
-import { useValue } from '@legendapp/state/react';
-import { completeFirstAccess } from '@/data/actions/first-access';
-import { firstAccess$ } from '@/data/states/first-access';
+import * as SecureStore from 'expo-secure-store';
+import { useCallback, useEffect, useState } from 'react';
+
+const FIRST_ACCESS_KEY = 'app.first_access';
 
 export const useOnboardingFirstAccess = () => {
-  const hasCompletedOnboarding = useValue(firstAccess$.hasCompletedOnboarding);
+  const [isFirstAccess, setIsFirstAccess] = useState<boolean | null>(null);
 
-  const completeOnboarding = () => {
-    completeFirstAccess();
-  };
+  useEffect(() => {
+    SecureStore.getItemAsync(FIRST_ACCESS_KEY).then((value) => {
+      setIsFirstAccess(value !== 'true');
+    });
+  }, []);
+
+  const completeOnboarding = useCallback(() => {
+    SecureStore.setItemAsync(FIRST_ACCESS_KEY, 'true').then(() => {
+      setIsFirstAccess(false);
+    });
+  }, []);
 
   return {
-    isFirstAccess: !hasCompletedOnboarding,
+    isFirstAccess,
     completeOnboarding,
   };
 };

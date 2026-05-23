@@ -1,30 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import type { Session } from '@supabase/supabase-js';
-import type { UserType } from '@/data/types/user';
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 jest.mock('expo-linking', () => ({
   createURL: jest.fn(() => 'powerlists://password-recovery'),
 }));
 
-jest.mock('@legendapp/state/react', () => require('../../../__mocks__/legend-state-react.cjs'));
 jest.mock('@/lib/supabase', () => require('../../../__mocks__/supabase.cjs'));
 jest.mock('@/data/actions/auth', () => require('../../../__mocks__/auth-actions.cjs'));
 jest.mock('@/services', () => require('../../../__mocks__/services.cjs'));
-jest.mock('@/data/storage', () => require('../../../__mocks__/storage.cjs'));
-jest.mock('@/data/states/auth', () => require('../../../__mocks__/auth-state.cjs'));
-
-type Cell<T> = {
-  get: () => T;
-  set: (next: T) => void;
-};
-
-type AuthStoreMock = {
-  user: Cell<UserType>;
-  session: Cell<Session | null>;
-  isInitialized: Cell<boolean>;
-  isLoading: Cell<boolean>;
-};
+jest.mock('@/features/auth/authState', () => require('../../../__mocks__/auth-state.cjs'));
 
 type UseAuthContract = {
   session: Session | null;
@@ -56,25 +41,18 @@ type ServicesMock = {
   resetServiceMocks: () => void;
 };
 
-type StorageMock = {
-  clearAllStorage: jest.Mock;
-  resetStorageMocks: () => void;
-};
-
 const { useAuth } = require('@/hooks/use-auth') as { useAuth: () => UseAuthContract };
-const { auth$, resetAuthState } = require('../../../__mocks__/auth-state.cjs') as {
-  auth$: AuthStoreMock;
-  resetAuthState: () => void;
-};
+const {
+  getCurrentUser,
+  getCurrentSession,
+  setAuthState,
+  resetAuthState,
+} = require('../../../__mocks__/auth-state.cjs');
 const { supabase, resetSupabaseMocks } = require('../../../__mocks__/supabase.cjs') as {
   supabase: SupabaseMock;
   resetSupabaseMocks: () => void;
 };
 const authActions = require('../../../__mocks__/auth-actions.cjs') as AuthActionsMock;
-const { clearAllStorage, resetStorageMocks } = require('../../../__mocks__/storage.cjs') as {
-  clearAllStorage: StorageMock['clearAllStorage'];
-  resetStorageMocks: StorageMock['resetStorageMocks'];
-};
 const { showToast, SyncService, promptDataMigration, resetServiceMocks } =
   require('../../../__mocks__/services.cjs') as ServicesMock;
 
@@ -89,7 +67,6 @@ describe('useAuth', () => {
     resetSupabaseMocks();
     authActions.resetAuthActionMocks();
     resetServiceMocks();
-    resetStorageMocks();
   });
 
   afterEach(() => {
@@ -102,8 +79,8 @@ describe('useAuth', () => {
     const result = await auth.fetchUserDataAsync();
 
     expect(result).toBe(false);
-    expect(auth$.isInitialized.get()).toBe(true);
-    expect(auth$.isLoading.get()).toBe(false);
+    expect(auth.isInitialized).toBe(true);
+    expect(auth.isLoading).toBe(false);
   });
 
   it('should sign in successfully and migrate guest data', async () => {
@@ -114,7 +91,7 @@ describe('useAuth', () => {
     };
     const signedUser = { id: 'user-1', is_guest: false };
 
-    auth$.user.set(previousGuest);
+    setAuthState({ user: previousGuest });
     (authActions.signInWithPassword as jest.Mock).mockImplementation(async () => ({
       user: signedUser,
       error: null,
@@ -132,8 +109,8 @@ describe('useAuth', () => {
       guestId: previousGuest.id,
       userId: signedUser.id,
     });
-    expect(auth$.user.get()).toEqual(signedUser);
-    expect(auth$.session.get()).toEqual({ access_token: 'token' });
+    expect(getCurrentUser()).toEqual(signedUser);
+    expect(getCurrentSession()).toEqual({ access_token: 'token' });
     expect(showToast).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'success',
@@ -151,7 +128,7 @@ describe('useAuth', () => {
     const result = await auth.signInWithPassword({ email: 'wrong@example.com', password: 'wrong' });
 
     expect(result).toBe(false);
-    expect(auth$.isLoading.get()).toBe(false);
+    expect(auth.isLoading).toBe(false);
     expect(showToast).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'error',
@@ -159,22 +136,23 @@ describe('useAuth', () => {
     );
   });
 
-  it('should sign out and clear user, session, and storage', async () => {
-    auth$.user.set({
-      id: 'user-1',
-      is_guest: false,
-      created_at: '2026-04-05T00:00:00.000Z',
+  it('should sign out and clear user and session', async () => {
+    setAuthState({
+      user: {
+        id: 'user-1',
+        is_guest: false,
+        created_at: '2026-04-05T00:00:00.000Z',
+      },
+      session: { access_token: 'token' } as Session,
     });
-    auth$.session.set({ access_token: 'token' } as Session);
 
     const auth = useAuth();
     const result = await auth.signOut();
 
     expect(result).toBe(true);
     expect(authActions.performSignOut).toHaveBeenCalledTimes(1);
-    expect(clearAllStorage).toHaveBeenCalledTimes(1);
-    expect(auth$.user.get()).toBeNull();
-    expect(auth$.session.get()).toBeNull();
+    expect(getCurrentUser()).toBeNull();
+    expect(getCurrentSession()).toBeNull();
   });
 
   it('should update password when resetPassword succeeds', async () => {

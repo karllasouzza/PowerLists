@@ -1,12 +1,14 @@
-import { useTheme } from '@/context/themes';
+import { useUserPreferences } from '@/context/themes/context';
 import { useRouter } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 export const useAuthPageLogic = () => {
   const router = useRouter();
-  const { setBackgroundColor } = useTheme();
+  const { setBackgroundColor } = useUserPreferences();
 
-  setBackgroundColor('default');
+  useEffect(() => {
+    setBackgroundColor('default');
+  }, [setBackgroundColor]);
 
   const handleCreateAccount = useCallback(() => {
     router.navigate('/create-account');

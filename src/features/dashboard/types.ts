@@ -1,4 +1,4 @@
-import type { List, ListItem } from '@/data/types';
+import type { List, ListItem } from '@/types';
 
 export type DashboardPeriod = 'all' | 'week' | 'month' | 'year';
 

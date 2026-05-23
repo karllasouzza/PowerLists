@@ -1,7 +1,14 @@
 import React, { useMemo } from 'react';
 import { type Href, usePathname } from 'expo-router';
 import { Tabs, TabList, TabSlot, TabTrigger } from 'expo-router/ui';
-import { IconHome, IconListLetters, IconUser } from '@tabler/icons-react-native';
+import {
+  IconFolder,
+  IconFolderFilled,
+  IconHome,
+  IconHomeFilled,
+  IconUser,
+  IconUserFilled,
+} from '@tabler/icons-react-native';
 
 import { TabButton } from '@/components/tab-button';
 const SCREENS_WITH_HIDDEN_TABS = ['/list', '/item-variations', '/item-comparison'];
@@ -38,13 +45,13 @@ export default function AuthenticatedLayout() {
         />
 
         <TabTrigger name="index" href={'/' as Href} asChild>
-          <TabButton icon={IconHome} label="Dashboard" />
+          <TabButton icon={IconHome} focusedIcon={IconHomeFilled} label="Dashboard" />
         </TabTrigger>
         <TabTrigger name="lists" href={'/lists' as Href} asChild>
-          <TabButton icon={IconListLetters} label="Listas" />
+          <TabButton icon={IconFolder} focusedIcon={IconFolderFilled} label="Listas" />
         </TabTrigger>
         <TabTrigger name="account" href={'/account' as Href} asChild>
-          <TabButton icon={IconUser} label="Perfil" />
+          <TabButton icon={IconUser} focusedIcon={IconUserFilled} label="Perfil" />
         </TabTrigger>
       </TabList>
     </Tabs>

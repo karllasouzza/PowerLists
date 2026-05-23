@@ -1,4 +1,4 @@
-import { List } from '@/data/types';
+import { List } from '@/types';
 
 export type ItemFormMode = 'listItem' | 'add' | 'edit';
 

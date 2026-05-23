@@ -1,4 +1,4 @@
-import { ListItem } from '@/data/types';
+import { ListItem } from '@/types';
 import { Decimal } from 'decimal.js';
 
 const BRL_CURRENCY_FORMATTER = new Intl.NumberFormat('pt-BR', {

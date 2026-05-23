@@ -17,6 +17,5 @@ module.exports = {
   testMatch: ['**/__tests__/**/*.property.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^react-native-mmkv$': '<rootDir>/__mocks__/react-native-mmkv.cjs',
   },
 };

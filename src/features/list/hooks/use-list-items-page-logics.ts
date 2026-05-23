@@ -1,12 +1,13 @@
-import { useSelector, useValue } from '@legendapp/state/react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { listItems$, toggleCheckListItem } from '@/data/states/list-items';
-import { lists$ } from '@/data/states/lists';
-import { ListItem as DataListItem, List, ListItem } from '@/data/types';
+import type { ListItem } from '@/types';
+import { List as ListModel } from '@/database/models/List';
+import { ListItem as ListItemModel } from '@/database/models/ListItem';
+import { database } from '@/database';
+import { useObservableQuery } from '@/hooks/use-observable-query';
+import { getListItemsByListId, toggleCheckListItem } from '@/database/operations/listItems';
 import { getAccentColorOption } from '@/features/lists/utils/accent-colors';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import { calculateTotal } from '@/utils/formatters';
 import { SortMode, sortItems } from '@/utils/sorting';
 
@@ -14,20 +15,36 @@ export const useListItemsPageLogics = () => {
   const { id: listId } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
 
-  const lists = useValue(lists$ || {});
-  const listsFormated = convertFromSupabaseFormat(Object.values(lists || {})) as List[];
-  const currentList = listsFormated.find((list) => list.id === listId);
+  const [currentList, setCurrentList] = useState<ListModel | null>(null);
 
-  const items = useSelector(() => {
-    if (!listId) return [] as ListItem[];
-    const raw = Object.values(listItems$.get() ?? {}).filter((item) => item.list_id === listId);
-    return (convertFromSupabaseFormat(raw) as DataListItem[]).map((item) => ({
-      ...item,
-      title: item.title ?? '',
-      price: item.price ?? 0,
-      amount: item.amount ?? 0,
-    })) as ListItem[];
-  });
+  useEffect(() => {
+    if (listId) {
+      database
+        .get<ListModel>('lists')
+        .find(listId)
+        .then(setCurrentList)
+        .catch(() => setCurrentList(null));
+    } else {
+      setCurrentList(null);
+    }
+  }, [listId]);
+
+  const itemsQuery = useMemo(() => getListItemsByListId(listId), [listId]);
+  const itemsRaw = useObservableQuery<ListItemModel>(itemsQuery);
+
+  const itemsPlain = useMemo((): ListItem[] => {
+    return itemsRaw.map((model) => ({
+      id: model.id,
+      listId: model.listId,
+      profileId: model.profileId,
+      title: model.title,
+      price: model.price,
+      amount: model.amount,
+      isChecked: model.isChecked,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt ?? undefined,
+    }));
+  }, [itemsRaw]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('default');
@@ -38,7 +55,7 @@ export const useListItemsPageLogics = () => {
 
   const handleToggleCheck = useCallback(async (id: string, currentStatus: boolean) => {
     try {
-      await toggleCheckListItem({ id, isChecked: !currentStatus });
+      await toggleCheckListItem(id, !currentStatus);
     } catch (error) {
       console.error('[ListItemsScreen] Error toggling item check:', error);
     }
@@ -59,11 +76,10 @@ export const useListItemsPageLogics = () => {
   }, []);
 
   const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return items;
-
+    if (!searchQuery.trim()) return itemsPlain;
     const query = searchQuery.toLowerCase();
-    return items.filter((item) => item.title?.toLowerCase().includes(query));
-  }, [items, searchQuery]);
+    return itemsPlain.filter((item) => item.title?.toLowerCase().includes(query));
+  }, [itemsPlain, searchQuery]);
 
   const sortedItems = useMemo(() => sortItems(filteredItems, sortMode), [filteredItems, sortMode]);
   const checkedItems = useMemo(() => sortedItems.filter((item) => item.isChecked), [sortedItems]);

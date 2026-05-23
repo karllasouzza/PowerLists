@@ -1,6 +1,5 @@
 import { Text } from '@/components/ui/text';
-import { useTheme } from '@/context/themes';
-import { rawColors } from '@/context/themes/theme-config';
+import { useUserPreferences } from '@/context/themes/context';
 import { DEFAULT_ACCENT_COLOR, isAccentColorToken } from '@/features/lists/utils/accent-colors';
 import { formatCurrency } from '@/utils/formatters';
 import { getThemeColorHex } from '@/utils/tailwind-color';
@@ -10,6 +9,7 @@ import React, { memo, useMemo } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import { Bar, CartesianChart } from 'victory-native';
 
+import { rawColors } from '@/lib/themes';
 import type { DashboardPieSlice } from '../types';
 
 type CheckedTotalPieChartProps = {
@@ -39,7 +39,7 @@ function CheckedTotalPieChartComponent({
   const { width } = useWindowDimensions();
   const axisFont = useFont(Poppins_500Medium, 11);
 
-  const { theme: themeName, colorScheme } = useTheme();
+  const { theme: themeName, colorScheme } = useUserPreferences();
   const themeVars = rawColors[themeName][colorScheme];
 
   const chartData = useMemo<ChartBar[]>(() => {

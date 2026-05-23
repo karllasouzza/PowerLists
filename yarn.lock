@@ -311,7 +311,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:^7.12.9":
+"@babel/plugin-proposal-decorators@npm:^7.12.9, @babel/plugin-proposal-decorators@npm:^7.29.0":
   version: 7.29.0
   resolution: "@babel/plugin-proposal-decorators@npm:7.29.0"
   dependencies:
@@ -1069,6 +1069,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:7.26.0":
+  version: 7.26.0
+  resolution: "@babel/runtime@npm:7.26.0"
+  dependencies:
+    regenerator-runtime: "npm:^0.14.0"
+  checksum: 10c0/12c01357e0345f89f4f7e8c0e81921f2a3e3e101f06e8eaa18a382b517376520cd2fa8c237726eb094dab25532855df28a7baaf1c26342b52782f6936b07c287
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.20.0, @babel/runtime@npm:^7.25.0, @babel/runtime@npm:^7.28.4":
   version: 7.29.2
   resolution: "@babel/runtime@npm:7.29.2"
@@ -1672,6 +1681,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo/schema-utils@npm:^56.0.0":
+  version: 56.0.1
+  resolution: "@expo/schema-utils@npm:56.0.1"
+  checksum: 10c0/8d6b2c76a754f64ae7f10ff417ab11ee64e6e665d34f13a6428ee86b1657cae5c0f40811b41c9716bd5e5f87461d403a08c915cb1c169408031e3c244184980d
+  languageName: node
+  linkType: hard
+
 "@expo/sdk-runtime-versions@npm:^1.0.0":
   version: 1.0.0
   resolution: "@expo/sdk-runtime-versions@npm:1.0.0"
@@ -2240,6 +2256,35 @@ __metadata:
   version: 1.0.39
   resolution: "@nolyfill/is-core-module@npm:1.0.39"
   checksum: 10c0/34ab85fdc2e0250879518841f74a30c276bca4f6c3e13526d2d1fe515e1adf6d46c25fcd5989d22ea056d76f7c39210945180b4859fc83b050e2da411aa86289
+  languageName: node
+  linkType: hard
+
+"@nozbe/simdjson@npm:3.9.4":
+  version: 3.9.4
+  resolution: "@nozbe/simdjson@npm:3.9.4"
+  checksum: 10c0/36fb86d41e0d99c6d02307458b69483227677dbea36020837e6598312dee18d593c895ad6b78a63c06f69703e23d1da2eb7f863f000969dfb7aaf8430bc604ab
+  languageName: node
+  linkType: hard
+
+"@nozbe/sqlite@npm:3.46.0":
+  version: 3.46.0
+  resolution: "@nozbe/sqlite@npm:3.46.0"
+  checksum: 10c0/890af9ae0c65e317c1b4c831c6b798315334f41666ea09863869c6827f73a8fec15d54bd760d7d7fdaf47bc6793c00a0c3803614cdec9148bb7d4ceb52ceb19b
+  languageName: node
+  linkType: hard
+
+"@nozbe/watermelondb@npm:^0.28.0":
+  version: 0.28.0
+  resolution: "@nozbe/watermelondb@npm:0.28.0"
+  dependencies:
+    "@babel/runtime": "npm:7.26.0"
+    "@nozbe/simdjson": "npm:3.9.4"
+    "@nozbe/sqlite": "npm:3.46.0"
+    hoist-non-react-statics: "npm:^3.3.2"
+    lokijs: "npm:@nozbe/lokijs@1.5.12-wmelon6"
+    rxjs: "npm:^7.8.1"
+    sql-escape-string: "npm:^1.1.0"
+  checksum: 10c0/9bfe588378a5b016ae2a2f00b64d2bc3847ead33b9f6d7fb34e0ca006ee3ab5a3e24254cfb7f102c19cc68ec6ed59c9001e78c9114e8f782fb9494fc13632864
   languageName: node
   linkType: hard
 
@@ -7378,6 +7423,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-build-properties@npm:^56.0.13":
+  version: 56.0.13
+  resolution: "expo-build-properties@npm:56.0.13"
+  dependencies:
+    "@expo/schema-utils": "npm:^56.0.0"
+    resolve-from: "npm:^5.0.0"
+    semver: "npm:^7.6.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/aec0acbfb3dd472fe925e081560980798e03dcbe5f6ae56fbe4df50c42ffd479a6cf9ab2e3de81b853198fc90004fa139161bebc1a44f4f89451c39fb7928627
+  languageName: node
+  linkType: hard
+
 "expo-constants@npm:~18.0.12, expo-constants@npm:~18.0.13":
   version: 18.0.13
   resolution: "expo-constants@npm:18.0.13"
@@ -8448,7 +8506,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hoist-non-react-statics@npm:^3.3.0":
+"hoist-non-react-statics@npm:^3.3.0, hoist-non-react-statics@npm:^3.3.2":
   version: 3.3.2
   resolution: "hoist-non-react-statics@npm:3.3.2"
   dependencies:
@@ -10079,6 +10137,13 @@ __metadata:
     chalk: "npm:^4.1.0"
     is-unicode-supported: "npm:^0.1.0"
   checksum: 10c0/67f445a9ffa76db1989d0fa98586e5bc2fd5247260dafb8ad93d9f0ccd5896d53fb830b0e54dade5ad838b9de2006c826831a3c528913093af20dff8bd24aca6
+  languageName: node
+  linkType: hard
+
+"lokijs@npm:@nozbe/lokijs@1.5.12-wmelon6":
+  version: 1.5.12-wmelon6
+  resolution: "@nozbe/lokijs@npm:1.5.12-wmelon6"
+  checksum: 10c0/2915bbcc5642e878d0df0e5cd5ce94a4b6453f655bc8d4132e39055b576dce57d9db039040c0d8a7ba4e6aca35daf73dbe7877867883ea9ea9dd102f44d27839
   languageName: node
   linkType: hard
 
@@ -11738,6 +11803,7 @@ __metadata:
   resolution: "powerlists@workspace:."
   dependencies:
     "@babel/core": "npm:^7.29.0"
+    "@babel/plugin-proposal-decorators": "npm:^7.29.0"
     "@babel/plugin-transform-flow-strip-types": "npm:^7.27.1"
     "@babel/plugin-transform-runtime": "npm:^7.29.0"
     "@babel/runtime": "npm:^7.28.4"
@@ -11746,6 +11812,7 @@ __metadata:
     "@hookform/resolvers": "npm:^5.2.2"
     "@legendapp/list": "npm:2.1.0-beta.14"
     "@legendapp/state": "npm:^3.0.0-beta.42"
+    "@nozbe/watermelondb": "npm:^0.28.0"
     "@rn-primitives/accordion": "npm:^1.2.0"
     "@rn-primitives/alert-dialog": "npm:^1.2.0"
     "@rn-primitives/aspect-ratio": "npm:^1.2.0"
@@ -11790,6 +11857,7 @@ __metadata:
     expo-atlas: "npm:^0.4.0"
     expo-audio: "npm:~1.1.1"
     expo-blur: "npm:~15.0.8"
+    expo-build-properties: "npm:^56.0.13"
     expo-constants: "npm:~18.0.13"
     expo-dev-client: "npm:~6.0.20"
     expo-font: "npm:~14.0.11"
@@ -12619,6 +12687,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"regenerator-runtime@npm:^0.14.0":
+  version: 0.14.1
+  resolution: "regenerator-runtime@npm:0.14.1"
+  checksum: 10c0/1b16eb2c4bceb1665c89de70dcb64126a22bc8eb958feef3cd68fe11ac6d2a4899b5cd1b80b0774c7c03591dc57d16631a7f69d2daa2ec98100e2f29f7ec4cc4
+  languageName: node
+  linkType: hard
+
 "regexp.prototype.flags@npm:^1.5.3, regexp.prototype.flags@npm:^1.5.4":
   version: 1.5.4
   resolution: "regexp.prototype.flags@npm:1.5.4"
@@ -12861,6 +12936,15 @@ __metadata:
   dependencies:
     queue-microtask: "npm:^1.2.2"
   checksum: 10c0/200b5ab25b5b8b7113f9901bfe3afc347e19bb7475b267d55ad0eb86a62a46d77510cb0f232507c9e5d497ebda569a08a9867d0d14f57a82ad5564d991588b39
+  languageName: node
+  linkType: hard
+
+"rxjs@npm:^7.8.1":
+  version: 7.8.2
+  resolution: "rxjs@npm:7.8.2"
+  dependencies:
+    tslib: "npm:^2.1.0"
+  checksum: 10c0/1fcd33d2066ada98ba8f21fcbbcaee9f0b271de1d38dc7f4e256bfbc6ffcdde68c8bfb69093de7eeb46f24b1fb820620bf0223706cff26b4ab99a7ff7b2e2c45
   languageName: node
   linkType: hard
 
@@ -13337,6 +13421,13 @@ __metadata:
   version: 1.0.3
   resolution: "sprintf-js@npm:1.0.3"
   checksum: 10c0/ecadcfe4c771890140da5023d43e190b7566d9cf8b2d238600f31bec0fc653f328da4450eb04bd59a431771a8e9cc0e118f0aa3974b683a4981b4e07abc2a5bb
+  languageName: node
+  linkType: hard
+
+"sql-escape-string@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "sql-escape-string@npm:1.1.0"
+  checksum: 10c0/89fa6b7adbd550ea2372fc556047ac64703a130593c2fae597e9ab258172908121ac03ac83ae79134f0a7e38c93a8b07ea708c3257f9abcf6452a6a038186f05
   languageName: node
   linkType: hard
 

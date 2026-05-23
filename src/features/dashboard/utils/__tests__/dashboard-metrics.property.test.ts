@@ -1,4 +1,4 @@
-import type { List, ListItem } from '@/data/types';
+import type { List, ListItem } from '@/types';
 import {
   buildDashboardSummary,
   buildItemVariations,
@@ -46,7 +46,7 @@ const itemArb = record<ListItem>({
   isChecked: boolean(),
   createdAt: isoDateArb,
   updatedAt: option(isoDateArb, { nil: null }),
-  deleted: option(boolean(), { nil: null }),
+  deletedAt: option(isoDateArb, { nil: null }),
 });
 
 const titledPricedItemArb = record<ListItem>({
@@ -59,7 +59,7 @@ const titledPricedItemArb = record<ListItem>({
   isChecked: boolean(),
   createdAt: isoDateArb,
   updatedAt: option(isoDateArb, { nil: null }),
-  deleted: option(boolean(), { nil: null }),
+  deletedAt: option(isoDateArb, { nil: null }),
 });
 
 const toCents = (value: number): number => {
@@ -98,7 +98,7 @@ describe('dashboard-metrics', () => {
         isChecked: true,
         createdAt: '2026-04-05T10:00:00.000Z',
         updatedAt: null,
-        deleted: null,
+        deletedAt: null,
       },
       {
         id: '2',
@@ -110,7 +110,7 @@ describe('dashboard-metrics', () => {
         isChecked: false,
         createdAt: '2026-04-05T11:00:00.000Z',
         updatedAt: null,
-        deleted: null,
+        deletedAt: null,
       },
       {
         id: '3',
@@ -122,7 +122,7 @@ describe('dashboard-metrics', () => {
         isChecked: true,
         createdAt: '2026-04-05T12:00:00.000Z',
         updatedAt: null,
-        deleted: null,
+        deletedAt: null,
       },
     ];
 

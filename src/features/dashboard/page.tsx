@@ -1,7 +1,6 @@
 import React, { Suspense, useCallback } from 'react';
 import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { observer } from '@legendapp/state/react';
 
 import { TopBar } from '@/components/top-bar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -131,4 +130,4 @@ function DashboardPage() {
   );
 }
 
-export default observer(DashboardPage);
+export default DashboardPage;

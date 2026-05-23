@@ -1,24 +1,25 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { TextInput, View } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Decimal } from 'decimal.js';
+import React, { useEffect, useRef, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { TextInput, View } from 'react-native';
+import { z } from 'zod';
 
-import { showToast } from '@/services';
-import { updateListItem } from '@/data/states/list-items';
 import {
   AppModal,
   AppModalContent,
+  AppModalFooter,
   AppModalHandle,
   AppModalHeader,
-  AppModalFooter,
 } from '@/components/molecules/app-modal';
 import { Input } from '@/components/ui/input';
-import { Text } from '@/components/ui/text';
 import { Label } from '@/components/ui/label';
-import { ListItem } from '@/data/types';
-import { numberToBRLInput, parseBRLToNumber, formatBRL } from '@/utils/currency';
+import { Text } from '@/components/ui/text';
+
+import { updateListItem } from '@/database/operations/listItems';
+import { ListItem } from '@/types';
+import { showToast } from '@/services';
+import { formatBRL, numberToBRLInput, parseBRLToNumber } from '@/utils/currency';
 
 const itemFormSchema = z.object({
   title: z.string().min(3, 'O nome deve ter pelo menos 3 caracteres'),
@@ -89,14 +90,13 @@ export function ItemUpdateModal({
 
     setIsSubmitting(true);
     try {
-      const success = await updateListItem({
-        id: currentItem.id,
+      const updated = await updateListItem(currentItem.id, {
         title: data.title,
         price: parseBRLToNumber(data.price || ''),
         amount: parseAmount(data.amount || '1'),
         isChecked: currentItem.isChecked ?? false,
       });
-      if (success) onOpenChange(false);
+      if (updated) onOpenChange(false);
     } catch {
       showToast({
         type: 'error',

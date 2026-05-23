@@ -7,12 +7,17 @@ import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { Toaster } from 'sonner-native';
 
 import { AnimatedBootSplash } from '@/components/animated-boot-splash';
-import ThemeProvider from '@/context/themes/use-themes';
+import ThemeProvider from '@/context/themes/provider';
 import '@/css/global.css';
 import { useAuth } from '@/hooks/use-auth';
 import { useUser } from '@/hooks/use-user';
 import { useAppFonts } from '@/utils/fonts';
 import ErrorBoundary from '@/components/error-boundary';
+import {
+  syncDatabase,
+  subscribeToRealtimeSync,
+  unsubscribeFromRealtimeSync,
+} from '@/database/sync';
 
 export default function RootLayout() {
   const [visible, setVisible] = useState(true);
@@ -23,7 +28,6 @@ export default function RootLayout() {
 
   useEffect(() => {
     fetchUserDataAsync();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -31,6 +35,17 @@ export default function RootLayout() {
       BootSplash.hide({ fade: true });
     }
   }, [isLoading, fontsLoaded]);
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      syncDatabase().catch((err) => console.error('[Layout] Initial sync failed:', err));
+      subscribeToRealtimeSync();
+      return () => {
+        unsubscribeFromRealtimeSync();
+      };
+    }
+    return undefined;
+  }, [user, isLoading]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

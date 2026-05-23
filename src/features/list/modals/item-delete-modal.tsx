@@ -1,17 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { useValue } from '@legendapp/state/react';
 
-import { deleteListItem, listItems$ } from '@/data/states/list-items';
-import { convertFromSupabaseFormat } from '@/lib/supabase/utils';
 import {
   AppModal,
   AppModalContent,
+  AppModalFooter,
   AppModalHandle,
   AppModalHeader,
-  AppModalFooter,
 } from '@/components/molecules/app-modal';
-import { ListItem } from '@/data/types';
+import { deleteListItem } from '@/database/operations/listItems';
+import { database } from '@/database';
+import { ListItem as ListItemModel } from '@/database/models/ListItem';
 
 type ItemDeleteModalProps = {
   open: boolean;
@@ -21,18 +20,27 @@ type ItemDeleteModalProps = {
 
 export function ItemDeleteModal({ open, itemId, onOpenChange }: ItemDeleteModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentItem, setCurrentItem] = useState<ListItemModel | null>(null);
 
-  const listItemsRaw = useValue(listItems$);
-  const allItems = convertFromSupabaseFormat(Object.values(listItemsRaw || {})) as ListItem[];
-  const currentItem = allItems.find((item) => item.id === itemId);
+  useEffect(() => {
+    if (itemId) {
+      database
+        .get<ListItemModel>('list_items')
+        .find(itemId)
+        .then(setCurrentItem)
+        .catch(() => setCurrentItem(null));
+    } else {
+      setCurrentItem(null);
+    }
+  }, [itemId]);
 
   const handleDelete = async () => {
     if (!itemId) return;
 
     setIsSubmitting(true);
     try {
-      const success = await deleteListItem({ itemId });
-      if (success) onOpenChange(false);
+      await deleteListItem(itemId);
+      onOpenChange(false);
     } finally {
       setIsSubmitting(false);
     }

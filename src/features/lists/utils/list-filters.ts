@@ -1,4 +1,4 @@
-import { List } from '@/data/types';
+import { List } from '@/types';
 
 export const filterListsByQuery = (lists: List[], query: string): List[] => {
   const normalizedQuery = query.trim().toLowerCase();

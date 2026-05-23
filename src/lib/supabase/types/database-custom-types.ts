@@ -12,7 +12,7 @@ export type ListRow = {
   icon: string | null;
   created_at: string | null;
   updated_at: string | null;
-  deleted: boolean | null;
+  deleted_at: string | null;
 };
 
 export type ListItemRow = {
@@ -25,7 +25,7 @@ export type ListItemRow = {
   is_checked: boolean;
   created_at: string | null;
   updated_at: string | null;
-  deleted: boolean | null;
+  deleted_at: string | null;
 };
 
 // Merge the generated database types with our custom types

@@ -1,97 +1,104 @@
 import * as Linking from 'expo-linking';
-import { useValue } from '@legendapp/state/react';
+import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
 
 import { SyncService, showToast } from '@/services';
 import { supabase } from '@/lib/supabase';
-import { isGuestUser } from '@/data/types/user';
+import { isGuestUser } from '@/types/user';
 import {
   fetchOrRestoreUser,
   syncWithSupabase,
   patchUser,
-  signInWithPassword,
+  signInWithPassword as signInAction,
   handleError,
   createSupabaseUser,
   performSignOut,
-} from '@/data/actions/auth';
-import { auth$ } from '@/data/states/auth';
-import { clearAllStorage } from '@/data/storage';
+} from '@/database/operations/auth';
+import {
+  getCurrentUser,
+  getCurrentSession,
+  setAuthState,
+  subscribe,
+  clearAuthState,
+} from '@/features/auth/authState';
 
 export function useAuth() {
-  const session = useValue(auth$.session);
-  const isInitialized = useValue(auth$.isInitialized);
-  const isLoading = useValue(auth$.isLoading);
+  const user = useSyncExternalStore(subscribe, getCurrentUser);
+  const [session, setSession] = useState(getCurrentSession());
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  return {
-    session,
-    isInitialized,
-    isLoading,
+  useEffect(() => {
+    const unsubscribe = subscribe(() => setSession(getCurrentSession()));
+    return unsubscribe;
+  }, []);
 
-    fetchUserDataAsync: async (): Promise<boolean> => {
-      try {
-        auth$.isLoading.set(true);
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
+      setAuthState({ session: newSession, user: newSession?.user ?? getCurrentUser() });
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
-        const current = auth$.user.get();
-        if (!current) {
-          auth$.isInitialized.set(true);
-          auth$.isLoading.set(false);
-          return false;
-        }
+  const fetchUserDataAsync = useCallback(async (): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      const current = getCurrentUser();
 
-        if (isGuestUser(current)) {
-          const result = await fetchOrRestoreUser();
-          auth$.user.set(result.user);
-          auth$.isInitialized.set(true);
-          auth$.isLoading.set(false);
-          return true;
-        }
-
-        const { data: sessionData } = await supabase.auth.getSession();
-
-        if (sessionData.session) {
-          const synced = await syncWithSupabase();
-          if (synced.user) {
-            auth$.user.set(synced.user);
-            auth$.session.set(sessionData.session);
-            auth$.isInitialized.set(true);
-            auth$.isLoading.set(false);
-            return true;
-          }
-        }
-
-        const updated = await patchUser({ id: current.id, is_guest: true });
-        auth$.user.set(updated.user);
-        auth$.session.set(null);
-        auth$.isInitialized.set(true);
-        auth$.isLoading.set(false);
-        return true;
-      } catch {
-        auth$.user.set(null);
-        auth$.session.set(null);
-        auth$.isInitialized.set(true);
-        auth$.isLoading.set(false);
+      if (!current) {
+        setIsInitialized(true);
+        setIsLoading(false);
         return false;
       }
-    },
 
-    signInWithPassword: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }): Promise<boolean> => {
+      if (isGuestUser(current)) {
+        const result = await fetchOrRestoreUser();
+        setAuthState({ user: result.user });
+        setIsInitialized(true);
+        setIsLoading(false);
+        return true;
+      }
+
+      const { data: sessionData } = await supabase.auth.getSession();
+
+      if (sessionData.session) {
+        const synced = await syncWithSupabase();
+        if (synced.user) {
+          setAuthState({ user: synced.user, session: sessionData.session });
+          setIsInitialized(true);
+          setIsLoading(false);
+          return true;
+        }
+      }
+
+      const updated = await patchUser({ id: current.id, is_guest: true });
+      setAuthState({ user: updated.user, session: null });
+      setIsInitialized(true);
+      setIsLoading(false);
+      return true;
+    } catch {
+      clearAuthState();
+      setIsInitialized(true);
+      setIsLoading(false);
+      return false;
+    }
+  }, []);
+
+  const signInWithPassword = useCallback(
+    async ({ email, password }: { email: string; password: string }): Promise<boolean> => {
       try {
         if (!email || !password) throw new Error('Email and password are required');
 
-        auth$.isLoading.set(true);
-        const previousUser = auth$.user.get();
+        setIsLoading(true);
+        const previousUser = getCurrentUser();
 
-        const result = await signInWithPassword(email, password);
+        const result = await signInAction(email, password);
         if (result.error) throw new Error(result.error);
         if (!result.user) throw new Error('Login failed');
 
         const {
-          data: { session },
+          data: { session: newSession },
         } = await supabase.auth.getSession();
 
         if (isGuestUser(previousUser)) {
@@ -102,15 +109,18 @@ export function useAuth() {
           });
         }
 
-        auth$.user.set(result.user);
-        auth$.session.set(session);
-        auth$.isLoading.set(false);
+        setAuthState({ user: result.user, session: newSession });
+        setIsLoading(false);
 
-        showToast({ type: 'success', title: 'Sucesso!', subtitle: 'Login realizado com sucesso' });
+        showToast({
+          type: 'success',
+          title: 'Sucesso!',
+          subtitle: 'Login realizado com sucesso',
+        });
         return true;
       } catch (error) {
         console.error('Error on signInWithPassword:', error);
-        auth$.isLoading.set(false);
+        setIsLoading(false);
         showToast({
           type: 'error',
           title: 'Erro ao conectar-se!',
@@ -119,17 +129,14 @@ export function useAuth() {
         return false;
       }
     },
+    [],
+  );
 
-    signUpWithPassword: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }): Promise<void> => {
+  const signUpWithPassword = useCallback(
+    async ({ email, password }: { email: string; password: string }): Promise<void> => {
       try {
-        auth$.isLoading.set(true);
-        const previousUser = auth$.user.get();
+        setIsLoading(true);
+        const previousUser = getCurrentUser();
 
         const result = await createSupabaseUser({ email, password });
         if (!result.user) throw new Error(result.error || 'Signup failed');
@@ -144,13 +151,16 @@ export function useAuth() {
           });
         }
 
-        auth$.user.set(result.user);
-        auth$.session.set(sessionData.session);
-        auth$.isLoading.set(false);
+        setAuthState({ user: result.user, session: sessionData.session });
+        setIsLoading(false);
 
-        showToast({ type: 'success', title: 'Sucesso!', subtitle: 'Conta criada com sucesso!' });
+        showToast({
+          type: 'success',
+          title: 'Sucesso!',
+          subtitle: 'Conta criada com sucesso!',
+        });
       } catch (error) {
-        auth$.isLoading.set(false);
+        setIsLoading(false);
         showToast({
           type: 'error',
           title: 'Erro ao criar conta!',
@@ -159,30 +169,30 @@ export function useAuth() {
         throw error;
       }
     },
+    [],
+  );
 
-    signOut: async (): Promise<boolean> => {
-      try {
-        auth$.isLoading.set(true);
-        await performSignOut();
-        clearAllStorage();
-        auth$.user.set(null);
-        auth$.session.set(null);
-        showToast({ type: 'success', title: 'Sucesso!', subtitle: 'Sessão encerrada!' });
-        return true;
-      } catch (error) {
-        console.error('Error on signOut:', error);
-        showToast({
-          type: 'error',
-          title: 'Erro ao desconectar!',
-          subtitle: 'Tente novamente mais tarde!',
-        });
-        return false;
-      } finally {
-        auth$.isLoading.set(false);
-      }
-    },
+  const signOut = useCallback(async (): Promise<boolean> => {
+    try {
+      setIsLoading(true);
+      await performSignOut();
+      showToast({ type: 'success', title: 'Sucesso!', subtitle: 'Sessão encerrada!' });
+      return true;
+    } catch (error) {
+      console.error('Error on signOut:', error);
+      showToast({
+        type: 'error',
+        title: 'Erro ao desconectar!',
+        subtitle: 'Tente novamente mais tarde!',
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-    sendResetPasswordByEmail: async ({ email }: { email: string }): Promise<boolean> => {
+  const sendResetPasswordByEmail = useCallback(
+    async ({ email }: { email: string }): Promise<boolean> => {
       try {
         const redirectUrl = Linking.createURL('password-recovery');
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -206,10 +216,13 @@ export function useAuth() {
         return false;
       }
     },
+    [],
+  );
 
-    resetPassword: async ({ password }: { password: string }): Promise<boolean> => {
+  const resetPassword = useCallback(
+    async ({ password }: { password: string }): Promise<boolean> => {
       try {
-        auth$.isLoading.set(true);
+        setIsLoading(true);
         const { error } = await supabase.auth.updateUser({ password });
         if (error) throw error;
 
@@ -224,37 +237,50 @@ export function useAuth() {
         });
         return false;
       } finally {
-        auth$.isLoading.set(false);
+        setIsLoading(false);
       }
     },
+    [],
+  );
 
-    checkSession: async (): Promise<void> => {
-      try {
-        const { data } = await supabase.auth.getSession();
+  const checkSession = useCallback(async (): Promise<void> => {
+    try {
+      const { data } = await supabase.auth.getSession();
 
-        if (data.session) {
-          const {
-            data: { user: supaUser },
-          } = await supabase.auth.getUser();
+      if (data.session) {
+        const {
+          data: { user: supaUser },
+        } = await supabase.auth.getUser();
 
-          if (supaUser) {
-            const synced = await syncWithSupabase(supaUser);
-            if (synced.user) {
-              auth$.user.set(synced.user);
-              auth$.session.set(data.session);
-            }
-          }
-        } else {
-          const current = auth$.user.get();
-          if (current) {
-            const updated = await patchUser({ id: current.id, is_guest: true });
-            auth$.user.set(updated.user);
-            auth$.session.set(null);
+        if (supaUser) {
+          const synced = await syncWithSupabase(supaUser);
+          if (synced.user) {
+            setAuthState({ user: synced.user, session: data.session });
           }
         }
-      } catch (error) {
-        console.error('Error checking session:', error);
+      } else {
+        const current = getCurrentUser();
+        if (current) {
+          const updated = await patchUser({ id: current.id, is_guest: true });
+          setAuthState({ user: updated.user, session: null });
+        }
       }
-    },
+    } catch (error) {
+      console.error('Error checking session:', error);
+    }
+  }, []);
+
+  return {
+    session,
+    isInitialized,
+    isLoading,
+    user,
+    fetchUserDataAsync,
+    signInWithPassword,
+    signUpWithPassword,
+    signOut,
+    sendResetPasswordByEmail,
+    resetPassword,
+    checkSession,
   };
 }

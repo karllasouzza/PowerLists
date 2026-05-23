@@ -1,33 +1,41 @@
 'use strict';
 /* global jest */
 
-const createCell = (initial) => {
-  let value = initial;
+let currentUser = null;
+let currentSession = null;
+const listeners = new Set();
 
-  return {
-    get: jest.fn(() => value),
-    set: jest.fn((next) => {
-      value = next;
-    }),
-  };
-};
+const getCurrentUser = jest.fn(() => currentUser);
+const getCurrentSession = jest.fn(() => currentSession);
 
-const auth$ = {
-  user: createCell(null),
-  session: createCell(null),
-  isInitialized: createCell(false),
-  isLoading: createCell(false),
-};
+const setAuthState = jest.fn(({ user, session }) => {
+  if (user !== undefined) currentUser = user;
+  if (session !== undefined) currentSession = session;
+  listeners.forEach((l) => l());
+});
+
+const clearAuthState = jest.fn(() => {
+  currentUser = null;
+  currentSession = null;
+  listeners.forEach((l) => l());
+});
+
+const subscribe = jest.fn((listener) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+});
 
 const resetAuthState = () => {
-  auth$.user.set(null);
-  auth$.session.set(null);
-  auth$.isInitialized.set(false);
-  auth$.isLoading.set(false);
+  currentUser = null;
+  currentSession = null;
+  listeners.clear();
 };
 
 module.exports = {
-  auth$,
-  createCell,
+  getCurrentUser,
+  getCurrentSession,
+  setAuthState,
+  clearAuthState,
+  subscribe,
   resetAuthState,
 };
