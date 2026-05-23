@@ -1,4 +1,4 @@
-import { themes } from "@/lib/themes";
+import { themes } from '@/lib/themes';
 
 export interface UserPreferencesProviderProps {
   children: React.ReactNode;
