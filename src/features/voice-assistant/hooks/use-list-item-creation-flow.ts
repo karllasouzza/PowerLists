@@ -1,4 +1,5 @@
-import { createNewListItem } from '@/data/actions/list-items';
+import { createListItem } from '@/database/operations/listItems';
+import { getCurrentUserId } from '@/features/auth/authState';
 import { generateUUID } from '@/utils/generate-uuid';
 import type { AudioPlayer } from 'expo-audio';
 import { useCallback } from 'react';
@@ -40,16 +41,17 @@ export const useListItemCreationFlow = (
       await playAudio(players.addingListItemPlayer);
 
       // Step 3: create the item
-      const isSaved = await createNewListItem({
-        title,
-        amount,
-        listId,
-        profileId: '',
-        price: null,
-        isChecked: false,
-      });
+      try {
+        const profileId = getCurrentUserId() ?? '';
+        await createListItem({
+          title,
+          amount,
+          listId,
+          profileId,
+          price: null,
+          isChecked: false,
+        });
 
-      if (isSaved) {
         // Step 4: success — update status
         setChatMessages((prev) =>
           prev.map((msg) =>
@@ -66,7 +68,7 @@ export const useListItemCreationFlow = (
           { type: 'assistant', text: 'Se quiser adicionar outro item, é só me falar' },
         ]);
         await playAudio(players.assistantNewItemPlayer);
-      } else {
+      } catch {
         // Step 5: error — update item status
         setChatMessages((prev) =>
           prev.map((msg) =>
