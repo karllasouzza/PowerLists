@@ -13,6 +13,11 @@ import { useAuth } from '@/hooks/use-auth';
 import { useUser } from '@/hooks/use-user';
 import { useAppFonts } from '@/utils/fonts';
 import ErrorBoundary from '@/components/error-boundary';
+import {
+  syncDatabase,
+  subscribeToRealtimeSync,
+  unsubscribeFromRealtimeSync,
+} from '@/database/sync';
 
 export default function RootLayout() {
   const [visible, setVisible] = useState(true);
@@ -30,6 +35,17 @@ export default function RootLayout() {
       BootSplash.hide({ fade: true });
     }
   }, [isLoading, fontsLoaded]);
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      syncDatabase().catch((err) => console.error('[Layout] Initial sync failed:', err));
+      subscribeToRealtimeSync();
+      return () => {
+        unsubscribeFromRealtimeSync();
+      };
+    }
+    return undefined;
+  }, [user, isLoading]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
