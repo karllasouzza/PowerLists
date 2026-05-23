@@ -1,20 +1,18 @@
 import { AuthError, AuthUser } from '@supabase/supabase-js';
 
-import { auth$ } from '@/data/states/auth';
-import { resetProfilesStore } from '@/data/states/profile';
 import type {
   CreateUserParams,
   UpdateUserParams,
   UserGuestType,
   UserOperationResult,
-} from '@/data/types/user';
-import { generateId } from '@/data/utils';
+} from '@/types/user';
+import { generateId } from '@/database/utils';
+import { database } from '@/database';
 import { supabase } from '@/lib/supabase';
-import { resetListItemsStore } from './list-items';
-import { resetListStore } from './lists';
+import { getCurrentUser, setAuthState, clearAuthState } from '@/features/auth/authState';
 
 export async function fetchOrRestoreUser(): Promise<UserOperationResult> {
-  const useCached = auth$.user.get();
+  const useCached = getCurrentUser();
   if (useCached) return { user: useCached };
 
   const {
@@ -22,7 +20,7 @@ export async function fetchOrRestoreUser(): Promise<UserOperationResult> {
   } = await supabase.auth.getUser();
 
   if (user) {
-    auth$.user.set(user);
+    setAuthState({ user });
     return { user };
   }
 
@@ -45,7 +43,7 @@ export async function createSupabaseUser({
     synchronized_at: new Date().toISOString(),
   };
 
-  auth$.user.set(newUser);
+  setAuthState({ user: newUser });
   return { user: newUser };
 }
 
@@ -55,11 +53,11 @@ export async function patchUser({
 }: UpdateUserParams): Promise<UserOperationResult> {
   if (!id) throw new Error('User ID is required');
 
-  const current = auth$.user.get();
+  const current = getCurrentUser();
   if (!current) return { user: null };
 
   const patched = { ...current, ...updates };
-  auth$.user.set(patched);
+  setAuthState({ user: patched });
 
   if (!patched.is_guest && updates.email) {
     const { error } = await supabase.auth.updateUser({ email: updates.email });
@@ -92,7 +90,7 @@ export async function syncWithSupabase(user?: AuthUser): Promise<UserOperationRe
     is_guest: false,
     synchronized_at: new Date().toISOString(),
   };
-  auth$.user.set(fallback);
+  setAuthState({ user: fallback });
   return { user: fallback };
 }
 
@@ -120,16 +118,16 @@ export async function createGuest(name?: string): Promise<UserOperationResult> {
     created_at: new Date().toISOString(),
   };
 
-  auth$.user.set(guest);
+  setAuthState({ user: guest });
   return { user: guest };
 }
 
 export async function performSignOut() {
   await supabase.auth.signOut();
-  auth$.user.set(null);
-  resetProfilesStore();
-  resetListStore();
-  resetListItemsStore();
+  await database.write(async () => {
+    await database.unsafeResetDatabase();
+  });
+  clearAuthState();
 }
 
 export function handleError(msg: string, error: unknown): string {
