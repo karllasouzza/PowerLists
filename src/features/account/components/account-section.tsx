@@ -4,11 +4,12 @@ import { Text } from '@/components/ui/text';
 import { SettingsRow } from './settings-row';
 
 type AccountSectionProps = {
+  isGuest?: boolean;
   onManageProfile: () => void;
   onPasswordSecurity: () => void;
 };
 
-export function AccountSection({ onManageProfile, onPasswordSecurity }: AccountSectionProps) {
+export function AccountSection({ isGuest, onManageProfile, onPasswordSecurity }: AccountSectionProps) {
   return (
     <View className="m-4 overflow-hidden flex flex-col gap-3">
       <Text className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
@@ -16,8 +17,12 @@ export function AccountSection({ onManageProfile, onPasswordSecurity }: AccountS
       </Text>
       <View className="rounded-2xl border border-border bg-card">
         <SettingsRow icon={IconUserEdit} label="Editar Perfil" onPress={onManageProfile} />
-        <View className="mx-5 border-t border-border" />
-        <SettingsRow icon={IconKey} label="Alterar Senha" onPress={onPasswordSecurity} />
+        {!isGuest && (
+          <>
+            <View className="mx-5 border-t border-border" />
+            <SettingsRow icon={IconKey} label="Alterar Senha" onPress={onPasswordSecurity} />
+          </>
+        )}
       </View>
     </View>
   );

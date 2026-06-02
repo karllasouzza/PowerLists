@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { IconEye, IconEyeClosed, IconLoader2, IconLogin } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconEye, IconEyeClosed, IconLoader2, IconLogin } from '@tabler/icons-react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -56,6 +56,14 @@ export default function LoginScreen() {
       className="flex-1 bg-background"
       bottomOffset={62}
       contentContainerClassName="flex-grow justify-between">
+      <View className="w-full px-4 pt-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onPress={() => router.back()}>
+          <Icon as={IconArrowLeft} size={24} />
+        </Button>
+      </View>
       <View className="flex w-full items-center justify-center gap-6 p-6">
         <View className="w-full max-w-md items-center justify-center gap-2">
           <Image

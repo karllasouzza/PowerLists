@@ -4,11 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
-import { IconEye, IconEyeClosed, IconLoader2, IconUserPlus } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconEye, IconEyeClosed, IconLoader2, IconUserPlus } from '@tabler/icons-react-native';
 import { Image } from 'expo-image';
 import { Controller } from 'react-hook-form';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useRouter } from 'expo-router';
 import { useCreateAccountLogic } from './hooks/use-create-account-logic';
 
 export default function CreateAccountScreen() {
@@ -23,11 +24,21 @@ export default function CreateAccountScreen() {
     isLoading,
   } = useCreateAccountLogic();
 
+  const router = useRouter();
+
   return (
     <KeyboardAwareScrollView
       className="flex-1 bg-background"
       bottomOffset={62}
       contentContainerClassName="flex-grow justify-between">
+      <View className="w-full px-4 pt-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onPress={() => router.back()}>
+          <Icon as={IconArrowLeft} size={24} />
+        </Button>
+      </View>
       <View className="flex w-full items-center justify-center gap-6 p-6">
         <View className="w-full max-w-md items-center justify-center gap-2">
           <Image

@@ -1,15 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
-import { IconFolder } from '@tabler/icons-react-native';
+import { IconArrowLeft, IconFolder } from '@tabler/icons-react-native';
 import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
 import { useAuthPageLogic } from './hooks/use-auth-page-logic';
 
 export default function AuthScreen() {
-  const { handleCreateAccount, handleLogin, handleGuest } = useAuthPageLogic();
+  const { handleCreateAccount, handleLogin, handleGuest, isAlreadyGuest } = useAuthPageLogic();
+  const router = useRouter();
 
   return (
     <View className="h-full w-full flex-1 flex-col items-center justify-between gap-2 overflow-hidden bg-background">
+      <View className="w-full items-center">
+        <View className="w-full px-4 pt-4">
+          <Button
+            variant="outline"
+            size="icon"
+            onPress={() => router.back()}>
+            <Icon as={IconArrowLeft} size={24} />
+          </Button>
+        </View>
+      </View>
       <View className="w-full items-center justify-center">
         <View className="h-[300px] max-h-[300px] w-full items-center justify-center gap-2">
           <Image
@@ -37,18 +49,20 @@ export default function AuthScreen() {
           </Button>
         </View>
 
-        <View className="w-full items-center justify-end gap-4 bg-background">
-          <View className="w-full flex-row items-center justify-center gap-4 bg-background px-4">
-            <View className="h-[1px] w-full bg-border" />
-            <Text className="font-bold uppercase text-muted-foreground">ou</Text>
-            <View className="h-[1px] w-full bg-border" />
-          </View>
+        {!isAlreadyGuest && (
+          <View className="w-full items-center justify-end gap-4 bg-background">
+            <View className="w-full flex-row items-center justify-center gap-4 bg-background px-4">
+              <View className="h-[1px] w-full bg-border" />
+              <Text className="font-bold uppercase text-muted-foreground">ou</Text>
+              <View className="h-[1px] w-full bg-border" />
+            </View>
 
-          <Button variant="ghost" className="h-12 w-full" onPress={handleGuest}>
-            <Icon as={IconFolder} className="text-secondary-foreground" size={20} />
-            <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
-          </Button>
-        </View>
+            <Button variant="ghost" className="h-12 w-full" onPress={handleGuest}>
+              <Icon as={IconFolder} className="text-secondary-foreground" size={20} />
+              <Text className="font-bold text-secondary-foreground">Continuar com conta local</Text>
+            </Button>
+          </View>
+        )}
       </View>
     </View>
   );
