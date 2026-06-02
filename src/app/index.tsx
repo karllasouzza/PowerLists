@@ -1,13 +1,22 @@
-import { useOnboardingFirstAccess } from '@/features/onboarding/hooks/use-onboarding-first-access';
-import OnboardingScreen from '@/features/onboarding/page';
+import { ActivityIndicator, View } from 'react-native';
 import { Redirect } from 'expo-router';
 
-export default function IndexScreen() {
-  const { isFirstAccess, completeOnboarding } = useOnboardingFirstAccess();
+import { useAuth } from '@/hooks/use-auth';
+import { useUser } from '@/hooks/use-user';
 
-  if (!isFirstAccess) {
-    return <Redirect href="/auth" />;
+export default function IndexScreen() {
+  const { isLoading } = useAuth();
+  const { user } = useUser();
+
+  if (isLoading) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background">
+        <ActivityIndicator />
+      </View>
+    );
   }
 
-  return <OnboardingScreen onComplete={completeOnboarding} />;
+  if (user) return <Redirect href="/(authenticated)" />;
+
+  return <Redirect href="/onboarding" />;
 }

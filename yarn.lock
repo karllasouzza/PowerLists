@@ -2200,20 +2200,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@legendapp/state@npm:^3.0.0-beta.42":
-  version: 3.0.0-beta.46
-  resolution: "@legendapp/state@npm:3.0.0-beta.46"
-  dependencies:
-    use-sync-external-store: "npm:^1.2.2"
-  peerDependencies:
-    expo-sqlite: ^15.0.0
-  peerDependenciesMeta:
-    expo-sqlite:
-      optional: true
-  checksum: 10c0/b5fdef615fa3fe3dba3513b635c200abe2b2c61adf69bdd2c03bb5512932d97647fc33f520c7aa9cee639483fbe51736a66da60102096785ddcaead05e7f2947
-  languageName: node
-  linkType: hard
-
 "@napi-rs/wasm-runtime@npm:^0.2.11":
   version: 0.2.12
   resolution: "@napi-rs/wasm-runtime@npm:0.2.12"
@@ -11811,7 +11797,6 @@ __metadata:
     "@expo-google-fonts/poppins": "npm:^0.4.1"
     "@hookform/resolvers": "npm:^5.2.2"
     "@legendapp/list": "npm:2.1.0-beta.14"
-    "@legendapp/state": "npm:^3.0.0-beta.42"
     "@nozbe/watermelondb": "npm:^0.28.0"
     "@rn-primitives/accordion": "npm:^1.2.0"
     "@rn-primitives/alert-dialog": "npm:^1.2.0"
@@ -11883,7 +11868,6 @@ __metadata:
     react-native-gesture-handler: "npm:~2.28.0"
     react-native-get-random-values: "npm:~1.11.0"
     react-native-keyboard-controller: "npm:1.18.5"
-    react-native-mmkv: "npm:3.3.3"
     react-native-reanimated: "npm:~4.1.1"
     react-native-safe-area-context: "npm:~5.6.0"
     react-native-screens: "npm:~4.16.0"
@@ -12379,16 +12363,6 @@ __metadata:
     react-native: "*"
     react-native-reanimated: ">=3.0.0"
   checksum: 10c0/708b8c299fdfc11749db4d84238330a2f04a07a92f40a5f0aa2870ffedb9e47c05455d50c3441a321f5cd5cacf7c936d5706e74cfb234a132e6c6c9ebb0d5e57
-  languageName: node
-  linkType: hard
-
-"react-native-mmkv@npm:3.3.3":
-  version: 3.3.3
-  resolution: "react-native-mmkv@npm:3.3.3"
-  peerDependencies:
-    react: "*"
-    react-native: "*"
-  checksum: 10c0/efd7f725674d686ea126a213bd8c4270e8e4e8f306917a1b846a9f7ddf652ad057c7d509a9292d7bbf6a58603d4ab5a18e0c3b0d1b00447df45eeac81cbbd1e1
   languageName: node
   linkType: hard
 
@@ -14458,7 +14432,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-sync-external-store@npm:^1.2.2, use-sync-external-store@npm:^1.5.0":
+"use-sync-external-store@npm:^1.5.0":
   version: 1.6.0
   resolution: "use-sync-external-store@npm:1.6.0"
   peerDependencies:

@@ -18,6 +18,7 @@ import {
   subscribeToRealtimeSync,
   unsubscribeFromRealtimeSync,
 } from '@/database/sync';
+import { isGuestUser } from '@/types/user';
 
 export default function RootLayout() {
   const [visible, setVisible] = useState(true);
@@ -53,9 +54,9 @@ export default function RootLayout() {
         <ThemeProvider>
           <ErrorBoundary>
             <Stack screenOptions={{ contentStyle: { backgroundColor: 'transparent' } }}>
-              <Stack.Protected guard={!user}>
+              <Stack.Protected guard={!user || isGuestUser(user)}>
                 <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="auth" options={{ headerShown: false }} />
+                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
                 <Stack.Screen name="login" options={{ headerShown: false }} />
                 <Stack.Screen name="create-account" options={{ headerShown: false }} />
                 <Stack.Screen name="request-password-recovery" options={{ headerShown: false }} />

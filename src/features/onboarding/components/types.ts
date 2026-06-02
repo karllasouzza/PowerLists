@@ -1,4 +1,4 @@
-import { ImageSourcePropType } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
 
 export interface ISlide {
   content: {
@@ -10,8 +10,4 @@ export interface ISlide {
 
 export interface SlideItemProps {
   item: ISlide;
-}
-
-export interface SlidesProps {
-  completeOnboarding: () => void;
 }
