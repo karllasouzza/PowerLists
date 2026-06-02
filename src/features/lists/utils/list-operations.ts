@@ -1,6 +1,7 @@
 import { createList, updateList, deleteList } from '@/database/operations/lists';
 import { showToast } from '@/services';
 import { getCurrentUserId } from '@/features/auth/authState';
+import { DEFAULT_ACCENT_COLOR } from '@/features/lists/utils/accent-colors';
 import { FormData } from '../types';
 
 export const handleAddNewList = async (data: FormData) => {
@@ -10,7 +11,7 @@ export const handleAddNewList = async (data: FormData) => {
 
     const newList = await createList({
       title: data.title,
-      accentColor: data.color || 'primary',
+      accentColor: data.color || DEFAULT_ACCENT_COLOR,
       icon: data.icon || 'cart',
       profileId: userId,
     });
@@ -38,7 +39,7 @@ export const handleEditList = async (listEditId: string, data: FormData) => {
   try {
     const editList = await updateList(listEditId, {
       title: data.title,
-      accentColor: data.color || 'primary',
+      accentColor: data.color || DEFAULT_ACCENT_COLOR,
       icon: data.icon || 'cart',
     });
 

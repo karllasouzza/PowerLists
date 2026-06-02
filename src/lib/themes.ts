@@ -60,6 +60,18 @@ export const rawColors = {
       '--color-onboarding-3': '90 12% 94%',
       '--color-onboarding-3-foreground': '127 15% 12%',
 
+      // === LIST ACCENT COLORS ===
+      '--color-list-accent-1': '123 44% 34%',
+      '--color-list-accent-1-foreground': '0 0% 100%',
+      '--color-list-accent-2': '175 45% 40%',
+      '--color-list-accent-2-foreground': '0 0% 100%',
+      '--color-list-accent-3': '12 55% 50%',
+      '--color-list-accent-3-foreground': '0 0% 100%',
+      '--color-list-accent-4': '42 75% 45%',
+      '--color-list-accent-4-foreground': '0 0% 100%',
+      '--color-list-accent-5': '150 30% 28%',
+      '--color-list-accent-5-foreground': '0 0% 100%',
+
       // === BOTTOM BAR ===
       '--color-bottom-bar': '90 15% 95%',
       '--color-bottom-bar-foreground': '132 12% 10%',
@@ -112,6 +124,18 @@ export const rawColors = {
       '--color-onboarding-3': '138 7% 7%',
       '--color-onboarding-3-foreground': '120 8% 88%',
 
+      // === LIST ACCENT COLORS ===
+      '--color-list-accent-1': '122 42% 52%',
+      '--color-list-accent-1-foreground': '0 0% 100%',
+      '--color-list-accent-2': '175 45% 60%',
+      '--color-list-accent-2-foreground': '0 0% 100%',
+      '--color-list-accent-3': '12 55% 60%',
+      '--color-list-accent-3-foreground': '0 0% 100%',
+      '--color-list-accent-4': '42 75% 55%',
+      '--color-list-accent-4-foreground': '0 0% 100%',
+      '--color-list-accent-5': '150 30% 50%',
+      '--color-list-accent-5-foreground': '0 0% 100%',
+
       // === BOTTOM BAR ===
       '--color-bottom-bar': '138 9% 6%',
       '--color-bottom-bar-foreground': '110 30% 95%',
@@ -152,6 +176,18 @@ export const rawColors = {
       '--color-onboarding-2-foreground': '0 0% 0%',
       '--color-onboarding-3': '32 98% 83%',
       '--color-onboarding-3-foreground': '0 0% 0%',
+      // === LIST ACCENT COLORS ===
+      '--color-list-accent-1': '270 57% 50%',
+      '--color-list-accent-1-foreground': '0 0% 100%',
+      '--color-list-accent-2': '175 45% 40%',
+      '--color-list-accent-2-foreground': '0 0% 100%',
+      '--color-list-accent-3': '330 50% 50%',
+      '--color-list-accent-3-foreground': '0 0% 100%',
+      '--color-list-accent-4': '42 75% 45%',
+      '--color-list-accent-4-foreground': '0 0% 100%',
+      '--color-list-accent-5': '250 50% 45%',
+      '--color-list-accent-5-foreground': '0 0% 100%',
+
       '--color-bottom-bar': '267 100% 96%',
       '--color-bottom-bar-foreground': '276 100% 20%',
       '--color-bottom-bar-accent': '270 57% 50%',
@@ -189,6 +225,18 @@ export const rawColors = {
       '--color-onboarding-2-foreground': '0 0% 100%',
       '--color-onboarding-3': '32 98% 83%',
       '--color-onboarding-3-foreground': '0 0% 100%',
+      // === LIST ACCENT COLORS ===
+      '--color-list-accent-1': '270 100% 86%',
+      '--color-list-accent-1-foreground': '272 100% 16%',
+      '--color-list-accent-2': '175 45% 60%',
+      '--color-list-accent-2-foreground': '0 0% 100%',
+      '--color-list-accent-3': '330 50% 65%',
+      '--color-list-accent-3-foreground': '0 0% 100%',
+      '--color-list-accent-4': '42 75% 55%',
+      '--color-list-accent-4-foreground': '0 0% 100%',
+      '--color-list-accent-5': '250 50% 65%',
+      '--color-list-accent-5-foreground': '0 0% 100%',
+
       '--color-bottom-bar': '272 100% 16%',
       '--color-bottom-bar-foreground': '273 100% 89%',
       '--color-bottom-bar-accent': '272 68% 57%',

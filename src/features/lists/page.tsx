@@ -6,8 +6,11 @@ import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-list-page-logics';
-import { IconPlus } from '@tabler/icons-react-native';
+import { IconFolderOff, IconPlus } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
+import { Button } from '@/components/ui/button';
 import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
 
 const AsyncCardList = React.lazy(async () => {
@@ -49,29 +52,50 @@ const HomeScreen = () => {
     closeOpenedSwipeable();
   }, []);
 
+  const isEmpty = lists.length === 0;
+
   return (
     <View className="flex flex-1 items-center bg-background p-0! w-full h-full">
       <TopBar
         title="Minhas Listas"
-        showSearch={true}
+        showSearch={!isEmpty}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Procurando por algo?"
       />
 
-      <Suspense fallback={<CardListSkeletonList />}>
-        <FlatList
-          data={lists}
-          renderItem={({ item }) => renderList(item)}
-          keyExtractor={(item) => item.id}
-          extraData={listTotalsById}
-          onScrollBeginDrag={handleListScrollStart}
-          ListFooterComponent={<View className="h-20" />}
-          className="flex flex-1 w-full h-full"
-        />
-      </Suspense>
+      {isEmpty ? (
+        <View className="flex-1 items-center justify-center px-8">
+          <Icon as={IconFolderOff} size={48} className="text-muted-foreground" />
+          <Text className="mt-4 text-lg font-semibold text-foreground">Nenhuma lista</Text>
+          <Text variant="muted" className="mt-1 text-center">
+            Suas listas de compras aparecerão aqui.
+          </Text>
+          <Button
+            variant="default"
+            className="mt-6 h-12 px-8"
+            onPress={handleOpenCreateModal}>
+            <Icon as={IconPlus} size={20} className="text-primary-foreground" />
+            <Text className="text-base font-bold text-primary-foreground">Criar primeira lista</Text>
+          </Button>
+        </View>
+      ) : (
+        <Suspense fallback={<CardListSkeletonList />}>
+          <FlatList
+            data={lists}
+            renderItem={({ item }) => renderList(item)}
+            keyExtractor={(item) => item.id}
+            extraData={listTotalsById}
+            onScrollBeginDrag={handleListScrollStart}
+            ListFooterComponent={<View className="h-20" />}
+            className="flex flex-1 w-full h-full"
+          />
+        </Suspense>
+      )}
 
-      <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />
+      {!isEmpty && (
+        <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />
+      )}
 
       <ListCreateModal open={isCreateOpen} onOpenChange={setCreateOpen} />
       <ListUpdateModal open={isUpdateOpen} listId={activeListId} onOpenChange={setUpdateOpen} />

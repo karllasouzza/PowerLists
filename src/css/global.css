@@ -35,6 +35,17 @@
   --sidebar-border: 90 10% 88%;
   --sidebar-ring: 123 44% 34%;
 
+  --color-list-accent-1: 123 44% 34%;
+  --color-list-accent-1-foreground: 0 0% 100%;
+  --color-list-accent-2: 175 45% 40%;
+  --color-list-accent-2-foreground: 0 0% 100%;
+  --color-list-accent-3: 12 55% 50%;
+  --color-list-accent-3-foreground: 0 0% 100%;
+  --color-list-accent-4: 42 75% 45%;
+  --color-list-accent-4-foreground: 0 0% 100%;
+  --color-list-accent-5: 150 30% 28%;
+  --color-list-accent-5-foreground: 0 0% 100%;
+
   --font-sans: Montserrat, sans-serif;
   --font-serif: Merriweather, serif;
   --font-mono: Source Code Pro, monospace;
@@ -83,6 +94,17 @@
   --sidebar-accent-foreground: 34 25% 92%;
   --sidebar-border: 132 10% 20%;
   --sidebar-ring: 122 42% 52%;
+
+  --color-list-accent-1: 122 42% 52%;
+  --color-list-accent-1-foreground: 0 0% 100%;
+  --color-list-accent-2: 175 45% 60%;
+  --color-list-accent-2-foreground: 0 0% 100%;
+  --color-list-accent-3: 12 55% 60%;
+  --color-list-accent-3-foreground: 0 0% 100%;
+  --color-list-accent-4: 42 75% 55%;
+  --color-list-accent-4-foreground: 0 0% 100%;
+  --color-list-accent-5: 150 30% 50%;
+  --color-list-accent-5-foreground: 0 0% 100%;
 
   --shadow-2xs: 0 1px 3px 0px rgb(0 0 0 / 0.05);
   --shadow-xs: 0 1px 3px 0px rgb(0 0 0 / 0.05);

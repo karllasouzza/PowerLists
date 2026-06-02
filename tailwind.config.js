@@ -71,6 +71,26 @@ export const theme = {
         DEFAULT: 'hsl(var(--color-onboarding-3))',
         foreground: 'hsl(var(--color-onboarding-3-foreground))',
       },
+      'list-accent-1': {
+        DEFAULT: 'hsl(var(--color-list-accent-1))',
+        foreground: 'hsl(var(--color-list-accent-1-foreground))',
+      },
+      'list-accent-2': {
+        DEFAULT: 'hsl(var(--color-list-accent-2))',
+        foreground: 'hsl(var(--color-list-accent-2-foreground))',
+      },
+      'list-accent-3': {
+        DEFAULT: 'hsl(var(--color-list-accent-3))',
+        foreground: 'hsl(var(--color-list-accent-3-foreground))',
+      },
+      'list-accent-4': {
+        DEFAULT: 'hsl(var(--color-list-accent-4))',
+        foreground: 'hsl(var(--color-list-accent-4-foreground))',
+      },
+      'list-accent-5': {
+        DEFAULT: 'hsl(var(--color-list-accent-5))',
+        foreground: 'hsl(var(--color-list-accent-5-foreground))',
+      },
       'bottom-bar': {
         DEFAULT: 'hsl(var(--color-bottom-bar))',
         foreground: 'hsl(var(--color-bottom-bar-foreground))',
