@@ -17,7 +17,7 @@ export const ListItemsEmptyComponent = ({
         <Text className={cn('text-sm font-semibold', accentForegroundClassName)}>+ Novo item</Text>
       </View>
       <Text variant="muted" className="text-center">
-        Nenhum item nesta lista.{'\n'}Toque em + para adicionar.
+        Nenhum item nesta lista.{'\n'}Toque em + para adicionar e{'\n'}controlar seus gastos.
       </Text>
     </View>
   );

@@ -67,9 +67,9 @@ const HomeScreen = () => {
       {isEmpty ? (
         <View className="flex-1 items-center justify-center px-8">
           <Icon as={IconFolderOff} size={48} className="text-muted-foreground" />
-          <Text className="mt-4 text-lg font-semibold text-foreground">Nenhuma lista</Text>
+          <Text className="mt-4 text-lg font-semibold text-foreground">Nenhuma lista ainda</Text>
           <Text variant="muted" className="mt-1 text-center">
-            Suas listas de compras aparecerão aqui.
+            Crie sua primeira lista e saiba exatamente{'\n'}quanto vai gastar em cada compra.
           </Text>
           <Button
             variant="default"
