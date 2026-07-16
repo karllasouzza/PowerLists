@@ -45,7 +45,7 @@ export default function AuthenticatedLayout() {
         />
 
         <TabTrigger name="index" href={'/' as Href} asChild>
-          <TabButton icon={IconHome} focusedIcon={IconHomeFilled} label="Dashboard" />
+          <TabButton icon={IconHome} focusedIcon={IconHomeFilled} label="Início" />
         </TabTrigger>
         <TabTrigger name="lists" href={'/lists' as Href} asChild>
           <TabButton icon={IconFolder} focusedIcon={IconFolderFilled} label="Listas" />

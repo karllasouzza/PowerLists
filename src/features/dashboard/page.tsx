@@ -96,7 +96,7 @@ function DashboardPage() {
 
   return (
     <View className="flex-1 bg-background">
-      <TopBar title="Dashboard" showSearch={false} />
+      <TopBar title="Início" showSearch={false} />
 
       {isLoading ? (
         <DashboardLoading />
