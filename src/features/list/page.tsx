@@ -144,6 +144,9 @@ const ListItemsScreen = () => {
         className="!bottom-20"
         onPress={handleOpenAdd}
         icon={IconPlus}
+        label="Adicionar item"
+        accessibilityLabel="Adicionar item à lista"
+        accessibilityRole="button"
         buttonClassName={accentBgClassName}
         iconClassName={accentForegroundClassName}
         labelClassName={accentForegroundClassName}

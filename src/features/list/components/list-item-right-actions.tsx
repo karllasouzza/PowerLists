@@ -34,6 +34,8 @@ function ListItemRightActionsComponent({
       <Button
         onPress={handleEdit}
         variant="secondary"
+        accessibilityRole="button"
+        accessibilityLabel="Editar item"
         className="justify-center h-full flex-col items-center w-[78px]">
         <Icon as={IconPencil} size={20} className="text-secondary-foreground" />
         <Text className="mt-1 font-semibold text-secondary-foreground text-xs">Editar</Text>
@@ -42,6 +44,8 @@ function ListItemRightActionsComponent({
       <Button
         onPress={handleDelete}
         variant="destructive"
+        accessibilityRole="button"
+        accessibilityLabel="Excluir item"
         className="justify-center h-full flex-col items-center w-[78px]">
         <Icon as={IconTrash} size={20} className="text-destructive-foreground" />
         <Text className="mt-1 font-semibold text-destructive-foreground text-xs">Deletar</Text>

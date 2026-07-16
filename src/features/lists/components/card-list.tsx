@@ -63,7 +63,11 @@ function CardListComponent({ list, totalPrice, onEdit, onDelete }: CardListProps
       dragOffsetFromRightEdge={14}
       overshootRight={false}
       renderRightActions={renderRightActions}>
-      <Pressable onPress={handlePress} className="flex-row items-center gap-3 bg-card px-4 py-4">
+      <Pressable
+        onPress={handlePress}
+        accessibilityRole="button"
+        accessibilityLabel={`Abrir lista ${list.title}, total ${totalPrice}`}
+        className="flex-row items-center gap-3 bg-card px-4 py-4">
         <View
           className={cn(
             'flex justify-center items-center rounded-lg size-[50px] overflow-hidden',

@@ -94,7 +94,13 @@ const HomeScreen = () => {
       )}
 
       {!isEmpty && (
-        <Fab icon={IconPlus} label="Adicionar Lista" onPress={handleOpenCreateModal} />
+        <Fab
+          icon={IconPlus}
+          label="Adicionar Lista"
+          accessibilityLabel="Adicionar nova lista"
+          accessibilityRole="button"
+          onPress={handleOpenCreateModal}
+        />
       )}
 
       <ListCreateModal open={isCreateOpen} onOpenChange={setCreateOpen} />
