@@ -1,9 +1,11 @@
-import { IconRobotFace, IconPlus } from '@tabler/icons-react-native';
+import { IconRobotFace, IconPlus, IconGitCompare } from '@tabler/icons-react-native';
 import { router } from 'expo-router';
 import React, { Suspense, useCallback } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 
 import { TopBar } from '@/components/top-bar';
+import { Icon } from '@/components/ui/icon';
+import { Text } from '@/components/ui/text';
 import { Fab } from '@/components/ui/fab';
 
 import { ListItemsFooter, ListItemSkeletonList, ListItemsSortBar } from './components';
@@ -92,6 +94,18 @@ const ListItemsScreen = () => {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Buscar itens..."
+        rightAction={
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Comparar preços dos itens"
+            onPress={() => router.push('/item-variations')}
+            className="flex-row items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+            <Icon as={IconGitCompare} size={18} className="text-foreground" />
+            <Text variant="small" className="font-semibold text-foreground">
+              Comparar
+            </Text>
+          </Pressable>
+        }
       />
       <ListItemsSortBar
         sortMode={sortMode}
@@ -119,6 +133,9 @@ const ListItemsScreen = () => {
         className="!bottom-36"
         onPress={handleOpenAssistant}
         icon={IconRobotFace}
+        label="Assistente"
+        accessibilityLabel="Abrir assistente de voz para adicionar itens"
+        accessibilityRole="button"
         buttonClassName={'bg-violet-400 p-3'}
         iconClassName={accentForegroundClassName}
         labelClassName={accentForegroundClassName}
