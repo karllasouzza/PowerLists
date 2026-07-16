@@ -100,7 +100,7 @@ This document outlines the core development rules and conventions for the PowerL
 ## Localization Rules
 
 - All user-facing strings are in **Portuguese (Brazil)**
-- `languagepacks.json` exists at the root but is currently empty — i18n is not yet implemented
+- `languagepacks.json` exists at the root but is currently empty — i18n is not yet implemented. Do not assume multi-language support exists; new strings should be written directly in PT-BR.
 
 ## Testing Rules
 
