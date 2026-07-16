@@ -5,7 +5,7 @@ import { vars } from 'nativewind';
  * These are the actual color values without NativeWind's vars() wrapper.
  * Use this when you need to access colors programmatically (e.g., for NavigationBar).
  *
- * Design System: Ecobi Grocery Green Theme
+ * Design System: PowerLists Green Theme
  * Primary: Moss Green (#41be52)
  * Secondary: Beige (#eaf1da)
  * Neutral: Bright Snow
