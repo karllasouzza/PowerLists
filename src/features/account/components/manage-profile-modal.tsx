@@ -8,7 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { updateProfile } from '@/database/operations/profiles';
-import { updateEmail } from '@/database/operations/profile';
+import { updateEmail } from '@/database/operations/auth-profile';
 import { showToast } from '@/services/toast';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
