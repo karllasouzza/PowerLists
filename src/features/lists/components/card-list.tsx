@@ -34,7 +34,7 @@ function CardListComponent({ list, totalPrice, onEdit, onDelete }: CardListProps
 
   const handlePress = () => {
     router.push({
-      pathname: '/list',
+      pathname: '/lists/[id]',
       params: { id: list.id },
     });
   };

@@ -66,7 +66,7 @@ function DashboardPage() {
   const handleOpenList = useCallback(
     (listId: string) => {
       router.push({
-        pathname: '/list',
+        pathname: '/lists/[id]',
         params: { id: listId },
       });
     },

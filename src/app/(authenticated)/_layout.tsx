@@ -31,7 +31,7 @@ export default function AuthenticatedLayout() {
       <TabList
         className="h-16 border-t border-border"
         style={shouldHideTabs ? { display: 'none' } : undefined}>
-        <TabTrigger name="list" href={'/list' as Href} style={{ display: 'none' }} />
+        <TabTrigger name="list" href={'/lists/[id]' as Href} style={{ display: 'none' }} />
         <TabTrigger name="assistant" href={'/assistant' as Href} style={{ display: 'none' }} />
         <TabTrigger
           name="item-variations"
