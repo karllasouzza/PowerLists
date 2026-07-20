@@ -1,1 +1,1 @@
-export * from './shema';
+export * from './schema';

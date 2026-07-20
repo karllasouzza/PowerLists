@@ -1,5 +1,5 @@
 import type { ChatMessage } from '../types';
-import { AssistantMessage } from './asistant-message';
+import { AssistantMessage } from './assistant-message';
 import { AssistantAcknowledgmentCard } from './assistant-acknowledgment-card';
 import { UserMessageCard } from './user-message-card';
 

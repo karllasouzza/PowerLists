@@ -1,4 +1,4 @@
-export * from './asistant-message';
+export * from './assistant-message';
 export * from './assistant-acknowledgment-card';
 export * from './microphone-cta';
 export * from './system-message';
