@@ -5,7 +5,7 @@ import { CardListSkeletonList } from '@/features/lists/components/card-list-skel
 import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
-import { useListPageLogics } from './hooks/use-list-page-logics';
+import { useListPageLogics } from './hooks/use-lists-page';
 import { IconFolderOff, IconPlus } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
 import { Icon } from '@/components/ui/icon';

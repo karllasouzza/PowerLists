@@ -10,7 +10,7 @@ import { Controller } from 'react-hook-form';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
-import { usePasswordRecoveryLogic } from './hooks/use-password-recovery-page-logic';
+import { usePasswordRecoveryLogic } from './hooks/use-password-recovery-page';
 
 export default function PasswordRecoveryScreen() {
   const {

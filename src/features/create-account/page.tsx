@@ -10,7 +10,7 @@ import { Controller } from 'react-hook-form';
 import { View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useRouter } from 'expo-router';
-import { useCreateAccountLogic } from './hooks/use-create-account-logic';
+import { useCreateAccountLogic } from './hooks/use-create-account-page';
 
 export default function CreateAccountScreen() {
   const {

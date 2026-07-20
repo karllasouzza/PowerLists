@@ -11,7 +11,7 @@ import { AccountSection } from './components/account-section';
 import { PreferencesSection } from './components/preferences-section';
 import { ManageProfileModal } from './components/manage-profile-modal';
 import { PasswordSecurityModal } from './components/password-security-modal';
-import useProfileData from './use-profile-data';
+import useProfileData from './use-account-page';
 import { Icon } from '@/components/ui/icon';
 
 const AccountScreen = () => {

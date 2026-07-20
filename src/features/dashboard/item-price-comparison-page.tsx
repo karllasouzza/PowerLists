@@ -6,7 +6,7 @@ import { TopBar } from '@/components/top-bar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 
-import { useItemPriceComparisonLogics } from './hooks/use-item-price-comparison-logics';
+import { useItemPriceComparisonLogics } from './hooks/use-item-comparison';
 import { formatCurrency } from '@/utils/formatters';
 
 const AsyncDailyPriceBarChart = React.lazy(async () => {

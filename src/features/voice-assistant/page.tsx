@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { View } from 'react-native';
 import { ChatMessageItem } from './components';
 import { VoiceAssistantFooter } from './components/voice-assistant-footer';
-import { useVoiceAssistantLogics } from './hooks/use-voice-assistant-logics';
+import { useVoiceAssistantLogics } from './hooks/use-voice-assistant';
 
 export default function AssistantPage() {
   const router = useRouter();

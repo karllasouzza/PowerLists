@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { TopBar } from '@/components/top-bar';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { useDashboardPageLogics } from './hooks/use-dashboard-page-logics';
+import { useDashboardPageLogics } from './hooks/use-dashboard-page';
 import type { DashboardItemVariation } from './types';
 
 const AsyncPeriodFilter = React.lazy(async () => {

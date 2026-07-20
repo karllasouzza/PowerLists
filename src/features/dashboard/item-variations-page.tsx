@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
 
-import { useItemVariationsPageLogics } from './hooks/use-item-variations-page-logics';
+import { useItemVariationsPageLogics } from './hooks/use-item-variations-page';
 
 const AsyncItemVariationRow = React.lazy(async () => {
   const module = await import('./components/item-variation-row');

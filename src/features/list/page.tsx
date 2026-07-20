@@ -10,7 +10,7 @@ import { Fab } from '@/components/ui/fab';
 
 import { ListItemsFooter, ListItemSkeletonList, ListItemsSortBar } from './components';
 import ListItemCard from './components/list-item-card';
-import { useListItemsPageLogics } from './hooks/use-list-items-page-logics';
+import { useListItemsPageLogics } from './hooks/use-list-items-page';
 import { ItemCreateModal, ItemDeleteModal, ItemUpdateModal } from './modals';
 
 const AsyncListItemsContent = React.lazy(() => import('./components/list-items-content'));

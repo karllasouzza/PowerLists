@@ -4,7 +4,7 @@ import { IconArrowLeft, IconFolder } from '@tabler/icons-react-native';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { Text, View } from 'react-native';
-import { useAuthPageLogic } from './hooks/use-auth-page-logic';
+import { useAuthPageLogic } from './hooks/use-auth-page';
 
 export default function AuthScreen() {
   const { handleCreateAccount, handleLogin, handleGuest, isAlreadyGuest } = useAuthPageLogic();
