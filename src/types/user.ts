@@ -34,10 +34,6 @@ export interface UserOperationResult {
   error?: string;
 }
 
-// Legacy types (manter para compatibilidade temporária)
-export type CreateUserGuestProps = { isGuest?: true; email?: string; password?: string };
-export type CreateUserGuestResult = Promise<{ newUser: UserType } | undefined>;
-
 export function isGuestUser(user: UserType): user is UserGuestType {
   return (user as UserGuestType)?.is_guest === true;
 }
