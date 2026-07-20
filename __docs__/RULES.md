@@ -49,7 +49,12 @@ This document outlines the core development rules and conventions for the PowerL
 - Read reactive data in components using `useObservableQuery()` (custom hook in `src/hooks/use-observable-query.ts`)
 - Use `withObservables` HOC from WatermelonDB when appropriate
 - Use `useState` only for local UI state (modal open/close, search query, etc.)
+
+### Auth State (Architecture Decision)
 - Auth state uses `expo-secure-store` for persistence + `useSyncExternalStore` for reactivity
+- `src/features/auth/authState.ts` uses a module-level singleton pattern (global variables + listeners)
+- **Decision:** Keep as-is (works, tested, low risk). Do not migrate to React Context unless there's a specific need
+- If migrating in the future, consider Zustand or Jotai for minimal boilerplate
 
 ## Styling Rules
 
