@@ -12,6 +12,7 @@ import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
+import type { List } from '@/types';
 
 const AsyncCardList = React.lazy(async () => {
   const module = await import('@/features/lists/components/card-list');
@@ -37,7 +38,7 @@ const HomeScreen = () => {
   } = useListPageLogics();
 
   const renderList = useCallback(
-    (list: any) => (
+    (list: List) => (
       <AsyncCardList
         list={list}
         totalPrice={listTotalsById[list.id] ?? 'R$ 0,00'}
