@@ -11,7 +11,7 @@ import {
 } from '@tabler/icons-react-native';
 
 import { TabButton } from '@/components/tab-button';
-const SCREENS_WITH_HIDDEN_TABS = ['/list', '/item-variations', '/item-comparison'];
+const SCREENS_WITH_HIDDEN_TABS = ['/lists/', '/item-variations', '/item-comparison'];
 
 export default function AuthenticatedLayout() {
   const pathname = usePathname();
@@ -31,7 +31,6 @@ export default function AuthenticatedLayout() {
       <TabList
         className="h-16 border-t border-border"
         style={shouldHideTabs ? { display: 'none' } : undefined}>
-        <TabTrigger name="list" href={'/lists/[id]' as Href} style={{ display: 'none' }} />
         <TabTrigger name="assistant" href={'/assistant' as Href} style={{ display: 'none' }} />
         <TabTrigger
           name="item-variations"
