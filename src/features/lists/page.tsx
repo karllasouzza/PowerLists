@@ -1,12 +1,13 @@
 import React, { Suspense, useCallback } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, Pressable } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { CardListSkeletonList } from '@/features/lists/components/card-list-skeleton';
 import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-lists-page';
-import { IconFolderOff, IconPlus } from '@tabler/icons-react-native';
+import { IconFolderOff, IconPlus, IconChartBar } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
@@ -20,6 +21,7 @@ const AsyncCardList = React.lazy(async () => {
 });
 
 const HomeScreen = () => {
+  const router = useRouter();
   const {
     searchQuery,
     setSearchQuery,
@@ -63,6 +65,20 @@ const HomeScreen = () => {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Procurando por algo?"
+        rightAction={
+          !isEmpty ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Ver resumo de gastos"
+              onPress={() => router.push('/dashboard')}
+              className="flex-row items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+              <Icon as={IconChartBar} size={18} className="text-foreground" />
+              <Text variant="small" className="font-semibold text-foreground">
+                Resumo
+              </Text>
+            </Pressable>
+          ) : undefined
+        }
       />
 
       {isEmpty ? (
