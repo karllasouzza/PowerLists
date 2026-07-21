@@ -13,6 +13,12 @@
       "skillPath": "skills/continuous-agent-loop/SKILL.md",
       "computedHash": "9f6e576fcb73dbf6399306c7d25a79a7ab9870ae5b14b85d736481d61b460523"
     },
+    "maestro-mobile-testing": {
+      "source": "tovimx/maestro-mobile-testing-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "bdbd865389287a513591c184ca7958256b42d694216ae55c8e94372843eda46b"
+    },
     "roadmap-planning": {
       "source": "deanpeters/product-manager-skills",
       "sourceType": "github",
