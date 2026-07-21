@@ -7,12 +7,12 @@ import { closeOpenedSwipeable } from '@/components/swipeable';
 import { TopBar } from '@/components/top-bar';
 
 import { useListPageLogics } from './hooks/use-lists-page';
-import { IconFolderOff, IconPlus, IconChartBar } from '@tabler/icons-react-native';
+import { IconPlus, IconChartBar } from '@tabler/icons-react-native';
 import { Fab } from '@/components/ui/fab';
 import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
-import { Button } from '@/components/ui/button';
 import { ListCreateModal, ListDeleteModal, ListUpdateModal } from './modals';
+import { EmptyListsState } from './components/empty-lists-state';
 import type { List } from '@/types';
 
 const AsyncCardList = React.lazy(async () => {
@@ -82,20 +82,7 @@ const HomeScreen = () => {
       />
 
       {isEmpty ? (
-        <View className="flex-1 items-center justify-center px-8">
-          <Icon as={IconFolderOff} size={48} className="text-muted-foreground" />
-          <Text className="mt-4 text-lg font-semibold text-foreground">Nenhuma lista ainda</Text>
-          <Text variant="muted" className="mt-1 text-center">
-            Crie sua primeira lista e saiba exatamente{'\n'}quanto vai gastar em cada compra.
-          </Text>
-          <Button
-            variant="default"
-            className="mt-6 h-12 px-8"
-            onPress={handleOpenCreateModal}>
-            <Icon as={IconPlus} size={20} className="text-primary-foreground" />
-            <Text className="text-base font-bold text-primary-foreground">Criar primeira lista</Text>
-          </Button>
-        </View>
+        <EmptyListsState onCreateList={handleOpenCreateModal} />
       ) : (
         <Suspense fallback={<CardListSkeletonList />}>
           <FlatList
