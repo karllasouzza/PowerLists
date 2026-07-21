@@ -4,8 +4,7 @@ import { Tabs, TabList, TabSlot, TabTrigger } from 'expo-router/ui';
 import {
   IconFolder,
   IconFolderFilled,
-  IconHome,
-  IconHomeFilled,
+  IconChartBar,
   IconUser,
   IconUserFilled,
 } from '@tabler/icons-react-native';
@@ -44,10 +43,10 @@ export default function AuthenticatedLayout() {
         />
 
         <TabTrigger name="index" href={'/' as Href} asChild>
-          <TabButton icon={IconHome} focusedIcon={IconHomeFilled} label="Início" />
-        </TabTrigger>
-        <TabTrigger name="lists" href={'/lists' as Href} asChild>
           <TabButton icon={IconFolder} focusedIcon={IconFolderFilled} label="Listas" />
+        </TabTrigger>
+        <TabTrigger name="dashboard" href={'/dashboard' as Href} asChild>
+          <TabButton icon={IconChartBar} label="Resumo" />
         </TabTrigger>
         <TabTrigger name="account" href={'/account' as Href} asChild>
           <TabButton icon={IconUser} focusedIcon={IconUserFilled} label="Perfil" />
