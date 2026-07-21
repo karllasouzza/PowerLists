@@ -1,1 +1,1 @@
-export { default } from '@/features/dashboard/item-variations-page';
+export { default } from '@/features/summary/item-variations-page';

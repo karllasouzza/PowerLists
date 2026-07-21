@@ -1,1 +1,1 @@
-export { default } from '@/features/dashboard/item-price-comparison-page';
+export { default } from '@/features/summary/item-price-comparison-page';
